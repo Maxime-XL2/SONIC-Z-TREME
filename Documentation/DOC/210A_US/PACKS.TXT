@@ -1,0 +1,239 @@
+******************************************************************************
+Debug Text Display Library
+******************************************************************************
+
+******************************************************************************
+void *slLocate((Uint16)xps, (Uint16)yps)
+******************************************************************************
+
+Function:
+Returns a text display address (current screen).
+xps and yps are specified by the cell position (normally 0 to 63) on the
+screen.
+
+******************************************************************************
+void slCurScrn((Uint16)scrn)
+******************************************************************************
+
+Function:
+Sets the screen used by slLocate() and set_vbar().
+Specify one of the following six settings for scrn.
+scnNBG0, scnNBG1, scnNBG2, scnNBG3, scnRBGA, scnRBGB
+
+******************************************************************************
+void slCurColor((Uint16)Palette)
+******************************************************************************
+************************** Changes *************************************
+Function:
+Specifies the palette number for the text displayed by "slPrint???()" and
+"slDisp???()".
+Specify a number from 1 to 15 for the palette.
+****************** End of Changes ***************************************
+
+
+
+******************************************************************************
+void slDispHex((Uint32)val, (void *)dspadd)
+******************************************************************************
+
+Function:
+Displays the specified variable as an 8 digit hexadecimal number.
+
+******************************************************************************
+void slPrintHex((Uint32)val, (void *)dspadd)
+******************************************************************************
+
+Function:
+Displays the specified variable as an 8 digit hexadecimal number.
+The upper 0's becomes spaces.
+
+******************************************************************************
+void slPrintFX((FIXED)val, (void *)dspadd)
+******************************************************************************
+
+Function:
+Displays fixed point data as a decimal number.  The upper 0's of the integer
+component and lower 0's of the fractional component become spaces.
+The integer and fraction parts are each notated as 5 digit decimal numbers.
+
+******************************************************************************
+void slPrintMatrix((MATRIX)mtrx, (void *)dspadd)
+******************************************************************************
+
+Function:
+Displays a 3x4 matrix using slPrintFX().
+
+******************************************************************************
+Uint32 slHex2Dec((Uint32)val)
+******************************************************************************
+
+Function:
+Converts 32 bit binary data to BCD data of up to 8 digits.
+If a value of more than 8 digits is specified (higher than 10000000(d) =
+5F5E100(h)), the most significant value becomes unreliable.
+
+******************************************************************************
+void slPrint((char *)string, (void *)dspadd)
+******************************************************************************
+
+Function:
+Displays a specified character string.
+The completion code of the character string is NULL characters (code 0).
+
+******************************************************************************
+void slExtendScroll((void *)tbl, (void *)dspadd)
+******************************************************************************
+
+Function:
+Expands command compressed scroll maps in VRAM.
+The following are the usable functions registered in sl_macro.h.
+
+Function                 Description
+--------                 -----------
+End()                    End compressed data
+LocateA0(adr)            Designate address of VRAMA 0
+LocateA1(adr)            Designate address of VRAMA 1
+LocateB0(adr)            Designate address of VRAMB 0
+LocateB1(adr)            Designate address of VRAMB 1
+Set(cnt)                 Set data for cnt characters (continue normal data
+                         afterwards).
+Stock(cnt)               Set cnt characters to stock buffer (continue normal
+                         data afterwards)
+Same(cnt,chr)            Set same character, cnt times.
+Inc(cnt,chr)             Increment cnt characters and set.
+Inc2(cnt,chr)            Increment cnt characters by 2 and set.
+Dec(cnt,chr)             Decrement cnt characters and set.
+Dec2(cnt,chr)            Decrement cnt characters by 2 and set.
+Vline(cnt, chr)          Vertically format the same character
+VlineMinus(cnt,chr)      Vertically format the same character (bottom to top)
+Skip(offset)             Shift display address by the offset amount
+                         (offset is 1 byte)
+Skip2(offset)            Shift display address by the offset amount
+                         (offset is 2 bytes)
+Copy(src,cnt)            Copy data set in memory (copy source is address)
+RelCopy(src,cnt)         Copy data set in memory (copy source is relative)
+Fill(cnt,chr)            Set same character, cnt times (pointer does not move)
+                         (Uses CPU DMA)
+Block(hcnt,vcnt)         Fill a block hcnt cells wide by vcnt cells high with
+                         data. (Pointer moves to the right of the block.)
+BlockInc(hcnt,vcnt,chr)  Fill a block hcnt cells wide by vcnt cells high with
+                         incrementing character chr. (Pointer moves to the
+                         right of the block)
+BlockInc2(hcnt,vcnt,chr) Fill a block hcnt cells wide by vcnt cells high with
+                         incrementing by 2 of character chr. (Pointer moves to
+                         the right of the block.)
+One(chr)                 Set a single character.
+High(cnt,chr)            Set the upper byte of cnt characters to chr,
+                         beginning with the current cell, and process the
+                         LChar macro.
+BlockFill(hcnt,vcnt,chr) Fill a block hcnt cells wide by vcnt cells high with
+                         character chr (Pointer moves to the right of the
+                         block.)
+Add(cnt,chr,add)         Set character chr and increment the character number
+                         by the specified number.
+                         (The increment value is a signed 8 bit value.)
+BlockAdd(hcnt,vcnt,chr,add) Fill a block hcnt wide by vcnt high with character
+                            chr while incrementing the character number by
+                            add. (Pointer moves to the right of the block.)
+                            (The increment value is a signed 8 bit value.)
+Loop(cnt)                Executes a process to the next Until() for cnt times.
+Until()                  However, nesting is not possible.
+
+Char1(c)                 Assign data to 1 cell
+Char2(c1,c2)             Assign data to 2 cells
+...
+Char8(c1,c2,c3,c4,c5,c6,c7,c8)  Assign data to 8 cells
+LChar1(c)                Assign high character data (lower byte)
+LChar2(c1,c2)            Assign lower-byte data to 2 cells
+...
+LChar8(c1,c2,c3,c4,c5,c6,c7,c8)  Assign lower-byte data to 8 cells
+
+ Examples)
+
+#define     SpaceCHR    0x0000
+#define     WhiteCHR    0x00fe
+
+    Uint8 SceneMap_1[] = {
+        Fill(Page , Space) ,                    /* Fills one page with spaces */        ************************** Changes ************
+        Loop(4) ,                               /* Repeats "Until()" four times */      ************************** Changes ************
+            BlockFill(8 , 8 , WhiteCHR) ,       /* Fills an 8 x 8 block with white CHR */ ************************ Changes ************
+            Skip(8) ,                           /* Moves the pointer 8 cells from the next bloc position */******* Changes ************
+            BlockFill(8 , 8 , WhiteCHR) ,
+            Skip(8) ,
+            BlockFill(8 , 8 , WhiteCHR) ,
+            Skip(8) ,
+            BlockFill(8 , 8 , WhiteCHR) ,
+            Skip2(7 * Line + 16) ,              /* Use Skip2 since the pointer movement amount exceeds 1 byte */  ********* Changes ************
+            BlockFill(8 , 8 , WhiteCHR) ,
+            Skip(8) ,
+            BlockFill(8 , 8 , WhiteCHR) ,
+            Skip(8) ,
+            BlockFill(8 , 8 , WhiteCHR) ,
+            Skip(8) ,
+            BlockFill(8 , 8 , WhiteCHR) ,
+            Skip2(7 * Line) ,
+        Until() ,
+        End()
+    } ;
+
+******************************************************************************
+void set_vbar((Uint16)xps)
+******************************************************************************
+
+
+
+Function:
+Displays a vertical bar at x coordinate xps for checking the CPU operation
+time.
+
+******************************************************************************
+void reset_vbar((Uint16)xps)
+******************************************************************************
+
+Function:
+Erases the bar displayed by set_vbar().
+
+Combine the two functions above with slSynch() to monitor CPU usage.
+
+Example:
+
+    while(-1){
+        slExecuteEvent() ; /* Event processing */
+
+        reset_vbar(39) ;   /* Vertical bar erase */
+        slSynch() ;        /* Wait video sync */
+        set_vbar(39) ;     /* Display vertical bar */
+    }
+
+Screen display starts immediately after slSynch(), and the vertical bar is 
+written to VRAM. The vertical bar is erased from VRAM after all events have 
+been processed from the start of slExecuteEvent().  Therefore, it is possible 
+to measure CPU use by the length of time the bar is visible on screen.
+
+Note: 
+The number of lines used to set characters changes based on the screen 
+resolution.
+
+In low resolution (224 or 240 lines), the upper 32 lines are overwritten.  In 
+high resolution (448 or 480 lines, interlaced), 64 lines are rewritten.
+
+******************************************************************************
+void *slLocateNbg((Uint16)xps, (Uint16)yps, (Uint16)scrn)
+******************************************************************************
+
+Function: 
+Returns the display address of the normal scroll screen. xps and yps sets the 
+cell position (normally 0 to 127) on screen. Specify scnNBG0, scnNBG1, 
+scnNBG2, or scnNBG3 for scrn.
+
+******************************************************************************
+void *slLocatePage((Uint16)xps, (Uint16)yps, (Uint16)page)
+******************************************************************************
+
+Function: 
+Returns the display address of the scroll screen. xps and yps specifies the 
+cell position (normally 0 to 63) on screen.
+
+page specifies a page number counted in 0x2000 units from the start address of 
+VRAM.
+

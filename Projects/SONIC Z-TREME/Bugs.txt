@@ -1,0 +1,8 @@
+BUGS
+
+OK-Explosions. Solution : Timer Uint32 au lieu d'un Sint16
+OK-Animations des textures. Solution temporaire : DMA
+-Insertion dans l'octree des entités
+-Améliorer la physique
+-Améliorer niveaux
+-Meilleur frustum

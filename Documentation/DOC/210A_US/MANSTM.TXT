@@ -1,0 +1,444 @@
+******************************************************************
+* Document type: Library reference
+* Readme file name: manstm.txt
+* Library prefix: STM
+* Library name: Stream System Library
+* Version: 2.11
+* Creator: H.T
+* Created: 3/21/96
+* Comments: None
+******************************************************************
+
+The following changes are also reflected in the File System.  Use
+version 2.10 or later of the File System.
+
+1. Changes from Ver.1.01 to Ver.1.10
+
+(1) Changes in Function Specifications
+
+(a) Replace functions from before Ver.1.01 as described below.
+
+* STM_Init()
+
+  #define GRP_MAX     12
+  #define STM_MAX     24
+  Uint32  work[STM_WORK_SIZE(GRP_MAX, STM_MAX)/sizeof(Uint32)];
+          .
+          .
+  STM_Init(GRP_MAX, STM_MAX, work);
+          .
+          .
+
+  Locate work in a 4 byte boundary.
+
+  Set the maximum number (open_max) of simultaneously opened files
+  for GFS_Init functions to STM_MAX or higher.
+
+* STM_OpenFid(grp, fid, &key), STM_OpenFrange(grp, &frange, &key)
+  STM_OpenFid(grp, fid, &key, STM_LOOP_READ);
+  STM_OpenFrange(grp, &frange, &key, STM_LOOP_READ);
+
+* STM_SetTrBuf(stm, buf, BUF_SIZE)
+  STM_SetTrBuf(stm, buf, BUF_SIZE, STM_UNIT_WORD);
+
+* STM_SetLoop(grp, stm)
+
+  When using loop playback:     STM_SetLoop(grp, stm,
+                                STM_LOOP_ENDLESS);
+  When not using loop playback: STM_SetLoop(grp, stm, 1);
+
+(b) The error code is passed to the second argument of the error
+    function (StmErrFunc).
+
+(2) Operation During Loop Playback
+
+When the pickup has reached the end of the playback range,
+operation will differ in the manner described below.
+
+        Pick up reaches the end of the playback range
+        Before Ver.1.01         |             After Ver.1.10
+                +-------------------------------+
+                |                               |
+Pause until transfer of all   Move the pickup to the loop stream
+data in the CD buffer         and start playback
+is completed    |                               |
+                v                               v
+Set status as                    After looping for the # of times
+STM_EXEC_COMPLETED,              specified in STM_SetLoop,
+reset transfer destination       reset transfer destination
+                |                               |
+                v                               v
+Move the pick up to the loop     Set status as STM_EXEC_COMPLETED
+stream, start playback
+
+Regardless of the changes mentioned above, a program (example on
+left) created with a version 1.01 or earlier library can operate
+in the same manner as a program created with version 1.10 by
+implementing STM_SetLoop(grp, STM_LOOP_DFL, 1) as shown in the
+example on the right.
+
+grp = STM_OpenGrp();                  grp = STM_OpenGrp();
+stm = STM_OpenFid(grp, FID1, &key);   stm = STM_OpenFid(grp, FID1,
+STM_SetTrBuf(stm, buf, BUFSIZE1);             &key,STM_LOOP_READ);
+STM_SetExecGrp(grp);                  STM_SetTrBuf(stm, buf,
+for (i = 0; i < LOOPMAX; ) {             BUFSIZE1, STM_UNIT_WORD);
+  stat = STM_ExecServer();            STM_SetLoop(grp,
+                                         STM_LOOP_DFL, 1);
+  if (stat == STM_EXEC_COMPLETED) {   STM_SetExecGrp(grp);
+          i++;                        for (i = 0; i < LOOPMAX; ) {
+      }                                  stat = STM_ExecServer();
+      user();                         if (stat ==
+                                         STM_EXEC_COMPLETED) {
+}                                          i++;
+                                           STM_SetLoop(grp,
+
+                                                 STM_LOOP_DFL, 1);
+                                              }
+                                              user();
+                                          }
+
+(3) Transfer Settings
+
+Before Ver.1.01, when performing the following process,
+
+  1) Set the transfer area
+               |
+               V
+  2) Set the transfer function
+               |
+               V
+  3) Clear the transfer function
+
+the next transfer destination was the transfer area set with the
+first setting.  However, after Ver.1.10, it is necessary to reset
+the transfer area.  The maximum transfer sector count and transfer
+mode will revert to the default.
+
+(4) Handling File Types
+
+All files on CD-ROM, Virtual CD, SIMM, and SCSI can be handled by
+sega_stm.lib.  However, the File System Library components that
+are linked must be used separately.
+
+(5) Other
+
+(a) To use the Stream System, the File System, CD Communication
+    Interface, DMA, and Cache libraries must all be linked.
+
+(b) There is a change in sega_stm.h.  Recompile all source files
+    included in sega_stm.h.
+
+2. Description of Changes After Ver.1.11
+   (from Ver.1.11 to Ver.1.13)
+
+2.1 Bug Fixes from Ver.1.10 to Ver.1.11
+
+(a) Fixed operational bug that occurs when the transfer function
+    returns a (-1) or (0).
+(b) Fixed bug that caused the drive to remain in playback state
+    and the FAD to freeze when a stream is opened immediately
+    before the final position of the playback range of another
+    stream.
+
+2.2 Bug Fixes from Ver.1.11 to Ver.1.12
+
+(a) A bug caused a transfer to the loop stream when the buffer
+    became full during the middle of the playback range.
+
+2.3 Bug Fixes from Ver.1.12 to Ver.1.13
+
+(a) Fixed a bug that caused the crash/infinite loop/File System
+    access denial that occurred when STM_SetExecGrp(NULL) was
+    executed.
+
+3. Description of Changes from Ver.1.13 to Ver.1.16
+
+To match the File System version number, the version number of the
+Stream System was also changed from Ver.1.13 to Ver.1.16.
+
+3.1 Adding Specification Functions for Immediate Return Type
+    Server Execution Groups
+
+The STM_SetExecGrp waits internally in the function until a drive
+pause state is reached.  The following function has been added to
+prevent processing delay on the application side.
+
+There are no effects on the application when STM_NwSetExecGrp is
+not used.
+
+3.1.1 Function Addition
+
++----------------+---------------------+------------------+-----+
+| Title          | Function            | Function Name    | No. |
+|                |                     |                  |     |
+| Function Specs | Set server          | STM_NwSetExecGrp | 7.1 |
+|                | execution group     |                  |     |
++----------------+---------------------+------------------+-----+
+
+Format:         Bool  STM_NwSetExecGrp(StmGrpHn grp)
+Input:     grp: Stream group handle
+Output:         None
+Function Value: TRUE when processing is accepted
+                FALSE when processing is rejected
+Function:       Specifies the stream groups which should be
+                executed by the stream server.  This is an
+                immediate return function, so it is necessary to
+                call the server function.
+Comments:
+
+(a) If a process is set, it returns immediately.
+(b) When NULL is specified to use the File System, call the GFS
+    functions after confirming that the drive goes to pause state
+    using the following method:
+
+        tsk = STM_NwSetExecGrp(grp);
+        if (tsk == FALSE)  return;
+        do {
+            stat = STM_ExecServer();
+            user();
+        } while (stat != STM_EXEC_TSKEND);
+
+(c) When NULL is specified, the stream server status becomes
+    STM_EXEC_PAUSE via STM_EXEC_TSKEND.  Be sure to call the
+    server function before STM_EXEC_TSKEND.
+
+(d) When using the File System, specify NULL to stop.
+
+(e) When stream group access is restarted, read starts from the
+    stop position.
+
+3.1.2 Function Specification Changes
+
++----------------+---------------------+------------------+-----+
+| Title          | Function            | Function Name    | No. |
+|                |                     |                  |     |
+| Function Specs | Execute server n    | STM_ExecServer   | 7.3 |
++----------------+---------------------+------------------+-----+
+
+Format:         Sint32  STM_ExecServer(void)
+Input:          None
+Output:         None
+Function Value: Stream access condition (StmAcStat)
+                If immediate return type functions are
+                being processed, then function ID (StmFuncId).
+                If there is an error, then error code(StmErrCode)
+Function:       Executes the stream server.
+
+3.1.3 Changes in Constants
+
++----------------+---------------------+------------------+-----+
+| Title          | Function            | Function Name    | No. |
+|                |                     |                  |     |
+| Function Specs | Stream access       | StmAcStat        | 2.2 |
+|                | conditions          |                  |     |
++----------------+---------------------+------------------+-----+
+
+(1) Stream Access Conditions
++------------------------------+--------------------------------+
+|     Constant name            |          Explanation           |
++------------------------------+--------------------------------+
+| STM_EXEC_COMPLETED           | Access completed               |
++------------------------------+--------------------------------+
+| STM_EXEC_PAUSE               | Access paused                  |
++------------------------------+--------------------------------+
+| STM_EXEC_DOING               | Accessing                      |
++------------------------------+--------------------------------+
+| STM_EXEC_WAIT                | Waiting for transfer           |
++------------------------------+--------------------------------+
+| STM_EXEC_TSKEND              | Immediate return type function |
+|                              | end                            +
++------------------------------+--------------------------------+
+
+3.2 Other Changes
+
+3.2.1 STM_SetExecGrp Function
+
+With the addition of STM_NwSetExecGrp, STM_SetExecGrp also returns
+Boolean values.  The function value's meaning is the same as that
+of STM_NwSetExecGrp.
+
+3.2.2 Function Addition
+
++----------------+---------------------+------------------+-----+
+| Title          | Function            | Function Name    | No. |
+|                |                     |                  |     |
+| Function Specs | Recover read error  | STM_Recover      | 9.3 |
++----------------+---------------------+------------------+-----+
+
+Format:         Sint32   STM_Recover(void)
+Input:          None
+Output:         None
+Function Value: STM_ERR_OK: Recovery succeeded
+                STM_ERR_CDRD: Recovery failed
+Function:       Forces playback to continue when a read error
+                occurs.
+
+Comments:
+
+Use as shown below in the error function:
+
+        void    errfunc(void *obj, Sint32 ec)
+        {
+            if (ec == STM_ERR_CDRD) {
+                STM_Recover();
+            } else {
+                .....
+            }
+        }
+
+3.3 Bug Fixes
+
+(a) A bug caused playback of the wrong area when processing occurs
+    in the following order: STM_SetExecGrp(grp) ->
+    STM_SetExecGrp(NULL)-> STM_SetExecGrp(grp).
+
+(b) Fixed incorrect playback range problem when
+    STM_GetExecStat(grp) is called between the execution of
+    STM_SetExecGrp(grp) and STM_ExecServer().
+
+(c) Fixed a bug that caused STM_GetLenTrBuf to return 0 as a value
+    when it was executed after the stream group access condition
+    became STM_EXEC_COMPLETED.
+
+(d) Fixed a bug that caused the STM_EXEC_PAUSE state to occur when
+    STM_MovePickup is executed during non-read function
+    operations.
+
+    Be sure to specify the loop count correctly when performing
+    a forced move of the pickup using STM_MovePickup.
+
+4. Description of Changes After Ver.1.16
+   (from Ver.1.16 to Ver.2.02)
+
+4.1 Bug Fixes from Ver.1.16 to Ver.1.20
+
+(a) Fixed a bug that caused a return to STM_EXEC_DOING when
+    STM_ExecServer was called continuously after the
+    STM_EXEC_COMPLETED status.  This problem occurred when a
+    stream group without a CD stream is executed.
+
+(b) Fixed a bug that caused resident streams to be transferred
+    only once when the loop count is set to two or more using
+    STM_SetLoop.
+
+(c) Fixed a crash bug during loop playback that occurred when the
+    playback file size is not in 4 byte units.
+
+(d) Fixed a problem that caused the playback of the last stream's
+    entire playback range to occur whenever a stream was closed
+    during playback.  This problem occurred when the last stream's
+    playback range existed prior to the playback start position.
+
+4.2 Description of Changes from Ver.1.20 to Ver.1.21
+
+4.2.1 Function Addition
+
++----------------+---------------------+------------------+-----+
+| Title          | Function            | Function Name    | No. |
+|                |                     |                  |     |
+| Function Specs | Reset Stream System | STM_Reset        | 1.2 |
++----------------+---------------------+------------------+-----+
+
+Format:         void  STM_Reset(void)
+Input:          None
+Output:         None
+Function Value: None
+Function:       Close all open stream groups and streams, and
+                reset the Stream System.  (Stop stream access and
+                initialize all data.)
+
+4.2.2 Other Changes
+
+(a) The necessary low-level functions have been set up so that the
+    A-Bus is not accessed (see caution items below) when they
+    are executed during SCU-DMA transfers.
+
+(b) Made compatible with the CDC Library Ver.1.20.
+
+4.2.3 Bug Fixes
+
+(a) Fix a bug that caused the transferable sector count to be
+    smaller than the maximum transfer sector count during the use
+    of a transfer function, regardless of the presence of data in
+    the CD buffer.  Because of this problem, after the transfer
+    function was set, it became impossible to obtain the
+    transferred data count using STM_GetLenTrBuf.
+
+(b) Increased processing speed when streams belonging to stream
+    groups being played back are closed.  (However, the processing
+    time required when streams are closed during reads is the
+    same).
+
+4.3 Bug Fixes from Ver.1.21 to Ver.1.22
+
+(a) A fix was made to prevent access to an illegal address
+    after the playback of a stream group.
+
+4.4 Bug Fixes from Ver.1.22 to Ver.1.23
+
+(a) Fixed a bug that prevented the pickup from moving to the start
+    of the playback range when multiple streams in the same
+    playback range are opened during stream group playback.
+
+4.5 Bug Fixes from Ver.1.23 to Ver.1.24
+
+(a) Corrected a bug that caused data to be read into the incorrect
+    buffer partition after a stream has been closed after playback
+    and only the prior unplayed streams are open.
+
+4.6 Ver.2.00
+
+(a) Ver.2.00 is the same as Ver.1.24.
+
+4.7 Changes from Ver.2.00 to Ver.2.02
+
+This version was numbered Ver.2.02 in order to match the File
+System's version number.
+
+(1) Integration of SBL and the SGL CD-ROM Libraries
+
+(a) If SBL is defined with USE_SGL before compiling, it can be
+    used as a SGL CD-ROM Library module.
+
+(2) Bug Fixes
+
+(a) The bug which prevented transfers by STM_ExecTrans after
+    playback start by STM_ExecServer has been fixed.
+
+4.8 Changes from Ver 2.02 to Ver.2.10
+
+(a) The error detection function for a FATAL CD block and CD Tray
+    Open status was improved.
+
+4.9 Changes from Ver 2.10 to Ver.2.11
+
+***************************** changes ******************************
+(1) Bug Fixes
+
+(a) Errors in the interleaved stream playback range and the filter frame
+address range were corrected.
+
+**********************End of Changes *****************************
+5. Cautions
+
+(1) Closing Streams that have Transfer Functions Set
+
+The Stream System will keep calling the transfer function until it
+returns a value greater than zero.  This happens whenever a stream
+is closed immediately after the transfer function returns a
+negative value (-1).  A value greater than 0 must be returned
+after the transfer is complete.
+
+(2) Using SCU-DMA
+
+When the transfer mode is STM_TR_SCU or an SCU-DMA is started by
+the transfer function, only the following functions can be used
+during stream reads.
+
+During SCU-DMA transfers, access to the A-Bus is prohibited, so
+the use of functions other than these is prohibited.
+
+* STM_Reset         * STM_CloseGrp      * STM_IsTrans
+* STM_ExecServer    * STM_ExecTrans     * STM_GetErrStat
+
+***************************end of file****************************

@@ -1,0 +1,486 @@
+******************************************************************************
+Math and System Libraries
+******************************************************************************
+
+Numerical values used by the library are based on the following
+specifications.
+
+Fixed point data for coordinates and trigonometric functions:
+
+    The upper 16 bits are integers and the lower 16 bits are decimals
+    for a total of 32 bits (signed).
+
+    Type name: FIXED
+
+    Example:
+
+        When denoting 16.5:   0x0010_8000
+                                ---- ----
+                                  |    |__ Decimal portion
+                                  |__ Integer portion
+
+The coordinates are as follows:
+
+    - X axis for the left/right direction (a positive value = right)
+    - Y axis for the up/down direction (a positive value = down)
+    - Z axis for depth (a positive value = back).
+
+Angle:
+
+    360¡ is represented in 16 bits
+
+    Type name: ANGLE
+
+    Example:
+
+        90.0¡  :  0x4000
+        45.0¡  :  0x2000
+        22.5¡  :  0x1000
+        11.25¡ :  0x0800
+
+    When a rotational matrix is created, the positive angular direction
+    is a rotation to the right relative to the axis.
+
+Matrix:
+
+    FIXED numbers are used. The data placement in memory for a 3x4
+    matrix is shown below:
+
+        M00, M01, M02,
+        M10, M11, M12,
+        M20, M21, M22,
+        M30, M31, M32
+
+******************************************************************************
+Library Functions
+******************************************************************************
+
+******************************************************************************
+void slInitMatrix(void)
+******************************************************************************
+
+Function:
+Initializes variables and buffers used for matrix calculation.
+
+******************************************************************************
+Bool slPushMatrix(void)
+******************************************************************************
+
+Function:
+Increments the matrix stack pointer and copies the current matrix to that
+position. Up to 20 levels of matrices can be nested, but an error is returned
+if this number is exceeded.
+
+******************************************************************************
+Bool slPushUnitMatrix(void)
+******************************************************************************
+
+Function:
+Increments the matrix stack pointer and sets the unit matrix at that location.
+An error is returned when excessive nesting occurs.
+
+******************************************************************************
+Bool slIncMatrixPtr(void)
+******************************************************************************
+
+Function:
+Increments the matrix stack pointer. Up to 20 matrices can be nested, but an
+error is returned if this number is exceeded.
+
+******************************************************************************
+Bool slPopMatrix(void)
+Bool slDecMatrixPtr(void)
+******************************************************************************
+
+Function:
+Decrements the matrix stack pointer by 1. An error is returned when the matrix
+is decremented too far.
+
+******************************************************************************
+void slUnitMatrix(MATRIX *mtptr)
+******************************************************************************
+
+Function:
+Converts the specified matrix into a unit matrix. When CURRENT is specified
+for the matrix, the current matrix of the matrix stack is used.
+
+******************************************************************************
+void slUnitAngle(MATRIX *mtptr)
+******************************************************************************
+
+Function:
+Makes the rotational portion (3x3) of the matrix into a unit matrix.
+The translated portion does not change. When CURRENT is specified for the
+matrix, the current matrix is modified.
+
+******************************************************************************
+void slUnitTranslate(MATRIX *mtptr)
+******************************************************************************
+
+Function:
+Sets the translated section of the matrix to 0. The rotational section does
+not change. When CURRENT is specified for the matrix, the current matrix is
+modified.
+
+******************************************************************************
+void slLoadMatrix(MATRIX *mtptr)
+******************************************************************************
+
+Function:
+Copies a specified matrix to the current matrix.
+
+******************************************************************************
+Bool slCopyMatrix(void)
+******************************************************************************
+
+Function:
+Copies the penultimate matrix to the current matrix. When the matrix is not
+nested, an error is returned.
+
+******************************************************************************
+void slRegistMatrix(MATRIX *mtptr)
+******************************************************************************
+
+Function:
+Copies a specified matrix to the matrix buffer. When CURRENT is specified for
+the matrix, the current matrix of the matrix stack is used.
+
+******************************************************************************
+void slGetMatrix(MATRIX *mtptr)
+******************************************************************************
+
+Function:
+Copies the current matrix to a specified matrix.
+
+******************************************************************************
+void slGetTranslate(FIXED *pbuf)
+******************************************************************************
+
+Function:
+Fetches the translated component from the matrix and copies it to a specified
+buffer.
+
+******************************************************************************
+void slLoadTranslate(FIXED M30, FIXED M31, FIXED M32)
+******************************************************************************
+
+Function:
+Updates only the translated portion of the current matrix.
+
+******************************************************************************
+void slInversMatrix()
+******************************************************************************
+
+Function:
+Inverts the current matrix.
+
+******************************************************************************
+void slTransposeMatrix()
+******************************************************************************
+
+Function:
+Transposes the current matrix.
+
+******************************************************************************
+void slRotX(ANGLE angx)
+******************************************************************************
+
+Function:
+Multiplies an X axis rotation matrix to the current matrix. The rotation
+matrix is shown here:
+
+    1.0    0.0          0.0          0.0
+    0.0    cos(theta)   sin(theta)   0.0
+    0.0   -sin(theta)   cos(theta)   0.0
+    0.0    0.0          0.0          1.0
+
+******************************************************************************
+void slRotXSC(FIXED sn, FIXED cs)
+******************************************************************************
+
+Function:
+Rotates relative to the X axis by specifying sine and cosine values.
+
+    1.0    0.0    0.0    0.0
+    0.0    cs     sn     0.0
+    0.0   -sn     cs     0.0
+    0.0    0.0    0.0    1.0
+
+******************************************************************************
+void slRotY(ANGLE angy)
+******************************************************************************
+
+Function:
+Multiplies a Y axis rotation matrix to the current matrix.
+
+    cos(theta)    0.0    -sin(theta)    0.0
+    0.0           1.0    0.0            0.0
+    sin(theta)    0.0    cos(theta)     0.0
+    0.0           0.0    0.0            1.0
+
+******************************************************************************
+void slRotYSC(FIXED sn, FIXED cs)
+******************************************************************************
+
+Function:
+Rotates relative to the Y axis by specifying sine and cosine values.
+
+    cs     0.0   -sn     0.0
+    0.0    1.0    0.0    0.0
+    sn     0.0    cs     0.0
+    0.0    0.0    0.0    1.0
+
+******************************************************************************
+void slRotZ(ANGLE angz)
+******************************************************************************
+
+Function:
+Multiplies a Z axis rotation matrix to the current matrix.
+
+    cos(theta)     sin(theta)    0.0    0.0
+   -sin(theta)     cos(theta)    0.0    0.0
+    0.0            0.0           1.0    0.0
+    0.0            0.0           0.0    1.0
+
+******************************************************************************
+void slRotZSC(FIXED sn, FIXED cs)
+******************************************************************************
+
+Function:
+Rotates relative to the Z axis by specifying sine and cosine values.
+
+    cs     sn     0.0    0.0
+   -sn     cs     0.0    0.0
+    0.0    0.0    1.0    0.0
+    0.0    0.0    0.0    1.0
+
+******************************************************************************
+void slRotAX(FIXED vctX, FIXED vctY, FIXED vctZ, ANGLE A)
+******************************************************************************
+
+Function:
+Rotates relative to the desired axis about the origin point. The axis is
+specified by a unit vector.
+
+    NxNx(1-C)+C       NxNy(1-C)+NzS    NxNz(1-C)-NyS    0.0
+    NyNx(1-C)-NzS     NyNy(1-C)+C      NyNz(1-C)+NxS    0.0
+    NzNx(1-C)+NyS     NzNy(1-C)+NxS    NzNz(1-C)+C      0.0
+    0.0               0.0              0.0              1.0
+
+Nx, Ny, and Nz are unit vector elements that represent the axis.
+C represents cosine, and S represents sine.
+
+******************************************************************************
+void slTranslate(FIXED tx, FIXED ty, FIXED tz)
+******************************************************************************
+
+Function:
+Performs a translation of the current matrix.
+
+    0.0    0.0    0.0    0.0
+    0.0    0.0    0.0    0.0
+    0.0    0.0    0.0    0.0
+    tx     ty     tz     1.0
+
+******************************************************************************
+void slRegistTranslate(FIXED tx, FIXED ty, FIXED tz)
+******************************************************************************
+
+Function:
+Copies to the current matrix the matrix that was translated in the matrix
+buffer. However, the matrix buffer is not modified.
+
+******************************************************************************
+void slScale(FIXED sx, FIXED sy, FIXED sz)
+******************************************************************************
+
+Function:
+Scales the current matrix.
+
+    sx     0.0    0.0    0.0
+    0.0    sy     0.0    0.0
+    0.0    0.0    sz     0.0
+    0.0    0.0    0.0    1.0
+
+******************************************************************************
+void slMultiMatrix(MATRIX mtrx)
+******************************************************************************
+
+Function:
+Multiplies a specified matrix to the current matrix.
+
+******************************************************************************
+void slLookAt(FIXED camera[XYZ], FIXED target[XYZ], ANGLE angz)
+******************************************************************************
+
+Function:
+The matrix which holds the target direction from the camera position is
+multiplied with the current matrix. In this case, rotation also occurs about
+the Z axis.
+
+Note:
+Vectors on the XZ plane become smaller for directions that go along the Y
+axis. As a result, calculations may sometimes not be performed correctly.
+
+******************************************************************************
+FIXED slSin(ANGLE angs)
+******************************************************************************
+
+Function:
+Returns the sine for a specified angle. Values can range from 0xffff0000 to
+0x00010000.
+
+Note:
+For angular data, the lower 4 bits are discarded, and the data is converted to
+values between 0x0000 to 0xfff0.  Accuracy is slightly lowered because of this
+(the same restriction applies wherever angles are used below).
+
+******************************************************************************
+FIXED slCos(ANGLE angc)
+******************************************************************************
+
+Function:
+Returns the cosine for a specified angle. Values can range from 0xffff0000 to
+0x00010000.
+
+******************************************************************************
+FIXED slTan(ANGLE angt)
+******************************************************************************
+
+Function:
+Returns the tangent for a specified angle.
+
+Note:
+When close to 90¡, the value of the tangent is too large and accuracy is
+questionable.
+
+******************************************************************************
+ANGLE slAtan(FIXED tx, FIXED ty)
+******************************************************************************
+
+Function:
+Returns the angle of a specified direction.
+
+******************************************************************************
+Uint16 slSquart(Uint32 sqrt)
+******************************************************************************
+
+Function:
+Computes the square root of an unsigned integer.
+
+******************************************************************************
+FIXED slSquartFX(FIXED sqrtfx)
+******************************************************************************
+
+Function:
+Computes the square root of an unsigned fixed point number.
+
+Note:
+The result is calculated as an integer, so the resulting accuracy is an 8 bit
+integer and an 8 bit decimal.
+
+******************************************************************************
+FIXED slMulFX(FIXED a,FIXED b)
+******************************************************************************
+
+Function:
+Multiplies fixed point numbers and returns the result.
+
+******************************************************************************
+FIXED slDivFX(FIXED a,FIXED b)
+******************************************************************************
+
+Function:
+Divides fixed point numbers and returns the result (b/a).
+
+******************************************************************************
+FIXED slInnerProduct(VECTOR vct1,VECTOR vct2)
+******************************************************************************
+
+Function:
+Takes the inner product of two vectors and returns the result.
+
+******************************************************************************
+void slNormalVector(VECTOR a, b, c, ans)
+******************************************************************************
+
+Function:
+Computes a vector (unit normal vector) which intersects 2 vectors (b->a, b->c)
+specified by 3 points.
+To reverse the way of vectors, sets the 3 points in the order of b, a, and c.****** Changes ***************
+******************************************************************************
+FIXED slRandom()
+******************************************************************************
+
+Function:
+Generates a random number between 0 and 1.0.
+
+******************************************************************************
+void slBezier(VECTOR p0, VECTOR p1, VECTOR p2, VECTOR p3, FIXED timming,
+VECTOR ans)
+******************************************************************************
+
+Function:
+Returns the position of a Bezier curve that connects 4 points based on the
+timming value. Values from 0 to 1.0 can be specified for the timming
+parameter.
+
+******************************************************************************
+FIXED slBallCollision(FIXED object1[XYZ], FIXED size1, FIXED object2[XYZ],
+FIXED size2)
+******************************************************************************
+
+Function:
+Detects whether two spheres, one defined with coordinate of object[XYZ] and
+radius size1 and the other with coordinate of object2[XYZ] and radius size2,
+collide with each other.  If collision is detected, their distance is
+returned. When there is no collision, negative value is returned.
+
+******************************************************************************
+FIXED slCheckOnScreen(FIXED object[XYZ], FIXED size)
+******************************************************************************
+
+Function:
+Transforms the position of a specified object via the current matrix and
+determines whether the object at that position with a specified size will be
+displayed on the screen, and returns the result.  Returns -1 (FFFFFFFF) when
+the object is in front of the screen; -2 (FFFFFFFE) when the object is outside
+the upper-lower, left-right clipping boundaries; and the Z position when
+within the screen.
+
+******************************************************************************
+FIXED slCheckOnScreen0(FIXED size)
+******************************************************************************
+
+Function:
+Tests whether an object at position (0, 0, 0) will be displayed on the screen
+at its specified size, and returns the result. Returns -1 (FFFFFFFF) when the
+object is in front of the screen, -2 (FFFFFFFE) when the object is outside the
+upper-lower, left-right boundaries, and Z position when within the screen.
+
+******************************************************************************
+void slSlaveFunc(void (*func)(), void *par)
+******************************************************************************
+
+Function:
+Executes the specified function with the slave CPU. If a function such as a
+polygon display function remains in the slave's command buffer, this function
+will not be executed, resulting in its delayed execution start.
+
+******************************************************************************
+void slSetTrayCheck(Bool switch)
+******************************************************************************
+
+Function:
+
+This function has been eliminated.
+
+******************************************************************************
+FIXED  slConvert3Dto2D( FIXED pos[XYZ], Sint32 ans[XY])
+******************************************************************************
+
+**************************** Changes ******************************:
+Function:
+A function has been added that returns the screen coordinate values when the current
+matrix is used to display 3D relative coordinates on the actual screen.
+************************** End of Changes **********************

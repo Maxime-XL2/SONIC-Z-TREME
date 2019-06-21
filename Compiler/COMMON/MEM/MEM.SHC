@@ -1,0 +1,9 @@
+-optimize=1
+-cpu=sh2
+-string=const
+-section=p=SEGA_P,c=SEGA_C,d=SEGA_D,b=SEGA_B
+-div=nomask
+-include=..\..\sh\include,..\include
+-def=_SH,SATURN
+-macsave=0
+

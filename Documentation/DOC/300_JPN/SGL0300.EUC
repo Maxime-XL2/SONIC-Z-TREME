@@ -1,0 +1,313 @@
+●SGL Ver3.0について
+  SGL Ver3.0は、現SGL Ver2.1xと比べて以下の機能追加がなされました。
+   ・リアルタイムグーローシェーディング
+   ・ニアクリッピング
+   ・デプスキューイング
+   ・色付き光源
+  以下に Ver3.0で追加されたデータや関数、また削除されたものやSGL Ver2.1xからの
+移行に際しての注意点を記述します。
+
+１．データ
+(1)リアルタイムグーロー処理用モデルデータ(構造体)
+    typedef struct {
+        POINT   *pntbl;     /* 頂点の位置データテーブル */
+        Uint32  nbPoint;    /* 頂点の数 */
+        POLYGON *pltbl;     /* ポリゴン定義テーブル */
+        Uint32  nbPolygon;  /* ポリゴンの数 */
+        ATTR    *attbl;     /* ポリゴンのアトリビュートテーブル */
+        VECTOR  *vntbl;     /* 頂点法線データ */
+    } XPDATA ;
+
+(2)アトリビュートオプション
+  ATTRIBUTE構造体のOPTIONで指定するマクロ定義について説明します。
+
+  <削除されたマクロ>
+    UseClip
+      UseClipがUseNearClipに置き換わりました。
+　    sl_def.hでは、UseClipをUseNearClipとして定義しています。
+
+  <追加された項目>
+    UseGouraud
+      リアルタイムグーローで表示します。
+      グーローテーブル用のアドレスも指定します。
+      UseDepth,UseLightオプションと同時に使用できません。
+
+    UseNearClip
+      ニアクリップの処理を行います。
+      slSetNearClipFlag関数で 0(補正処理をしない)を指定すると、この設定は無効に
+    なります。
+
+    UseDepth
+      デプスキュー処理を行う。
+      UseGouraudオプションと同時に使用できない。
+      UseLightオプションが指定できるのは、単色ポリゴンのみです。
+
+
+２．関数
+
+(1) リアルタイムグーローシェーディング関連
+
+void slInitGouraud( GOURAUDTBL *gtbl, Uint32 gmax, Uint32 gaddr, Uint8 *vaddr )
+  機能 : リアルタイムグーローシェーディング処理の初期化を行います。
+         グーローデータ格納エリアは、グーローポリゴン最大数x8バイト必要になりま
+         す。
+　　     頂点演算ワークアドレスは、1モデル最大頂点数バイト必要です。
+         グーローテーブルアドレスは、VDP1にグーローテーブルをセットするアドレス
+         になります。
+         VDP1オフセットアドレス/8を指定します。（モデルデータのグーローアドレス
+         と同じ方法です）
+    gtbl  : グーローデータ格納エリア
+    gmax  : グーローポリゴン最大数
+    gaddr : グーローテーブルアドレス
+    vaddr : 頂点演算ワークアドレス
+  注意 : この関数を実行する前に必ずslInitGouraud関数で初期化しておく必要があり
+         ます。
+  例 : 総ポリゴン数500、1モデル最大頂点数100の場合。
+    #define    MAX_POLYGON     500
+    #define    MAX_MODEL_VERT  100
+    #define    GOURAUD_ADDR    0xE000
+    GOURAUDTBL GTBL[MAX_POLYGON];
+    Uint8      VTBL[MAX_MODEL_VERT];
+
+    slInitGouraud( GTBL, MAX_POLYGON, GOURAUD_ADDR, VTBL );
+
+
+void slPutPolygonX( XPDATA *xpdata, FIXED *light )
+  機能 : モデルデータの出力を行います。
+         オプションでUseGouraudを指定していないポリゴンも正常に出力される。
+    xpdata : モデルデータ
+    light  : 光源ベクトル
+
+void slGouraudTblCopy( void )
+  機能 : グーローデータをVRAMに転送します。
+         slSynch関数の直前か、slIntFunction関数に登録してください。
+
+void slSetGouraudTbl( Uint16 *tbl )
+  機能 : ユーザ独自のグーローテーブルをセットします。
+         光源の反対側の一番暗い値から、光源の正面の一番明るい値までを32段階で
+         指定します。
+  例 : 
+    #define GRTBL(r,g,b)    (((b&0x1f)<<10) | ((g&0x1f)<<5) | (r&0x1f) )
+    static  Uint16  GourTbl[32] = {
+        GRTBL(  0, 16, 16 ),GRTBL(  1, 16, 16 ),GRTBL(  2, 16, 16 ),
+        GRTBL(  3, 16, 16 ),GRTBL(  4, 16, 16 ),GRTBL(  5, 16, 16 ),
+        GRTBL(  6, 16, 16 ),GRTBL(  7, 16, 16 ),GRTBL(  8, 16, 16 ),
+        GRTBL(  9, 16, 16 ),GRTBL( 10, 16, 16 ),GRTBL( 11, 16, 16 ),
+        GRTBL( 12, 16, 16 ),GRTBL( 13, 16, 16 ),GRTBL( 14, 16, 16 ),
+        GRTBL( 15, 16, 16 ),GRTBL( 16, 16, 16 ),GRTBL( 17, 16, 16 ),
+        GRTBL( 18, 16, 16 ),GRTBL( 19, 16, 16 ),GRTBL( 20, 16, 16 ),
+        GRTBL( 21, 16, 16 ),GRTBL( 22, 16, 16 ),GRTBL( 23, 16, 16 ),
+        GRTBL( 24, 16, 16 ),GRTBL( 25, 16, 16 ),GRTBL( 26, 16, 16 ),
+        GRTBL( 27, 16, 16 ),GRTBL( 28, 16, 16 ),GRTBL( 29, 16, 16 ),
+        GRTBL( 30, 16, 16 ),GRTBL( 31, 16, 16 ),
+    };
+    
+    slSetGouraudTbl( GourTbl );
+
+
+
+(2) 光源色関連
+void slSetGouraudColor( Uint16 col )
+  機能 : リアルタイムグーロー用の光源色を設定します。
+         slSetGouraudTbl関数の設定は無視されます。
+    col : 光源色
+  例 :
+    Uint16  gr_data;
+    gr_data =((gr_b)<<10)+((gr_b>>2)<<5)+(gr_g>>2);
+    slSetGouraudColor(gr_data);
+
+
+void slSetFlatColor( Uint16 col )
+  機能 : 通常光源の光源色を設定します。(UseLightの光源)
+    col : 光源色
+
+
+void slSetAmbient( Uint16 col )
+  機能 : 環境光として、光源計算の最低ラインを設定します。
+         この設定は、slSetGouraudColor関数, slSetFlatColor関数に影響します。
+         この設定の後、必ず光源色の設定を行ってください。
+    col : 環境色
+          標準ではRGBそれぞれ 15〜-16まで変化しますが、例えばこの関数で
+            R = -10, G = -5, B = 0
+          のように設定すれば、Rは 15〜-10まで変化し、本来なら-16までになるはずの
+          テーブルには-10が設定されます。
+     　　   つまり、32段階の、下6段階は最低値が引き継がれます。
+          この設定によって指定した値より暗くなりすぎるのを防ぐことができ、環境光
+          として設定することになります。
+  注意 :slSetGouraudTbl関数で直接設定したテーブルに対しては、無効になります。
+  例 :  
+    slSetAmbient(C_RGB(1,1,1));
+
+
+(3) ニアクリッピング関連
+void slSetNearClipFlag( Uint32 flag )
+  機能 : ニアクリップの為の頂点補正を行うかどうかを設定します。初期値は頂点補正
+         するになっています。
+    flag : ニアクリッピングフラグ
+           0 : 補正しない
+           1 : 補正する(初期値)
+ 
+void slWindowClipLevel( Sint32 level )
+  機能 : ニアクリップを設定してあるポリゴンは、４点とも画面外のとき表示を行いま
+         せん。このとき、４点とも画面外でも画面の角にかかるポリゴンを表示するた
+         め、実際の画面より少し大きめで、クリッピングのチェックをするための設定
+         です。levelで設定した分だけ画面より大きめにチェックします。
+         設定する必要がある場合、値は20〜50が最適と思われます。
+    level : 画面外の数値指定(初期値は0)。
+            0が表示画面内。負数の設定も可能。
+
+
+(4) デプスキュー関連関数
+void slSetDepthLimit( Uint32 near, Uint16 depth, Uint16 step )
+  機能 : デプスキューのための範囲を設定します。
+         near位置から（FIXEDではない）depthまでの範囲を、step段階で設定します。
+         depthとstepの値は乗数を設定してください。
+         例えば、5を設定すれば実際には32として扱われます。
+    near  : 手前位置
+    depth : 深さ（２の乗数）
+    step  : 段階（２の乗数）
+
+
+void slSetDepthTbl( Uint16 *dtbl, Uint16 gaddr, Uint16 size )
+  機能 : デプスキューのためのテーブルを設定します。
+         グーローテーブルは段階数分用意し、手前から奥に向かってデータをセットし
+         ます。
+         グーローアドレスgaddrはVDP1にセットするアドレスです。
+         2のstep乗がsizeと同じになるようにしてください。
+         VRAM上のグーローエリアはグーローテーブルの4倍のエリアが必要です。
+    dtbl  : デプスキュー用グーローテーブル
+    gaddr : グーローテーブルアドレス
+    size  : テーブルサイズ
+ 
+  例 : 距離100から1124までを32段階に分ける
+       グーローテーブルは 0xE000にセットする。
+
+    Uint16    depthtbl[32] = {
+        ...
+    };
+    slSetDepthLimit( 100, 10, 5 );
+    slSetDepthTbl( depthtbl, 0xe000, 32 );
+
+(5) その他
+void slDispPlaneLevel( Sint32 level )
+  機能 : ポリゴンの表裏判定のレベルを設定します。
+         プラスに設定すると、より裏側まで描画します。
+         マイナスにセットすると、より正面の方のみ描画します。
+    level : ポリゴン表裏判定のレベル(初期値0)
+
+Uint32 slSlaveCheck( void )
+  機能 : スレーブの動作状況をチェックします。
+  
+
+３．リアルタイムグーロー使用手順
+　リアルタイムグーローを実現するには以下の４つの処理が必要です。
+(1)アトリビュートテーブルに以下の3つを加えます。
+　(a) MODEに「CL_Gouraud」を指定。
+　(b) GOURAUDにグローテーブルの格納位置の指定。
+　(c) OPTIONに「UseGouraud」を指定。
+
+  <例>
+    ATTRIBUTE(Single_Plane, SORT_CEN, 0, 0xffa0, 0xe000,
+           CL16Look|MESHoff|CL_Gouraud, sprNoflip, UseGouraud )
+           
+(2)法線ベクトルの指定
+　各頂点の法線ベクトルと「XPDATA」というポリゴンモデルデータテーブルを指定
+  <例>
+	VECTOR	gr_point[]	={					/*	頂点法線ベクトルデータ*/
+		toFIXED(-0.873),toFIXED( 0.436),toFIXED( 0.217),
+		toFIXED(-0.873),toFIXED(-0.436),toFIXED( 0.217),
+				:
+				:
+	};
+	XPDATA PD_BOX = {						/*モデルテーブル指定*/
+		point_BOX,							/* 頂点の位置データテーブル */
+		sizeof(point_BOX)/sizeof(POINT),	/* 頂点の数 */
+		polygon_BOX,						/* ポリゴン定義テーブル */
+		sizeof(polygon_BOX)/sizeof(POLYGON),/* ポリゴンの数 */
+		attribute_BOX2,				/* ポリゴンのアトリビュートテーブル */
+		gr_point							/*	頂点法線ベクトルデータ*/
+	};
+	
+(3)リアルタイムグーロープログラムの初期化
+  (a) 使用するグーローテーブルの位置大きさを指定
+    <例>
+      slInitGouraud((GOURAUDTBL *)gr_tab,(Uint32)300,0xe000,vaddr);
+  (b) グーロープログラムをVブランクに登録
+    <例>
+      slIntFunction(slGouraudTblCopy);
+
+(4)光源ベクトルの指定
+    <例>
+        FIXED    light[XYZ];
+        light[X] = toFIXED(1.0);
+        light[Y] = toFIXED(0.0);
+        light[Z] = toFIXED(0.0);
+	slPutPolygonX(&PD_BOXx,(FIXED *)light);
+
+(5)実際のプログラム使用例
+   <例>
+	static	GOURAUDTBL	gr_tab[300];
+	void	ss_main(void)
+	{
+		FIXED	light[XYZ];
+			:
+	/* リアルタイムグロープログラムの初期化 */
+		slInitGouraud((GOURAUDTBL *)gr_tab,(Uint32)300,0xe000);
+		slIntFunction(slGouraudTblCopy);
+			:
+		light[X]	=toFIXED(1.0);
+		light[X]	=toFIXED(0.0);
+		light[X]	=toFIXED(0.0);
+		while(1)
+		{
+				:
+			slPushMatrix();
+			{
+					:
+				/**/
+				slPutPolygonX(&PD_BOXx,(FIXED *)light);
+			}
+			slPopMatrix();
+			slSynch();
+		}
+	}
+
+４．ニアクリッピング
+  アトリビュートテーブルのOPTIONに「UseNearClip」を指定するとニアクリッピング
+処理をします。「UseClip」はVer3.0から同機能追加により「UseNearClip」に置き換わ
+りました。
+  <例>
+    ATTRIBUTE(Single_Plane,SORT_CEN, 1,No_Palet,No_Gouraud,CL32KRGB|MESHoff,
+    sprNoflip,UseNearClip),
+
+５．SGL Ver2.1xとSGL Ver3.00の相違点
+(1)フラットシェーディングの光源計算方法の変更
+  フラットシェーディングの光源計算方法が以下のように変更になっています。
+    <Ver2.1xまでの光源計算方法>
+      光源と面の角度
+              0------45------90-----135-----180
+              31-----16-------0-------0-------0
+      グーローテーブル
+
+　　　　　　　　↓
+
+　  <Ver3.0 からの光源計算方法>
+      光源と面の角度
+              0------45------90-----135-----180
+              31-----24------16-------8-------0
+      グーローテーブル
+
+(2)光源の影響による発色データテーブルのサイズ変更
+ 　光源処理に機能追加したことにより、発色データテーブル(CLOfsfBuf)領域を確保す
+るサイズが、32*32(0x400)から32*32*3(0xC00)に変更になりました。
+よって、初期値が設定されていたSGL/LIBディレクトリのSGLAREA.Oの変更と、ユーザカ
+スタム用のsgl/sample/workareaディレクトリにあるworkarea.cなどのファイルも計算
+部分に変更が加えられています。SGL Ver2.1xからの移行時には必ず変更するようにし
+てください。
+ 
+(3)UseClipオプションの削除
+  アトリビュートオプションUseClipが、SGL Ver3.0の機能追加によりUseNearClipに置
+き換わりました。
+
+
+以　上

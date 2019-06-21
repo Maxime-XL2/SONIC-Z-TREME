@@ -1,0 +1,596 @@
+
+◎ システムの使用するメモリのマッピングについて
+
+システムはスプライト、スクロールのコントロール用に ＷＯＲＫ-ＨＩ領域の
+０x４００００バイトを使用しています。また、テクスチャに光源の影響を与え
+る場合にグーローシェーディングを用いるため、このデータとしてＶＤＰ１の
+ＶＲＡＭの内２６４バイトを使用しています。それらの内分けと、デフォルト
+の設定を以下に示します。
+
+ＭＡＸ_ＰＯＬＹＧＯＮＳ:	１７８６	使用できるポリゴン数
+ＭＡＸ_ＶＥＲＴＩＣＥＳ:	２５００	使用できる頂点数
+ＭＡＸ_ＴＲＡＮＳＦＥＲ:	    ２０	ブランキング中の転送リクエスト数
+ＭＡＸ_ＮＥＳＴ:		    ２０	マトリクスのネスト数
+
+slPutPolygon() は指定されたモデルで使用するポリゴン数、及び頂点数を加えた時
+最大数を越える場合そのモデルは処理しません。
+
+また、slPutSprite() , slDispSprite() , slSetSprite() は実行されるたびにポリゴン数
+をひとつずつ加算し、最大数を越える場合にそのデータの処理を中止します。
+(ただし、指定されたＺ位置が表示範囲外の場合には加算されません)
+
+
+ワークＲＡＭ:
+    ０６０Ｃ００００:	(SortList)
+        スプライトコントロールデータのＤＭＡ転送用テーブルバッファ
+        (ＭＡＸ＿ＰＯＬＹＧＯＮＳ＋６)＊３＊４バイト = ０x５４００
+    ０６０Ｃ５４００:	(CLOfstBuf)
+        光源の影響による発色データテーブル
+        ３２＊３２ = ０x４００
+    ０６０Ｃ５８００:	(Zbuffer)
+        ポリゴンソート用の１次バッファ(ウィンドウ０用)
+        １２８＊４ = ０x２００
+    ０６０Ｃ５Ａ００:	(Zbuffer2)
+        ポリゴンソート用の１次バッファ２(ウィンドウ１用)
+        １２８＊４ = ０x２００
+    ０６０Ｃ５Ｃ００:	(Zbuf_nest)
+        ポリゴンソート用の２次バッファ
+        ２５６＊４ = ０x４００
+    ０６０Ｃ６０００:	(Spritebuf)
+        スプライトコントロールデータバッファ
+        (ＭＡＸ_ＰＯＬＹＧＯＮＳ＋５)＊３６ = ０xＦＢＤＣ
+    ０６０Ｄ５ＢＤＣ:	(Spritebuf2)
+        スプライトコントロールデータバッファ２
+        (ＭＡＸ_ＰＯＬＹＧＯＮＳ＋５)＊３６ = ０xＦＢＤＣ
+    ０６０Ｅ５７Ｂ８:	(Pbuffer)
+        ポリゴン演算用頂点位置バッファ
+        ＭＡＸ_ＶＥＲＴＩＣＥＳ＊１６ = ０x９Ｃ４０
+    ０６０ＥＦ３Ｆ８:	(CommandBuf)
+        マスターからスレーブへのコマンド受渡しバッファ
+        ＭＡＸ_ＰＯＬＹＧＯＮＳ＊３２−０x１Ｂ３８ = ０xＣ４０８
+    ０６０ＦＢ８００:	(TransList)
+        ブランキング中の転送リクエスト用のＤＭＡコントロールテーブル
+        ＭＡＸ_ＴＲＡＮＳＦＥＲ＊３＊４バイト = ０xＦ０
+    ０６０ＦＢ８Ｆ０:
+        スタック領域(０x４３１０)
+
+    ０６０ＦＦＣ００:
+        システム変数領域(ＧＢＲレジスタは常にここを指している)
+        ０x４００バイト
+システム変数は以下に示すもので、Ｃプログラムからも同じ名称で読み出すことができる
+
+    システム変数
+	０００:	(EventTop)	(EVENT *)	; 先頭に登録されているイベント
+	００４:	(EventLast)	(EVENT *)	; 末尾に登録されているイベント
+	００８:	(EventNow)	(EVENT *)	; 実行中のイベント
+	００Ｃ:	(EventCount)	(Uint16)	; イベントの残数
+	００Ｅ:	(WorkCount)	(Uint16)	; ワークの残数
+	０１０:	(MainMode)	(Uint8)		; メインシーケンスモード
+	０１１:	(SubMode)	(Uint8)		; サブシーケンスモード
+	０１２:	(SynchConst)	(Sint8)		; ビデオ同期カウント
+	０１３:	(SynchCount)	(Sint8)		; ビデオ同期カウント
+	０１４:	(UserFunction)	(void (*)())	; ブランキング中に実行するユーザー関数
+	０１８:	(TransCount)	(Uint16)	; ブランキング中の転送エントリー数
+	０１Ａ:	(TransRequest)	(Uint8)		; ブランキング中の転送のリクエスト
+	０１Ｂ: (PauseFlag)	(Uint8)		; スプライト、スクロールのポーズ用フラグ
+
+ 	０１Ｃ:	(mtptr)		(MATRIX *)	; カレントマトリクスポインタ
+	０２０:	(MatrixCount)	(Uint8)		; マトリクスのネストカウント
+	０２１:	(PrintColor)	(Uint8)		; テキスト表示用カラーパレット
+	０２２:	(IntCount)	(Uint16)	; 割り込みカウント
+	０２４:	(MsPbufPtr)	(Uint32 *)	; 頂点座標演算バッファポインタ(Master)
+	０２８:	(SlPbufPtr)	(Uint32 *)	; 頂点座標演算バッファポインタ(Slave)
+	０２Ｃ:	(SpritePtr)	(Uint16 *)	; スプライトデータ転送ポインタ
+	０３０:	(MsSdataPtr)	(Uint16 *)	; スプライトデータセットポインタ(Master)
+	０３４:	(SlSdataPtr)	(Uint16 *)	; スプライトデータセットポインタ(Master)
+	０３８:	(ZbufPtr)	(void **)	; Ｚバッファポインタ
+	０３Ｃ:	(FormTbl)	(TEXTURE *)	; テクスチャデータテーブル
+	０４０:	(SprbufBias)	(Uint32)	; スプライトデータバッファ切り替え
+	０４４:	(ComRdPtr)	(Uint32 *)	; コマンドリードポインタ
+	０４８:	(ComWrPtr)	(Uint32 *)	; コマンドセットポインタ
+	０４Ｃ:	(MsLightVector)	(VECTOR)	; 光源ベクトル(Master)
+	０５８:	(SlLightVector)	(VECTOR)	; 光源ベクトル(Master)
+	０６４:	(ColorOffset)	(Uint8 *)	; カラーオフセットテーブルポインタ
+	０６８:	(MsScreenDist)	(FIXED)		; スクリーン位置(Master)
+	０６Ｃ:	(SlScreenDist)	(FIXED)		; スクリーン位置(Slave)
+	０７０:	(MsZlimit)	(Sint16)	; 表示リミットＺ位置(Master)
+	０７２:	(WindowNumber)	(Uint8)		; ウィンドウ使用数
+	０７３:	(WinUseFlag)	(Uint8)		; ウィンドウ使用フラグ
+	０７４:	(TotalPolygons)	(Uint16)	; 演算ポリゴン数
+	０７６:	(TotalVertices)	(Uint16)	; 演算頂点数
+	０７８:	(MsScreenLeft)	(Sint16)	; スクリーン左位置
+	０７Ａ:	(MsScreenTop)	(Sint16)	; スクリーン上位置
+	０７Ｃ:	(MsScreenRight)	(Sint16)	; スクリーン右位置
+	０７Ｅ:	(MsScreenBottom) (Sint16)	; スクリーン下位置
+	０８０:	(MsScreenSizeX)	(Uint16)	; スクリーン横サイズ(Master)
+	０８２:	(MsScreenSizeY)	(Uint16)	; スクリーン縦サイズ(Master)
+	０８４:	(MsWindowSizeX)	(Uint16)	; ウィンドウサイズ(Master)
+	０８６:	(MsWindowSizeY)	(Uint16)	; ウィンドウサイズ(Master)
+	０８８:	(MXPolygons)	(Uint16)	; 最大ポリゴン数
+	０８Ａ:	(MXVertices)	(Uint16)	; 最大頂点数
+	０８Ｃ:	(FrameSizeX)	(Uint16)	; フレームバッファサイズ
+	０８Ｅ:	(FrameSizeY)	(Uint16)	; フレームバッファサイズ
+	０９０:	(MsWinXAdder)	(Sint16)	; ウィンドウチェック用加算データ(Master)
+	０９２:	(MsWinYAdder)	(Sint16)	; ウィンドウチェック用加算データ(Master)
+	０９４:	(SlWinXAdder)	(Uint16)	; ウィンドウチェック用加算データ(Slave)
+	０９６:	(SlWinYAdder)	(Uint16)	; ウィンドウチェック用加算データ(Slave)
+	０９８:	(MsClipXAdder)	(Sint16)	; クリッピング用加算データ(横)(Master)
+	０９Ａ:	(MsClipYAdder)	(Sint16)	; クリッピング用加算データ(縦)(Master)
+	０９Ｃ:	(SlClipXAdder)	(Sint16)	; クリッピング用加算データ(横)(Slave)
+	０９Ｅ:	(SlClipYAdder)	(Sint16)	; クリッピング用加算データ(縦)(Slave)
+	０Ａ０:	(SlZlimit)	(Sint16)	; 表示リミットＺ位置(Slave)
+	０Ａ２:	(WinPtr)	(Uint16)	; ウィンドウデータセットオフセット
+	０Ａ４:	(DispPolygons)	(Uint16)	; 表示ポリゴン数
+	０Ａ６:	(DMAEndFlag)	(Uint8)		; ＤＭＡ転送終了フラグ(未使用)
+	０Ａ８:	(DMASetFlag)	(Uint8)		; ＤＭＡテーブルセットフラグ
+	０ＡＡ:	(PutCount)	(Uint16)	; slPutPolygon(),sl...Sprite()呼び出し回数
+	０ＡＣ:	(MsZdpsftcnt)	(Uint8)		; 画面表示リミットシフトカウンタ(Master)
+	０ＡＤ:	(SlZdpsftcnt)	(Uint8)		; 画面表示リミットシフトカウンタ(Slave)
+
+	０Ｂ０ : (Resolution)	(Uint8)		; 画面モード 
+	０Ｂ１ : (NbPCMBf)	(Uint8)		; ＰＣＭバッファの数(２０００Ｈ単位)
+	０Ｂ２ : (PCMBufFlag)	(Sint16)	; ＰＣＭバッファの空き状況フラグ
+	０Ｂ４ : (SoundRdCount)	(Uint8)		; サウンドバッファ読み出しカウンタ
+	０Ｂ５ : (SoundWrCount)	(Uint8)		; サウンドバッファエントリーカウンタ
+	０Ｂ６ : (FRT_Count)	(Sint16)	; ＦＲＴカウンタ
+	０Ｂ７ : (SCUMC_ID)	(Uint8)		; ＳＣＵメモリーコピーのチャンネルナンバー
+	０Ｂ８ : (DMASt_CPU0)	(Uint8)		; ＣＰＵ Ｄ.Ｍ.Ａ.のステータス(ＣＨ０)
+	０ＢＡ : (DMASt_CPU1)	(Uint8)		; ＣＰＵ Ｄ.Ｍ.Ａ.のステータス(ＣＨ１)
+	０ＢＢ : (DMASt_SCU0)	(Uint8)		; ＳＣＵ Ｄ.Ｍ.Ａ.のステータス(ＣＨ０)
+	０ＢＣ : (DMASt_SCU1)	(Uint8)		; ＳＣＵ Ｄ.Ｍ.Ａ.のステータス(ＣＨ１)
+	０ＢＤ : (DMASt_SCU2)	(Uint8)		; ＳＣＵ Ｄ.Ｍ.Ａ.のステータス(ＣＨ２)
+	０ＢＥ : (--------)	(Uint16)	; システム予約
+
+	０Ｃ０:	(VDP2_TVMD)	(Uint16)	; ＴＶ画面モード
+	０Ｃ２:	(VDP2_EXTEN)	(Uint16)	; 外部信号イネーブル
+	０Ｃ４:	(VDP2_TVSTAT)	(Uint16)	; 画面ステータス
+	０Ｃ６:	(VDP2_VRSIZE)	(Uint16)	; ＶＲＡＭサイズ
+	０Ｃ８:	(VDP2_HCNT)	(Uint16)	; Ｈカウンター
+	０ＣＡ:	(VDP2_VCNT)	(Uint16)	; Ｖカウンター
+	０ＣＥ:	(VDP2_RAMCTL)	(Uint16)	; ＲＡＭコントロール
+	０Ｄ０:	(VDP2_CYCA0L)	(Uint16)	; ＶＲＡＭサイクルパターン（バンクＡ０、Ｔ０ー３）
+	０Ｄ２:	(VDP2_CYCA0U)	(Uint16)	; ＶＲＡＭサイクルパターン（バンクＡ０、Ｔ４ー７）
+	０Ｄ４:	(VDP2_CYCA1L)	(Uint16)	; ＶＲＡＭサイクルパターン（バンクＡ１、Ｔ０ー３）
+	０Ｄ６:	(VDP2_CYCA1U)	(Uint16)	; ＶＲＡＭサイクルパターン（バンクＡ１、Ｔ４ー７）
+	０Ｄ８:	(VDP2_CYCB0L)	(Uint16)	; ＶＲＡＭサイクルパターン（バンクＢ０、Ｔ０ー３）
+	０ＤＡ:	(VDP2_CYCB0U)	(Uint16)	; ＶＲＡＭサイクルパターン（バンクＢ０、Ｔ４ー７）
+	０ＤＣ:	(VDP2_CYCB1L)	(Uint16)	; ＶＲＡＭサイクルパターン（バンクＢ１、Ｔ０ー３）
+	０ＤＥ:	(VDP2_CYCB1U)	(Uint16)	; ＶＲＡＭサイクルパターン（バンクＢ１、Ｔ４ー７）
+	０Ｅ０:	(VDP2_BGON)	(Uint16)	; 画面表示イネーブル
+	０Ｅ２:	(VDP2_MZCTL)	(Uint16)	; モザイクコントロール
+	０Ｅ４:	(VDP2_SFSEL)	(Uint16)	; 特殊機能コードセレクト
+	０Ｅ６:	(VDP2_SFCODE)	(Uint16)	; 特殊機能コード
+	０Ｅ８:	(VDP2_CHCTLA)	(Uint16)	; キャラクタコントロール（ＮＢＧ０、ＮＢＧ１）
+	０ＥＡ:	(VDP2_CHCTLB)	(Uint16)	; キャラクタコントロール（ＮＢＧ２、ＮＢＧ３、ＲＢＧ０）
+	０ＥＣ:	(VDP2_BMPNA)	(Uint16)	; ビットマップパレットナンバー(ＮＢＧ０、１)
+	０ＥＥ:	(VDP2_BMPNB)	(Uint16)	; ビットマップパレットナンバー(ＲＢＧ０)
+	０Ｆ０:	(VDP2_PNCN0)	(Uint16)	; パターンネームコントロール（ＮＢＧ０）
+	０Ｆ２:	(VDP2_PNCN1)	(Uint16)	; パターンネームコントロール（ＮＢＧ１）
+	０Ｆ４:	(VDP2_PNCN2)	(Uint16)	; パターンネームコントロール（ＮＢＧ２）
+	０Ｆ６:	(VDP2_PNCN3)	(Uint16)	; パターンネームコントロール（ＮＢＧ３）
+	０Ｆ８:	(VDP2_PNCR)	(Uint16)	; パターンネームコントロール（ＲＢＧ０）
+	０ＦＡ:	(VDP2_PLSZ)	(Uint16)	; プレーンサイズ
+	０ＦＣ:	(VDP2_MPOFN)	(Uint16)	; マップオフセット（ＮＢＧ０ー３）
+	０ＦＥ:	(VDP2_MPOFR)	(Uint16)	; マップオフセット（回転パラメータＡ、Ｂ）
+	１００:	(VDP2_MPABN0)	(Uint16)	; マップ（ＮＢＧ０プレーンＡ、Ｂ）
+	１０２:	(VDP2_MPCDN0)	(Uint16)	; マップ（ＮＢＧ０プレーンＣ、Ｄ）
+	１０４:	(VDP2_MPABN1)	(Uint16)	; マップ（ＮＢＧ１プレーンＡ、Ｂ）
+	１０６:	(VDP2_MPCDN1)	(Uint16)	; マップ（ＮＢＧ１プレーンＣ、Ｄ）
+	１０８:	(VDP2_MPABN2)	(Uint16)	; マップ（ＮＢＧ２プレーンＡ、Ｂ）
+	１０Ａ:	(VDP2_MPCDN2)	(Uint16)	; マップ（ＮＢＧ２プレーンＣ、Ｄ）
+	１０Ｃ:	(VDP2_MPABN3)	(Uint16)	; マップ（ＮＢＧ３プレーンＡ、Ｂ）
+	１０Ｅ:	(VDP2_MPCDN3)	(Uint16)	; マップ（ＮＢＧ３プレーンＣ、Ｄ）
+	１１０:	(VDP2_MPABRA)	(Uint16)	; マップ（回転パラメータＡプレーンＡ、Ｂ）
+	１１２:	(VDP2_MPCDRA)	(Uint16)	; マップ（回転パラメータＡプレーンＣ、Ｄ）
+	１１４:	(VDP2_MPEFRA)	(Uint16)	; マップ（回転パラメータＡプレーンＥ、Ｆ）
+	１１６:	(VDP2_MPGHRA)	(Uint16)	; マップ（回転パラメータＡプレーンＧ、Ｈ）
+	１１８:	(VDP2_MPIJRA)	(Uint16)	; マップ（回転パラメータＡプレーンＩ、Ｊ）
+	１１Ａ:	(VDP2_MPKLRA)	(Uint16)	; マップ（回転パラメータＡプレーンＫ、Ｌ）
+	１１Ｃ:	(VDP2_MPMNRA)	(Uint16)	; マップ（回転パラメータＡプレーンＭ、Ｎ）
+	１１Ｅ:	(VDP2_MPOPRA)	(Uint16)	; マップ（回転パラメータＡプレーンＯ、Ｐ）
+	１２０:	(VDP2_MPABRB)	(Uint16)	; マップ（回転パラメータＢプレーンＡ、Ｂ）
+	１２２:	(VDP2_MPCDRB)	(Uint16)	; マップ（回転パラメータＢプレーンＣ、Ｄ）
+	１２４:	(VDP2_MPEFRB)	(Uint16)	; マップ（回転パラメータＢプレーンＥ、Ｆ）
+	１２６:	(VDP2_MPGHRB)	(Uint16)	; マップ（回転パラメータＢプレーンＧ、Ｈ）
+	１２８:	(VDP2_MPIJRB)	(Uint16)	; マップ（回転パラメータＢプレーンＩ、Ｊ）
+	１２Ａ:	(VDP2_MPKLRB)	(Uint16)	; マップ（回転パラメータＢプレーンＫ、Ｌ）
+	１２Ｃ:	(VDP2_MPMNRB)	(Uint16)	; マップ（回転パラメータＢプレーンＭ、Ｎ）
+	１２Ｅ:	(VDP2_MPOPRB)	(Uint16)	; マップ（回転パラメータＢプレーンＯ、Ｐ）
+	１３０:	(VDP2_SCXN0)	(FIXED)		; 画面スクロール値（ＮＢＧ０、水平方向固定小数）
+	１３０:	 (VDP2_SCXIN0)	(Sint16)	; 画面スクロール値（ＮＢＧ０、水平方向整数部）
+	１３２:	 (VDP2_SCXDN0)	(Uint16)	; 画面スクロール値（ＮＢＧ０、水平方向小数部）
+	１３４:	(VDP2_SCYN0)	(FIXED)		; 画面スクロール値（ＮＢＧ０、垂直方向固定小数）
+	１３４:	 (VDP2_SCYIN0)	(Uint16)	; 画面スクロール値（ＮＢＧ０、垂直方向整数部）
+	１３６:	 (VDP2_SCYDN0)	(Uint16)	; 画面スクロール値（ＮＢＧ０、垂直方向小数部）
+	１３８:	(VDP2_ZMXN0)	(FIXED)		; 座標増分（ＮＢＧ０、水平方向固定小数）
+	１３８:	 (VDP2_ZMXIN0)	(Uint16)	; 座標増分（ＮＢＧ０、水平方向整数部）
+	１３Ａ:	 (VDP2_ZMXDN0)	(Uint16)	; 座標増分（ＮＢＧ０、水平方向小数部）
+	１３Ｃ:	(VDP2_ZMYN0)	(FIXED)		; 座標増分（ＮＢＧ０、垂直方向固定小数）
+	１３Ｃ:	 (VDP2_ZMYIN0)	(Uint16)	; 座標増分（ＮＢＧ０、垂直方向整数部）
+	１３Ｅ:	 (VDP2_ZMYDN0)	(Uint16)	; 座標増分（ＮＢＧ０、垂直方向小数部）
+	１４０:	(VDP2_SCXN1)	(FIXED)		; 画面スクロール値（ＮＢＧ１、水平方向固定小数）
+	１４０:	 (VDP2_SCXIN1)	(Uint16)	; 画面スクロール値（ＮＢＧ１、水平方向整数部）
+	１４２:	 (VDP2_SCXDN1)	(Uint16)	; 画面スクロール値（ＮＢＧ１、水平方向小数部）
+	１４４:	(VDP2_SCYN1)	(FIXED)		; 画面スクロール値（ＮＢＧ１、垂直方向固定小数）
+	１４４:	 (VDP2_SCYIN1)	(Uint16)	; 画面スクロール値（ＮＢＧ１、垂直方向整数部）
+	１４６:	 (VDP2_SCYDN1)	(Uint16)	; 画面スクロール値（ＮＢＧ１、垂直方向小数部）
+	１４８:	(VDP2_ZMXN1)	(FIXED)		; 座標増分（ＮＢＧ１、水平方向固定小数）
+	１４８:	 (VDP2_ZMXIN1)	(Uint16)	; 座標増分（ＮＢＧ１、水平方向整数部）
+	１４Ａ:	 (VDP2_ZMXDN1)	(Uint16)	; 座標増分（ＮＢＧ１、水平方向小数部）
+	１４Ｃ:	(VDP2_ZMYN1)	(FIXED)		; 座標増分（ＮＢＧ１、垂直方向固定小数）
+	１４Ｃ:	 (VDP2_ZMYIN1)	(Uint16)	; 座標増分（ＮＢＧ１、垂直方向整数部）
+	１４Ｅ:	 (VDP2_ZMYDN1)	(Uint16)	; 座標増分（ＮＢＧ１、垂直方向小数部）
+	１５０:	(VDP2_SCXN2)	(Uint16)	; 画面スクロール値（ＮＢＧ２、水平方向）
+	１５２:	(VDP2_SCYN2)	(Uint16)	; 画面スクロール値（ＮＢＧ２、垂直方向）
+	１５４:	(VDP2_SCXN3)	(Uint16)	; 画面スクロール値（ＮＢＧ３、水平方向）
+	１５６:	(VDP2_SCYN3)	(Uint16)	; 画面スクロール値（ＮＢＧ３、垂直方向）
+	１５８:	(VDP2_ZMCTL)	(Uint16)	; 縮小イネーブル
+	１５Ａ:	(VDP2_SCRCTL)	(Uint16)	; ライン＆縦セルスクロールコントロール
+	１５Ｃ:	(VDP2_VCSTA)	(Uint16 *)	; 縦セルスクロールテーブルアドレス
+	１６０:	(VDP2_LSTA0)	(Sint16 *)	; ＮＢＧ０用ラインスクロールテーブルアドレス
+	１６４:	(VDP2_LSTA1)	(Sint16 *)	; ＮＢＧ１用ラインスクロールテーブルアドレス
+	１６８:	(VDP2_LCTA)	(Uint16 *)	; ラインカラー画面テーブルアドレス
+	１６Ｃ:	(VDP2_BKTA)	(Uint16 *)	; バック画面テーブルアドレス
+	１７０:	(VDP2_RPMD)	(Uint16)	; 回転パラメータモード
+	１７２:	(VDP2_RPRCTL)	(Uint16)	; 回転パラメータリードコントロール
+	１７４:	(VDP2_KTCTL)	(Uint16)	; 係数テーブルコントロール
+	１７６:	(VDP2_KTAOF)	(Uint16)	; 係数テーブルアドレスオフセット
+	１７８:	(VDP2_OVPNRA)	(Uint16)	; 画面オーバーパターンネーム
+	１７Ａ:	(VDP2_OVPNRB)	(Uint16)	; 画面オーバーパターンネーム
+	１７Ｃ:	(VDP2_RPTA)	(Sint32 *)	; 回転パラメータテーブルアドレス
+	１８０:	(VDP2_WPSX0)	(Uint16)	; ウィンドウポジション(H start)
+	１８２:	(VDP2_WPSY0)	(Uint16)	; ウィンドウポジション(V start)
+	１８４:	(VDP2_WPEX0)	(Uint16)	; ウィンドウポジション(H stop)
+	１８６:	(VDP2_WPEY0)	(Uint16)	; ウィンドウポジション(V stop)
+	１８８:	(VDP2_WPSX1)	(Uint16)	; ウィンドウポジション(H start)
+	１８Ａ:	(VDP2_WPSY1)	(Uint16)	; ウィンドウポジション(V start)
+	１８Ｃ:	(VDP2_WPEX1)	(Uint16)	; ウィンドウポジション(H stop)
+	１８Ｅ:	(VDP2_WPEY1)	(Uint16)	; ウィンドウポジション(V stop)
+	１９０:	(VDP2_WCTLA)	(Uint16)	; ウィンドウコントロール
+	１９２:	(VDP2_WCTLB)	(Uint16)	; ウィンドウコントロール
+	１９４:	(VDP2_WCTLC)	(Uint16)	; ウィンドウコントロール
+	１９６:	(VDP2_WCTLD)	(Uint16)	; ウィンドウコントロール
+	１９８:	(VDP2_LWTA0)	(Uint16 *)	; ラインウィンドウテーブルアドレス
+	１９Ｃ:	(VDP2_LWTA1)	(Uint16 *)	; ラインウィンドウテーブルアドレス
+	１Ａ０:	(VDP2_SPCTL)	(Uint16)	; スプライトコントロール
+	１Ａ２:	(VDP2_SDCTL)	(Uint16)	; シャドウコントロール
+	１Ａ４:	(VDP2_CRAOFA)	(Uint16)	; カラーＲＡＭアドレスオフセット（ＮＢＧ０ー３）
+	１Ａ６:	(VDP2_CRAOFB)	(Uint16)	; カラーＲＡＭアドレスオフセット（ＲＢＧ０、スプライト）
+	１Ａ８:	(VDP2_LNCLEN)	(Uint16)	; ラインカラー画面イネーブル
+	１ＡＡ:	(VDP2_SFPRMD)	(Uint16)	; 特殊プライオリティモード
+	１ＡＣ:	(VDP2_CCCTL)	(Uint16)	; カラー演算コントロール
+	１ＡＥ:	(VDP2_SFCCMD)	(Uint16)	; 特殊カラー演算モード
+	１Ｂ０:	(VDP2_PRISA)	(Uint16)	; プライオリティナンバー
+	１Ｂ２:	(VDP2_PRISB)	(Uint16)	; プライオリティナンバー
+	１Ｂ４:	(VDP2_PRISC)	(Uint16)	; プライオリティナンバー
+	１Ｂ６:	(VDP2_PRISD)	(Uint16)	; プライオリティナンバー
+	１Ｂ８:	(VDP2_PRINA)	(Uint16)	; プライオリティナンバー
+	１ＢＡ:	(VDP2_PRINB)	(Uint16)	; プライオリティナンバー
+	１ＢＣ:	(VDP2_PRIR)	(Uint16)	; プライオリティナンバー
+	１ＢＥ: (--------)	(Uint16)	; システム予約
+	１Ｃ０:	(VDP2_CCRSA)	(Uint16)	; カラー演算割合(スプライト０、１)
+	１Ｃ２:	(VDP2_CCRSB)	(Uint16)	; カラー演算割合(スプライト２、３)
+	１Ｃ４:	(VDP2_CCRSC)	(Uint16)	; カラー演算割合(スプライト４、５)
+	１Ｃ６:	(VDP2_CCRSD)	(Uint16)	; カラー演算割合(スプライト６、７)
+	１Ｃ８:	(VDP2_CCRNA)	(Uint16)	; カラー演算割合(ＮＢＧ０、１)
+	１ＣＡ:	(VDP2_CCRNB)	(Uint16)	; カラー演算割合(ＮＢＧ２、３)
+	１ＣＣ:	(VDP2_CCRR)	(Uint16)	; カラー演算割合(ＲＧＢ０)
+	１ＣＥ:	(VDP2_CCRLB)	(Uint16)	; カラー演算割合(ラインカラー画面、バック画面)
+	１Ｄ０:	(VDP2_CLOFEN)	(Uint16)	; カラーオフセットイネーブル
+	１Ｄ２:	(VDP2_CLOFSL)	(Uint16)	; カラーオフセットセレクト
+	１Ｄ４:	(VDP2_COAR)	(Uint16)	; カラーオフセットＡ(Ｒｅｄ)
+	１Ｄ６:	(VDP2_COAG)	(Uint16)	; カラーオフセットＡ(Ｇｒｅｅｎ)
+	１Ｄ８:	(VDP2_COAB)	(Uint16)	; カラーオフセットＡ(Ｂｌｕｅ)
+	１ＤＡ:	(VDP2_COBR)	(Uint16)	; カラーオフセットＢ(Ｒｅｄ)
+	１ＤＣ:	(VDP2_COBG)	(Uint16)	; カラーオフセットＢ(Ｇｒｅｅｎ)
+	１ＤＥ:	(VDP2_COBB)	(Uint16)	; カラーオフセットＢ(Ｂｌｕｅ)
+
+	１Ｅ０:	(ScrRotPtr)	(ROTSCROLL *)	; 操作する回転パラメータのアドレス
+	１Ｅ４:	(nbg0_char_adr)	(void *)	; ＮＢＧ０用ＣＧアドレス
+	１Ｅ８:	(nbg1_char_adr)	(void *)	; ＮＢＧ１用ＣＧアドレス
+	１ＥＣ:	(nbg2_char_adr)	(void *)	; ＮＢＧ２用ＣＧアドレス
+	１Ｆ０:	(nbg3_char_adr)	(void *)	; ＮＢＧ３用ＣＧアドレス
+	１Ｆ４:	(ra_char_adr)	(void *)	; ＲＢＧ０(パラメータＡ)用ＣＧアドレス
+	１Ｆ８:	(rb_char_adr)	(void *)	; ＲＢＧ０(パラメータＢ)用ＣＧアドレス
+	１ＦＣ:	(nbg0_page_adr)	(void *)	; ＮＢＧ０用パターンネームアドレス
+	２００:	(nbg1_page_adr)	(void *)	; ＮＢＧ１用パターンネームアドレス
+	２０４:	(nbg2_page_adr)	(void *)	; ＮＢＧ２用パターンネームアドレス
+	２０８:	(nbg3_page_adr)	(void *)	; ＮＢＧ３用パターンネームアドレス
+	２０Ｃ:	(ra_page_adr)	(void *)	; ＲＢＧ０(パラメータＡ)用パターンネームアドレス
+	２１０:	(rb_page_adr)	(void *)	; ＲＢＧ０(パラメータＢ)用パターンネームアドレス
+	２１４:	(rpara_vram_adr)(void *)	; 回転パラメータセットアドレス
+	２１８:	(k_table_adr)	(void *)	; 係数テーブルセットアドレス
+	２１Ｃ:	(RotScrParA)	(ROTSCROLL)	; 回転パラメータＡ
+	２８４:	(RotScrParB)	(ROTSCROLL)	; 回転パラメータＢ
+	２ＥＣ: (Nbg2_PosX)	(FIXED)		; ＮＢＧ２ 表示位置 (Ｘ)
+	２Ｆ０: (Nbg2_PosY)	(FIXED)		; ＮＢＧ２ 表示位置 (Ｙ)
+	２Ｆ４: (Nbg3_PosX)	(FIXED)		; ＮＢＧ３ 表示位置 (Ｘ)
+	２Ｆ８: (Nbg3_PosY)	(FIXED)		; ＮＢＧ３ 表示位置 (Ｙ)
+
+	２ＦＣ:	(Window_data)	(Uint16[22])	; ウィンドウコントロールデータバッファ(２つ分)
+	３２８:	(Center_data)	(Uint16[10])	; ウィンドウ中心コントロールデータバッファ(２つ分)
+	３３Ｃ:	(RandWork)	(Uint32)	; 乱数生成用ワーク
+	３４０: (CDReadExec)	(void*())	; ＣＤ読み込みサーバー関数
+	３４４: (DMA_TRANS)	(Uint32[10])	; ＣＰＵ Ｄ.Ｍ.Ａ. パラメータ
+	３６Ｃ: (SOUND)		(void*[3])	; サウンドバッファポインタ
+	３７８: (PERIPHERAL)	(Uint32[12])	; ペリフェラルコントロールデータ
+
+
+○ ＶＤＰ１_ＶＲＡＭ
+    ０x２５Ｃ０００００から始まるＶＤＰ１のＶＲＡＭで先頭と末尾の領域はシステムによって
+  使用されているため、ユーザーは使用できない。
+
+  ２５Ｃ０００００: スプライトコントロールコマンド
+	(ＭＡＸ_ＰＯＬＹＧＯＮ ＋ ６) ＊ ３２ = ０xＥ１Ｃ０
+  ２５Ｃ７ＦＦ００: グーローシェーディングテーブル
+	２＊４＊３３ = ０x１０８(２６４)
+
+○ ＶＤＰ２_ＶＲＡＭ
+    ０x２５Ｅ０００００から始まるＶＤＰ２のＶＲＡＭはシステム初期化の際、以下の様に
+  区分されている。
+
+  ２５Ｅ０００００: VDP2_VRAM_A0
+	回転スクロール用ＣＧデータ
+  ２５Ｅ２００００: VDP2_VRAM_A1
+	回転スクロール用係数データ及び、回転パラメータ
+  ２５Ｅ４００００: VDP2_VRAM_B0
+	回転スクロール用パターンネームデータ
+  ２５Ｅ６００００: VDP2_VRAM_B1
+	ノーマルスクロール用データ
+	この領域はＣＧとパターンネームが共有している。
+    ２５Ｅ６００００〜２５Ｅ６７ＦＦＦ	(ＮＢＧ０及びＮＢＧ１用ＣＧデータ)
+    ２５Ｅ６８０００〜２５Ｅ７５ＦＦＦ	(ＮＢＧ１用ＣＧデータ)
+    ２５Ｅ７６０００〜２５Ｅ７７ＦＦＦ	(ＮＢＧ０用パターンネームデータ１ページ)
+    ２５Ｅ７８０００〜２５Ｅ７ＦＦＦＦ	(ＮＢＧ１用パターンネームデータ４ページ)
+
+  ＣＧはどのスクロールも２５６色モードでパターンネームは１ワード/セルになっている。
+  ＮＢＧ０は各セルごとに反転のフラグを持つ１０ビットモードで、他の面は反転を面ごとに
+  使用する１２ビットモードとなっている。
+  カラーＲＡＭは１６ビット２０４８色モードで、オフセットは使用していない。
+  バック面は単色で、２５Ｅ３ＦＦＦＥにカラーデータ(００００)を入れている。
+
+ 06000000 : +---------------------------+
+	    | Boot ROM BIOS functions	|
+ 06000800 : +---------------------------+
+	    | Slave CPU Stack Area	|
+ 06001000 : +---------------------------+
+	    | Master CPU default Stack	|
+ 06002000 : +---------------------------+
+	    | ???			|
+ 06004000 : +---------------------------+
+	    |				|
+	    | User Program & Data	|
+	    |				|
+ 060C0000 : +---------------------------+
+	    |				|
+	    | SortList	(5400)		|
+	    |				|
+ 060C5400 : +---------------------------+
+	    | TransList	(F0)		|
+ 060C54F0 : +---------------------------+
+	    | Zbuffer	(200)		|
+ 060C56F0 : +---------------------------+
+	    | Zbuffer2	(200)		|
+ 060C58F0 : +---------------------------+
+	    | Zbuf_nest	(400)		|
+ 060C5CF0 : +---------------------------+
+	    |				|
+	    | Spritebuf	(FBDC)		|
+	    |				|
+ 060D58CC : +---------------------------+
+	    |				|
+	    | Spritebuf2(FBDC)		|
+	    |				|
+ 060E54A8 : +---------------------------+
+	    |				|
+	    | Pbuffer	(9C40)		|
+	    |				|
+ 060EF0E8 : +---------------------------+
+	    | CLOfstBuf	(400)		|
+ 060EF4E8 : +---------------------------+
+	    |				|
+	    | CommandBuf(DF40)		|
+	    |				|
+ 060FD428 : +---------------------------+
+	    |				|
+	    | Stack Area(27D8)		|
+	    |				|
+ 060FFC00 : +---------------------------+
+	    | SystemWork(400)		|
+ 06100000 : +---------------------------+
+
+
+ 25C00000 : +---------------------------+
+	    |				|
+	    | SpriteCommand(E1C0)	|
+	    |				|
+ 25C0E1C0 : +---------------------------+
+	    |				|
+	    | Free (for User)		|
+	    |				|
+ 25C7FEF8 : +---------------------------+
+	    | Gouraud table(108)	|
+ 25C80000 : +---------------------------+
+
+
+ 25E00000 : +---------------------------+
+	    |				|
+	    | RBG0 CG (2048chars)	|
+	    |				|
+ 25E20000 : +---------------------------+
+	    |				|
+	    | RBG0 K table		|
+	    |				|
+ 25E40000 : +---------------------------+
+	    |				|
+	    | RBG0 Map (16pages)	|
+	    |				|
+ 25E60000 : +---------------------------+
+	    | NBG0 , NBG1 CG (512 chars)|
+ 25E68000 : +- - - - - - - - - - - - - -+
+	    | NBG1 CG (+896chars)	|
+ 25E76000 : +---------------------------+
+	    | NBG0 Map (1page)		|
+ 25E78000 : +---------------------------+
+	    | NBG1 Map (4pages)		|
+ 25E80000 : +---------------------------+
+
+;---------------------------------------------------------------------------
+
+◎ システムワークＲＡＭ領域のカスタマイズについて
+
+０６０ＦＦＣ００から始まるシステム変数領域はシステムで固定されていますが、
+ワークＲＡＭとして使用される領域(デフォルトでは ０６０Ｃ００００〜)について
+は、以下に示す変数をユーザーが定義することによりカスタマイズ可能です。
+(ただし、一部を変更する場合でも全ての変数を設定するようにして下さい)
+
+    void*   MasterStack = (void*)0x60ffc00 ;	/* Master Stack area End */
+    void*   SlaveStack  = (void*)0x6001e00 ;	/* Slave Stack area End */
+    Uint16  MaxVertices = 2500 ;		/* Calculatable vertice numbers */
+    Uint16  MaxPolygons = 1786 ;		/* Calculatable polygon numbers */
+    Uint16  EventSize = 0x80 ;			/* sizeof(EVENT) */
+    Uint16  WorkSize = 0x40 ;			/* sizeof(WORK) */
+    Uint16  MaxEvents = 64 ;			/* Useful Event count */
+    Uint16  MaxWorks = 256 ;			/* Useful Work count */
+    void*   SortList = (void*)0x60c0000 ;	/* SCU D.M.A. Table */
+    Uint32  SortListSize = 0x5400 ;		/* Sprite transfer request table size */
+    void*   TransList = (void*)0x60fb800 ;	/* SCU D.M.A. Table */
+    void*   Zbuffer = (void*)0x60c5800 ;	/* (128 + 128 + 256) * 4 Bytes fix */
+    void*   SpriteBuf (void*)0x60c6000 ;	/* Sprite control data buffer */
+    Uint32  SpriteBufSize = 0x1f7b8 ;		/* Sprite control data buffer size */
+    void*   Pbuffer = (void*)0x60e57b8 ;	/* Point calculate buffer */
+    void*   CLOfstBuf = (void*)0x60c5400 ;	/* 32 * 32 Bytes fix */
+    void*   CommandBuf = (void*)0x60ef3f8 ;	/* Command for slave CPU buffer */
+    void*   PCM_Work = (void*)0x25a78000 ;	/* PCM data buffer */
+    Uint32  PCM_WkSize = 0x8000 ;		/* PCM data buffer size */
+
+    EVENT  EventBuf[MAX_EVENTS] ;	/* buffer for Event use */
+    WORK   WorkBuf[MAX_WORKS] ;		/* buffer for Work use */
+    EVENT* RemainEvent[MAX_EVENTS] ;	/* Remain Event address buffer */
+    WORK*  RemainWork[MAX_WORKS] ;	/* Remain Work address buffer */
+
+それぞれの領域の設定は以下の注意点を必ず守るようにして下さい。
+
+(１) SortList と TransList は ＳＣＵ Ｄ.Ｍ.Ａ.を間接モードで使用するため、
+     テーブルのサイズを越える２のべき乗数で領域調整するようにして下さい。
+     SortList は スプライト(ポリゴン)データ及び、ウィンドウ等のデータの
+     転送にも使用するため、表示される最大スプライト数 ＋ ６個分のエントリー
+     を確保して下さい。
+     ひとつのエントリーにつき１２バイトのテーブルを使用します。
+     例えば、１０００スプライト表示する場合には
+	(１０００＋６) ＊ １２ ＝ １２０７２(２Ｆ２８Ｈ) となりますので、
+     ４０００Ｈバウンダリのアドレスに設定する。
+
+     また、TransList はブランキング中の転送リクエストに使用され２０エント
+     リーまでとなっていますので、
+	２０ ＊ １２ ＝ ２４０(Ｆ０Ｈ) バイト必要ですので、
+     １００Ｈ バウンダリのアドレスに設定して下さい。
+
+(２) Zbuffer , CLOfstBuf は サイズが固定で ４バイトバウンダリのアドレスに
+     設定して下さい。
+
+(３) CommandBuf は 表示制御関数(slPutPolygon , slDispSprite等)の実行回数
+     ＊ ８０バイト ＋ １００Ｈ ぐらいのサイズを確保して下さい。
+     実行関数が特定できる場合には 次の表を参考にバッファサイズを設定して
+     下さい。
+
+	slPutPolygon	７２バイト
+	slDispPolygon	１６バイト
+	slPutSprite	３６バイト
+	slDispSprite	３６バイト
+	slSetSprite	１６バイト
+	slPerspective	  ８バイト
+	slWindow	２０バイト
+	slLight		１６バイト
+	slZdspLevel	  ４バイト
+
+     この他にシステムが各フレームごとにファンクションを送っているため、
+     その分の余裕を見るようにして下さい。
+
+(４) SpriteBuf は スプライトコントロールデータをセットするバッファで、
+     各フレームで前半と後半とを切替えながら使用します。
+     したがって、(実際に表示されるスプライト(ポリゴン)数 ＋ ５個) ＊ ３６
+     バイト ＊ ２バンク 分のバッファが必要になります。
+
+(５) Pbuffer は ポリゴンモデルを表示する際に座標変換、透視変換の演算用の
+     バッファとして使用する領域で、slPutPolygon , slDispPolygon を使用し
+     ないアプリケーションでは必要ありませんので、他のバッファと重複しても
+     問題はありません。
+
+(６) MaxPolygons , MaxVertices は 表示制御関数を実行する際にバッファオー
+     バーをチェックするために使用しますが、実際に表示される数ではなく、
+     エントリーされている数に対してチェックを行なっていますので、
+     MaxPolygons に関しては 必ずしも SortListSize , SpriteBufSize と合って
+     いる必要はありません。
+
+(７) PCM_Work はサウンドＣＰＵの領域で、サイズが ２０００Ｈ単位となります
+     ので、サウンド担当者と相談の上設定して下さい。
+
+以下に ワークＲＡＭの設定を行なうサンプル(workarea.c)を示します。
+
+/*						*/
+/*  Workarea assignment customize file		*/
+/*		for SGL ver. 1.30		*/
+
+/*------------------------------------------------------------------------*/
+
+#include  "sl_def.h"
+
+/*------------------------------------------------------------------------*/
+
+#define		SystemWork		0x060ffc00	/* システム固定 */
+
+#define		_Byte_			sizeof(Uint8)
+#define		_Word_			sizeof(Uint16)
+#define		_LongWord_		sizeof(Uint32)
+#define		_Sprite_		(sizeof(Uint16) * 18)
+
+#define		AdjWork(pt,sz,ct)	(pt + (sz) * (ct))
+
+/*------------------------------------------------------------------------*/
+
+#define		MAX_VERTICES		 500
+#define		MAX_POLYGONS		 100
+
+#define		WORK_AREA		0x060f0000
+
+    enum workarea{
+	sort_list  = WORK_AREA ,
+	zbuffer    = AdjWork(sort_list  , _LongWord_ * 3 , MAX_POLYGONS + 6) ,
+	spritebuf  = AdjWork(zbuffer    , _LongWord_ , 512) ,
+	pbuffer    = AdjWork(spritebuf  , _Sprite_ , (MAX_POLYGONS + 6) * 2) ,
+	clofstbuf  = AdjWork(pbuffer    , _LongWord_ * 4 , MAX_VERTICES) ,
+	commandbuf = AdjWork(clofstbuf  , _Byte_ * 32 , 32) ,
+	NextEntry  = AdjWork(commandbuf , _LongWord_ * 8 , MAX_POLYGONS)
+    } ;
+
+#define		PCM_Buffer		SoundRAM+0x78000
+
+/*------------------------------------------------------------------------*/
+
+    const void*   MasterStack   = (void*)(WORK_AREA - 0x800) ;
+    const void*   SlaveStack    = (void*)(WORK_AREA) ;
+    const Uint16  MaxVertices   = MAX_VERTICES ;
+    const Uint16  MaxPolygons   = MAX_POLYGONS ;
+    const Uint16  EventSize     = sizeof(EVENT) ;
+    const Uint16  WorkSize      = sizeof(WORK) ;
+    const Uint16  MaxEvents     = MAX_EVENTS ;
+    const Uint16  MaxWorks      = MAX_WORKS ;
+    const void*   SortList      = (void*)(sort_list) ;
+    const Uint32  SortListSize  = (MAX_POLYGONS + 6) * _LongWord_ * 3 ;
+    const void*   Zbuffer       = (void*)(zbuffer) ;
+    const void*   SpriteBuf     = (void*)(spritebuf) ;
+    const Uint32  SpriteBufSize = _Sprite_ * (MAX_POLYGONS + 6) * 2 ;
+    const void*   Pbuffer       = (void*)(pbuffer) ;
+    const void*   CLOfstBuf     = (void*)(clofstbuf) ;
+    const void*   CommandBuf    = (void*)(commandbuf) ;
+    const void*   PCM_Work      = (void*)(PCM_Buffer) ;
+    const Uint32  PCM_WkSize    = 0x8000 ;
+    const void*   TransList     = (void*)(SystemWork - 0x0100) ;
+
+    EVENT  EventBuf[MAX_EVENTS] ;
+    WORK   WorkBuf[MAX_WORKS] ;
+    EVENT* RemainEvent[MAX_EVENTS] ;
+    WORK*  RemainWork[MAX_WORKS] ;
+
+/*------------------------------------------------------------------------*/

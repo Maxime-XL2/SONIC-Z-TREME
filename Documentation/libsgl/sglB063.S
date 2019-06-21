@@ -1,0 +1,15 @@
+
+sglB063.o:     file format coff-sh
+
+
+Disassembly of section SLPROG:
+
+00000000 <_slPriority>:
+   0:	d0 01       	mov.l	8 <IMM_VDP2_PRINA>,r0	! 60ffdb8
+   2:	00 0b       	rts	
+   4:	04 54       	mov.b	r5,@(r0,r4)
+	...
+
+00000008 <IMM_VDP2_PRINA>:
+   8:	06 0f       	mac.l	@r0+,@r6+
+   a:	fd b8       	fmov	@r11,fr13

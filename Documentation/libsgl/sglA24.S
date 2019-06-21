@@ -1,0 +1,516 @@
+
+sglA24.o:     file format coff-sh
+
+
+Disassembly of section SLPROG:
+
+00000000 <_slInversMatrix>:
+   0:	c6 07       	mov.l	@(28,gbr),r0
+   2:	2f 86       	mov.l	r8,@-r15
+   4:	2f a6       	mov.l	r10,@-r15
+   6:	2f 96       	mov.l	r9,@-r15
+   8:	66 03       	mov	r0,r6
+   a:	50 60       	mov.l	@(0,r6),r0
+   c:	e9 00       	mov	#0,r9
+   e:	63 03       	mov	r0,r3
+  10:	40 11       	cmp/pz	r0
+  12:	8d 01       	bt.s	18 <invmx_01>
+  14:	51 64       	mov.l	@(16,r6),r1
+  16:	63 0b       	neg	r0,r3
+
+00000018 <invmx_01>:
+  18:	64 13       	mov	r1,r4
+  1a:	41 11       	cmp/pz	r1
+  1c:	8d 01       	bt.s	22 <invmx_02>
+  1e:	52 68       	mov.l	@(32,r6),r2
+  20:	64 1b       	neg	r1,r4
+
+00000022 <invmx_02>:
+  22:	33 42       	cmp/hs	r4,r3
+  24:	8d 02       	bt.s	2c <invmx_03>
+  26:	65 23       	mov	r2,r5
+  28:	63 43       	mov	r4,r3
+  2a:	e9 01       	mov	#1,r9
+
+0000002c <invmx_03>:
+  2c:	42 11       	cmp/pz	r2
+  2e:	89 00       	bt	32 <invmx_04>
+  30:	65 2b       	neg	r2,r5
+
+00000032 <invmx_04>:
+  32:	33 52       	cmp/hs	r5,r3
+  34:	8d 0e       	bt.s	54 <invmx_05>
+  36:	58 61       	mov.l	@(4,r6),r8
+  38:	59 62       	mov.l	@(8,r6),r9
+  3a:	53 63       	mov.l	@(12,r6),r3
+  3c:	54 6b       	mov.l	@(44,r6),r4
+  3e:	57 6a       	mov.l	@(40,r6),r7
+  40:	55 69       	mov.l	@(36,r6),r5
+  42:	16 3b       	mov.l	r3,@(44,r6)
+  44:	16 43       	mov.l	r4,@(12,r6)
+  46:	16 9a       	mov.l	r9,@(40,r6)
+  48:	16 72       	mov.l	r7,@(8,r6)
+  4a:	16 89       	mov.l	r8,@(36,r6)
+  4c:	63 23       	mov	r2,r3
+  4e:	62 03       	mov	r0,r2
+  50:	a0 0f       	bra	72 <invmx_08>
+  52:	e9 02       	mov	#2,r9
+
+00000054 <invmx_05>:
+  54:	29 98       	tst	r9,r9
+  56:	89 0e       	bt	76 <invmx_10>
+  58:	59 62       	mov.l	@(8,r6),r9
+  5a:	53 63       	mov.l	@(12,r6),r3
+  5c:	54 67       	mov.l	@(28,r6),r4
+  5e:	57 66       	mov.l	@(24,r6),r7
+  60:	55 65       	mov.l	@(20,r6),r5
+  62:	16 37       	mov.l	r3,@(28,r6)
+  64:	16 43       	mov.l	r4,@(12,r6)
+  66:	16 96       	mov.l	r9,@(24,r6)
+  68:	16 72       	mov.l	r7,@(8,r6)
+  6a:	16 85       	mov.l	r8,@(20,r6)
+  6c:	63 13       	mov	r1,r3
+  6e:	61 03       	mov	r0,r1
+  70:	e9 01       	mov	#1,r9
+
+00000072 <invmx_08>:
+  72:	68 53       	mov	r5,r8
+  74:	60 33       	mov	r3,r0
+
+00000076 <invmx_10>:
+  76:	38 1d       	dmuls.l	r1,r8
+  78:	ea ff       	mov	#-1,r10
+  7a:	4a 18       	shll8	r10
+  7c:	1a 00       	mov.l	r0,@(0,r10)
+  7e:	04 0a       	sts	mach,r4
+  80:	05 1a       	sts	macl,r5
+  82:	1a 44       	mov.l	r4,@(16,r10)
+  84:	1a 55       	mov.l	r5,@(20,r10)
+  86:	55 65       	mov.l	@(20,r6),r5
+  88:	54 a7       	mov.l	@(28,r10),r4
+  8a:	38 2d       	dmuls.l	r2,r8
+  8c:	35 48       	sub	r4,r5
+  8e:	16 55       	mov.l	r5,@(20,r6)
+  90:	1a 00       	mov.l	r0,@(0,r10)
+  92:	04 0a       	sts	mach,r4
+  94:	05 1a       	sts	macl,r5
+  96:	1a 44       	mov.l	r4,@(16,r10)
+  98:	1a 55       	mov.l	r5,@(20,r10)
+  9a:	55 69       	mov.l	@(36,r6),r5
+  9c:	63 89       	swap.w	r8,r3
+  9e:	63 3f       	exts.w	r3,r3
+  a0:	48 28       	shll16	r8
+  a2:	54 a7       	mov.l	@(28,r10),r4
+  a4:	1a 00       	mov.l	r0,@(0,r10)
+  a6:	1a 34       	mov.l	r3,@(16,r10)
+  a8:	1a 85       	mov.l	r8,@(20,r10)
+  aa:	35 48       	sub	r4,r5
+  ac:	16 59       	mov.l	r5,@(36,r6)
+  ae:	58 62       	mov.l	@(8,r6),r8
+  b0:	53 a7       	mov.l	@(28,r10),r3
+  b2:	38 1d       	dmuls.l	r1,r8
+  b4:	63 3b       	neg	r3,r3
+  b6:	16 31       	mov.l	r3,@(4,r6)
+  b8:	1a 00       	mov.l	r0,@(0,r10)
+  ba:	04 0a       	sts	mach,r4
+  bc:	05 1a       	sts	macl,r5
+  be:	1a 44       	mov.l	r4,@(16,r10)
+  c0:	1a 55       	mov.l	r5,@(20,r10)
+  c2:	55 66       	mov.l	@(24,r6),r5
+  c4:	54 a7       	mov.l	@(28,r10),r4
+  c6:	38 2d       	dmuls.l	r2,r8
+  c8:	35 48       	sub	r4,r5
+  ca:	16 56       	mov.l	r5,@(24,r6)
+  cc:	1a 00       	mov.l	r0,@(0,r10)
+  ce:	04 0a       	sts	mach,r4
+  d0:	05 1a       	sts	macl,r5
+  d2:	1a 44       	mov.l	r4,@(16,r10)
+  d4:	1a 55       	mov.l	r5,@(20,r10)
+  d6:	63 89       	swap.w	r8,r3
+  d8:	63 3f       	exts.w	r3,r3
+  da:	48 28       	shll16	r8
+  dc:	55 6a       	mov.l	@(40,r6),r5
+  de:	54 a7       	mov.l	@(28,r10),r4
+  e0:	1a 00       	mov.l	r0,@(0,r10)
+  e2:	1a 34       	mov.l	r3,@(16,r10)
+  e4:	1a 85       	mov.l	r8,@(20,r10)
+  e6:	35 48       	sub	r4,r5
+  e8:	16 5a       	mov.l	r5,@(40,r6)
+  ea:	58 63       	mov.l	@(12,r6),r8
+  ec:	53 a7       	mov.l	@(28,r10),r3
+  ee:	64 89       	swap.w	r8,r4
+  f0:	64 48       	swap.b	r4,r4
+  f2:	64 4e       	exts.b	r4,r4
+  f4:	48 18       	shll8	r8
+  f6:	1a 00       	mov.l	r0,@(0,r10)
+  f8:	1a 44       	mov.l	r4,@(16,r10)
+  fa:	1a 85       	mov.l	r8,@(20,r10)
+  fc:	63 3b       	neg	r3,r3
+  fe:	16 32       	mov.l	r3,@(8,r6)
+ 100:	58 a7       	mov.l	@(28,r10),r8
+ 102:	38 1d       	dmuls.l	r1,r8
+ 104:	55 67       	mov.l	@(28,r6),r5
+ 106:	03 0a       	sts	mach,r3
+ 108:	04 1a       	sts	macl,r4
+ 10a:	43 18       	shll8	r3
+ 10c:	43 28       	shll16	r3
+ 10e:	44 19       	shlr8	r4
+ 110:	24 3b       	or	r3,r4
+ 112:	35 48       	sub	r4,r5
+ 114:	16 57       	mov.l	r5,@(28,r6)
+ 116:	38 2d       	dmuls.l	r2,r8
+ 118:	55 6b       	mov.l	@(44,r6),r5
+ 11a:	03 0a       	sts	mach,r3
+ 11c:	04 1a       	sts	macl,r4
+ 11e:	43 18       	shll8	r3
+ 120:	43 28       	shll16	r3
+ 122:	44 19       	shlr8	r4
+ 124:	24 3b       	or	r3,r4
+ 126:	35 48       	sub	r4,r5
+ 128:	16 5b       	mov.l	r5,@(44,r6)
+ 12a:	68 8b       	neg	r8,r8
+ 12c:	48 18       	shll8	r8
+ 12e:	16 83       	mov.l	r8,@(12,r6)
+ 130:	63 19       	swap.w	r1,r3
+ 132:	63 3f       	exts.w	r3,r3
+ 134:	41 28       	shll16	r1
+ 136:	1a 00       	mov.l	r0,@(0,r10)
+ 138:	1a 34       	mov.l	r3,@(16,r10)
+ 13a:	1a 15       	mov.l	r1,@(20,r10)
+ 13c:	63 29       	swap.w	r2,r3
+ 13e:	63 3f       	exts.w	r3,r3
+ 140:	42 28       	shll16	r2
+ 142:	58 a7       	mov.l	@(28,r10),r8
+ 144:	1a 00       	mov.l	r0,@(0,r10)
+ 146:	1a 34       	mov.l	r3,@(16,r10)
+ 148:	1a 25       	mov.l	r2,@(20,r10)
+ 14a:	16 84       	mov.l	r8,@(16,r6)
+ 14c:	e1 01       	mov	#1,r1
+ 14e:	e3 00       	mov	#0,r3
+ 150:	55 a7       	mov.l	@(28,r10),r5
+ 152:	1a 00       	mov.l	r0,@(0,r10)
+ 154:	16 58       	mov.l	r5,@(32,r6)
+ 156:	1a 14       	mov.l	r1,@(16,r10)
+ 158:	1a 35       	mov.l	r3,@(20,r10)
+ 15a:	50 65       	mov.l	@(20,r6),r0
+ 15c:	e3 00       	mov	#0,r3
+ 15e:	64 03       	mov	r0,r4
+ 160:	40 11       	cmp/pz	r0
+ 162:	8d 01       	bt.s	168 <invmx_11>
+ 164:	52 69       	mov.l	@(36,r6),r2
+ 166:	64 0b       	neg	r0,r4
+
+00000168 <invmx_11>:
+ 168:	42 11       	cmp/pz	r2
+ 16a:	8d 01       	bt.s	170 <invmx_12>
+ 16c:	61 23       	mov	r2,r1
+ 16e:	61 2b       	neg	r2,r1
+
+00000170 <invmx_12>:
+ 170:	34 12       	cmp/hs	r1,r4
+ 172:	8d 0f       	bt.s	194 <invmx_14>
+ 174:	58 64       	mov.l	@(16,r6),r8
+ 176:	53 67       	mov.l	@(28,r6),r3
+ 178:	54 6b       	mov.l	@(44,r6),r4
+ 17a:	55 66       	mov.l	@(24,r6),r5
+ 17c:	51 6a       	mov.l	@(40,r6),r1
+ 17e:	16 3b       	mov.l	r3,@(44,r6)
+ 180:	16 47       	mov.l	r4,@(28,r6)
+ 182:	16 5a       	mov.l	r5,@(40,r6)
+ 184:	16 16       	mov.l	r1,@(24,r6)
+ 186:	55 68       	mov.l	@(32,r6),r5
+ 188:	16 88       	mov.l	r8,@(32,r6)
+ 18a:	68 53       	mov	r5,r8
+ 18c:	63 23       	mov	r2,r3
+ 18e:	62 03       	mov	r0,r2
+ 190:	60 33       	mov	r3,r0
+ 192:	e3 02       	mov	#2,r3
+
+00000194 <invmx_14>:
+ 194:	51 61       	mov.l	@(4,r6),r1
+ 196:	49 18       	shll8	r9
+ 198:	29 3b       	or	r3,r9
+ 19a:	38 1d       	dmuls.l	r1,r8
+ 19c:	53 a7       	mov.l	@(28,r10),r3
+ 19e:	1a 00       	mov.l	r0,@(0,r10)
+ 1a0:	16 30       	mov.l	r3,@(0,r6)
+ 1a2:	04 0a       	sts	mach,r4
+ 1a4:	05 1a       	sts	macl,r5
+ 1a6:	1a 44       	mov.l	r4,@(16,r10)
+ 1a8:	1a 55       	mov.l	r5,@(20,r10)
+ 1aa:	54 a7       	mov.l	@(28,r10),r4
+ 1ac:	38 2d       	dmuls.l	r2,r8
+ 1ae:	33 48       	sub	r4,r3
+ 1b0:	16 30       	mov.l	r3,@(0,r6)
+ 1b2:	1a 00       	mov.l	r0,@(0,r10)
+ 1b4:	04 0a       	sts	mach,r4
+ 1b6:	05 1a       	sts	macl,r5
+ 1b8:	1a 44       	mov.l	r4,@(16,r10)
+ 1ba:	1a 55       	mov.l	r5,@(20,r10)
+ 1bc:	63 89       	swap.w	r8,r3
+ 1be:	63 3f       	exts.w	r3,r3
+ 1c0:	48 28       	shll16	r8
+ 1c2:	55 68       	mov.l	@(32,r6),r5
+ 1c4:	54 a7       	mov.l	@(28,r10),r4
+ 1c6:	1a 00       	mov.l	r0,@(0,r10)
+ 1c8:	1a 34       	mov.l	r3,@(16,r10)
+ 1ca:	1a 85       	mov.l	r8,@(20,r10)
+ 1cc:	35 48       	sub	r4,r5
+ 1ce:	16 58       	mov.l	r5,@(32,r6)
+ 1d0:	58 66       	mov.l	@(24,r6),r8
+ 1d2:	53 a7       	mov.l	@(28,r10),r3
+ 1d4:	38 1d       	dmuls.l	r1,r8
+ 1d6:	63 3b       	neg	r3,r3
+ 1d8:	16 34       	mov.l	r3,@(16,r6)
+ 1da:	1a 00       	mov.l	r0,@(0,r10)
+ 1dc:	04 0a       	sts	mach,r4
+ 1de:	05 1a       	sts	macl,r5
+ 1e0:	1a 44       	mov.l	r4,@(16,r10)
+ 1e2:	1a 55       	mov.l	r5,@(20,r10)
+ 1e4:	55 62       	mov.l	@(8,r6),r5
+ 1e6:	54 a7       	mov.l	@(28,r10),r4
+ 1e8:	38 2d       	dmuls.l	r2,r8
+ 1ea:	35 48       	sub	r4,r5
+ 1ec:	16 52       	mov.l	r5,@(8,r6)
+ 1ee:	1a 00       	mov.l	r0,@(0,r10)
+ 1f0:	04 0a       	sts	mach,r4
+ 1f2:	05 1a       	sts	macl,r5
+ 1f4:	1a 44       	mov.l	r4,@(16,r10)
+ 1f6:	1a 55       	mov.l	r5,@(20,r10)
+ 1f8:	63 89       	swap.w	r8,r3
+ 1fa:	63 3f       	exts.w	r3,r3
+ 1fc:	48 28       	shll16	r8
+ 1fe:	55 6a       	mov.l	@(40,r6),r5
+ 200:	54 a7       	mov.l	@(28,r10),r4
+ 202:	1a 00       	mov.l	r0,@(0,r10)
+ 204:	1a 34       	mov.l	r3,@(16,r10)
+ 206:	1a 85       	mov.l	r8,@(20,r10)
+ 208:	35 48       	sub	r4,r5
+ 20a:	16 5a       	mov.l	r5,@(40,r6)
+ 20c:	58 67       	mov.l	@(28,r6),r8
+ 20e:	53 a7       	mov.l	@(28,r10),r3
+ 210:	64 89       	swap.w	r8,r4
+ 212:	64 48       	swap.b	r4,r4
+ 214:	64 4e       	exts.b	r4,r4
+ 216:	48 18       	shll8	r8
+ 218:	1a 00       	mov.l	r0,@(0,r10)
+ 21a:	1a 44       	mov.l	r4,@(16,r10)
+ 21c:	1a 85       	mov.l	r8,@(20,r10)
+ 21e:	63 3b       	neg	r3,r3
+ 220:	16 36       	mov.l	r3,@(24,r6)
+ 222:	58 a7       	mov.l	@(28,r10),r8
+ 224:	38 1d       	dmuls.l	r1,r8
+ 226:	55 63       	mov.l	@(12,r6),r5
+ 228:	03 0a       	sts	mach,r3
+ 22a:	04 1a       	sts	macl,r4
+ 22c:	43 18       	shll8	r3
+ 22e:	43 28       	shll16	r3
+ 230:	44 19       	shlr8	r4
+ 232:	24 3b       	or	r3,r4
+ 234:	35 48       	sub	r4,r5
+ 236:	16 53       	mov.l	r5,@(12,r6)
+ 238:	38 2d       	dmuls.l	r2,r8
+ 23a:	55 6b       	mov.l	@(44,r6),r5
+ 23c:	03 0a       	sts	mach,r3
+ 23e:	04 1a       	sts	macl,r4
+ 240:	43 18       	shll8	r3
+ 242:	43 28       	shll16	r3
+ 244:	44 19       	shlr8	r4
+ 246:	24 3b       	or	r3,r4
+ 248:	35 48       	sub	r4,r5
+ 24a:	16 5b       	mov.l	r5,@(44,r6)
+ 24c:	1a 00       	mov.l	r0,@(0,r10)
+ 24e:	63 19       	swap.w	r1,r3
+ 250:	63 3f       	exts.w	r3,r3
+ 252:	1a 34       	mov.l	r3,@(16,r10)
+ 254:	41 28       	shll16	r1
+ 256:	1a 15       	mov.l	r1,@(20,r10)
+ 258:	68 8b       	neg	r8,r8
+ 25a:	48 18       	shll8	r8
+ 25c:	16 87       	mov.l	r8,@(28,r6)
+ 25e:	51 a7       	mov.l	@(28,r10),r1
+ 260:	1a 00       	mov.l	r0,@(0,r10)
+ 262:	16 11       	mov.l	r1,@(4,r6)
+ 264:	63 29       	swap.w	r2,r3
+ 266:	63 3f       	exts.w	r3,r3
+ 268:	1a 34       	mov.l	r3,@(16,r10)
+ 26a:	42 28       	shll16	r2
+ 26c:	1a 25       	mov.l	r2,@(20,r10)
+ 26e:	e1 01       	mov	#1,r1
+ 270:	e3 00       	mov	#0,r3
+ 272:	52 a7       	mov.l	@(28,r10),r2
+ 274:	1a 00       	mov.l	r0,@(0,r10)
+ 276:	1a 14       	mov.l	r1,@(16,r10)
+ 278:	1a 35       	mov.l	r3,@(20,r10)
+ 27a:	16 29       	mov.l	r2,@(36,r6)
+ 27c:	50 6a       	mov.l	@(40,r6),r0
+ 27e:	58 68       	mov.l	@(32,r6),r8
+ 280:	51 62       	mov.l	@(8,r6),r1
+ 282:	52 66       	mov.l	@(24,r6),r2
+ 284:	38 1d       	dmuls.l	r1,r8
+ 286:	53 a7       	mov.l	@(28,r10),r3
+ 288:	16 35       	mov.l	r3,@(20,r6)
+ 28a:	1a 00       	mov.l	r0,@(0,r10)
+ 28c:	04 0a       	sts	mach,r4
+ 28e:	05 1a       	sts	macl,r5
+ 290:	1a 44       	mov.l	r4,@(16,r10)
+ 292:	1a 55       	mov.l	r5,@(20,r10)
+ 294:	55 60       	mov.l	@(0,r6),r5
+ 296:	54 a7       	mov.l	@(28,r10),r4
+ 298:	38 2d       	dmuls.l	r2,r8
+ 29a:	35 48       	sub	r4,r5
+ 29c:	16 50       	mov.l	r5,@(0,r6)
+ 29e:	1a 00       	mov.l	r0,@(0,r10)
+ 2a0:	04 0a       	sts	mach,r4
+ 2a2:	05 1a       	sts	macl,r5
+ 2a4:	1a 44       	mov.l	r4,@(16,r10)
+ 2a6:	1a 55       	mov.l	r5,@(20,r10)
+ 2a8:	63 89       	swap.w	r8,r3
+ 2aa:	63 3f       	exts.w	r3,r3
+ 2ac:	48 28       	shll16	r8
+ 2ae:	55 64       	mov.l	@(16,r6),r5
+ 2b0:	54 a7       	mov.l	@(28,r10),r4
+ 2b2:	1a 00       	mov.l	r0,@(0,r10)
+ 2b4:	1a 34       	mov.l	r3,@(16,r10)
+ 2b6:	1a 85       	mov.l	r8,@(20,r10)
+ 2b8:	35 48       	sub	r4,r5
+ 2ba:	16 54       	mov.l	r5,@(16,r6)
+ 2bc:	58 69       	mov.l	@(36,r6),r8
+ 2be:	53 a7       	mov.l	@(28,r10),r3
+ 2c0:	38 1d       	dmuls.l	r1,r8
+ 2c2:	63 3b       	neg	r3,r3
+ 2c4:	16 38       	mov.l	r3,@(32,r6)
+ 2c6:	1a 00       	mov.l	r0,@(0,r10)
+ 2c8:	04 0a       	sts	mach,r4
+ 2ca:	05 1a       	sts	macl,r5
+ 2cc:	1a 44       	mov.l	r4,@(16,r10)
+ 2ce:	1a 55       	mov.l	r5,@(20,r10)
+ 2d0:	55 61       	mov.l	@(4,r6),r5
+ 2d2:	54 a7       	mov.l	@(28,r10),r4
+ 2d4:	38 2d       	dmuls.l	r2,r8
+ 2d6:	35 48       	sub	r4,r5
+ 2d8:	16 51       	mov.l	r5,@(4,r6)
+ 2da:	1a 00       	mov.l	r0,@(0,r10)
+ 2dc:	04 0a       	sts	mach,r4
+ 2de:	05 1a       	sts	macl,r5
+ 2e0:	1a 44       	mov.l	r4,@(16,r10)
+ 2e2:	1a 55       	mov.l	r5,@(20,r10)
+ 2e4:	63 89       	swap.w	r8,r3
+ 2e6:	63 3f       	exts.w	r3,r3
+ 2e8:	48 28       	shll16	r8
+ 2ea:	55 65       	mov.l	@(20,r6),r5
+ 2ec:	54 a7       	mov.l	@(28,r10),r4
+ 2ee:	1a 00       	mov.l	r0,@(0,r10)
+ 2f0:	1a 34       	mov.l	r3,@(16,r10)
+ 2f2:	1a 85       	mov.l	r8,@(20,r10)
+ 2f4:	35 48       	sub	r4,r5
+ 2f6:	16 55       	mov.l	r5,@(20,r6)
+ 2f8:	58 6b       	mov.l	@(44,r6),r8
+ 2fa:	53 a7       	mov.l	@(28,r10),r3
+ 2fc:	64 89       	swap.w	r8,r4
+ 2fe:	64 48       	swap.b	r4,r4
+ 300:	64 4e       	exts.b	r4,r4
+ 302:	48 18       	shll8	r8
+ 304:	1a 00       	mov.l	r0,@(0,r10)
+ 306:	1a 44       	mov.l	r4,@(16,r10)
+ 308:	1a 85       	mov.l	r8,@(20,r10)
+ 30a:	63 3b       	neg	r3,r3
+ 30c:	16 39       	mov.l	r3,@(36,r6)
+ 30e:	58 a7       	mov.l	@(28,r10),r8
+ 310:	38 1d       	dmuls.l	r1,r8
+ 312:	55 63       	mov.l	@(12,r6),r5
+ 314:	03 0a       	sts	mach,r3
+ 316:	04 1a       	sts	macl,r4
+ 318:	43 18       	shll8	r3
+ 31a:	43 28       	shll16	r3
+ 31c:	44 19       	shlr8	r4
+ 31e:	24 3b       	or	r3,r4
+ 320:	35 48       	sub	r4,r5
+ 322:	38 2d       	dmuls.l	r2,r8
+ 324:	16 53       	mov.l	r5,@(12,r6)
+ 326:	55 67       	mov.l	@(28,r6),r5
+ 328:	03 0a       	sts	mach,r3
+ 32a:	04 1a       	sts	macl,r4
+ 32c:	43 18       	shll8	r3
+ 32e:	43 28       	shll16	r3
+ 330:	44 19       	shlr8	r4
+ 332:	24 3b       	or	r3,r4
+ 334:	35 48       	sub	r4,r5
+ 336:	16 57       	mov.l	r5,@(28,r6)
+ 338:	63 19       	swap.w	r1,r3
+ 33a:	63 3f       	exts.w	r3,r3
+ 33c:	41 28       	shll16	r1
+ 33e:	1a 00       	mov.l	r0,@(0,r10)
+ 340:	1a 34       	mov.l	r3,@(16,r10)
+ 342:	1a 15       	mov.l	r1,@(20,r10)
+ 344:	68 8b       	neg	r8,r8
+ 346:	48 18       	shll8	r8
+ 348:	16 8b       	mov.l	r8,@(44,r6)
+ 34a:	63 29       	swap.w	r2,r3
+ 34c:	63 3f       	exts.w	r3,r3
+ 34e:	42 28       	shll16	r2
+ 350:	51 a7       	mov.l	@(28,r10),r1
+ 352:	1a 00       	mov.l	r0,@(0,r10)
+ 354:	1a 34       	mov.l	r3,@(16,r10)
+ 356:	1a 25       	mov.l	r2,@(20,r10)
+ 358:	16 12       	mov.l	r1,@(8,r6)
+ 35a:	e1 01       	mov	#1,r1
+ 35c:	e3 00       	mov	#0,r3
+ 35e:	52 a7       	mov.l	@(28,r10),r2
+ 360:	1a 00       	mov.l	r0,@(0,r10)
+ 362:	1a 14       	mov.l	r1,@(16,r10)
+ 364:	1a 35       	mov.l	r3,@(20,r10)
+ 366:	16 26       	mov.l	r2,@(24,r6)
+ 368:	60 9c       	extu.b	r9,r0
+ 36a:	20 08       	tst	r0,r0
+ 36c:	8d 0b       	bt.s	386 <invmx_20>
+ 36e:	58 a7       	mov.l	@(28,r10),r8
+ 370:	50 61       	mov.l	@(4,r6),r0
+ 372:	51 62       	mov.l	@(8,r6),r1
+ 374:	52 65       	mov.l	@(20,r6),r2
+ 376:	53 66       	mov.l	@(24,r6),r3
+ 378:	54 69       	mov.l	@(36,r6),r4
+ 37a:	16 02       	mov.l	r0,@(8,r6)
+ 37c:	16 11       	mov.l	r1,@(4,r6)
+ 37e:	16 26       	mov.l	r2,@(24,r6)
+ 380:	16 35       	mov.l	r3,@(20,r6)
+ 382:	16 89       	mov.l	r8,@(36,r6)
+ 384:	68 43       	mov	r4,r8
+
+00000386 <invmx_20>:
+ 386:	49 19       	shlr8	r9
+ 388:	29 98       	tst	r9,r9
+ 38a:	8d 15       	bt.s	3b8 <invmx_29>
+ 38c:	79 ff       	add	#-1,r9
+ 38e:	50 60       	mov.l	@(0,r6),r0
+ 390:	51 64       	mov.l	@(16,r6),r1
+ 392:	29 98       	tst	r9,r9
+ 394:	8d 07       	bt.s	3a6 <invmx_21>
+ 396:	52 68       	mov.l	@(32,r6),r2
+ 398:	53 62       	mov.l	@(8,r6),r3
+ 39a:	54 66       	mov.l	@(24,r6),r4
+ 39c:	65 83       	mov	r8,r5
+ 39e:	16 02       	mov.l	r0,@(8,r6)
+ 3a0:	16 16       	mov.l	r1,@(24,r6)
+ 3a2:	a0 06       	bra	3b2 <invmx_28>
+ 3a4:	68 23       	mov	r2,r8
+
+000003a6 <invmx_21>:
+ 3a6:	53 61       	mov.l	@(4,r6),r3
+ 3a8:	54 65       	mov.l	@(20,r6),r4
+ 3aa:	55 69       	mov.l	@(36,r6),r5
+ 3ac:	16 01       	mov.l	r0,@(4,r6)
+ 3ae:	16 15       	mov.l	r1,@(20,r6)
+ 3b0:	16 29       	mov.l	r2,@(36,r6)
+
+000003b2 <invmx_28>:
+ 3b2:	16 30       	mov.l	r3,@(0,r6)
+ 3b4:	16 44       	mov.l	r4,@(16,r6)
+ 3b6:	16 58       	mov.l	r5,@(32,r6)
+
+000003b8 <invmx_29>:
+ 3b8:	16 8a       	mov.l	r8,@(40,r6)
+ 3ba:	69 f6       	mov.l	@r15+,r9
+ 3bc:	6a f6       	mov.l	@r15+,r10
+ 3be:	00 0b       	rts	
+ 3c0:	68 f6       	mov.l	@r15+,r8

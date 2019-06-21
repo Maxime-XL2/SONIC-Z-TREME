@@ -1,0 +1,643 @@
+******************************************************************************
+Sprite and Polygon Functions
+******************************************************************************
+
+******************************************************************************
+Bool slWindow(Sint16 Left,Sint16 Top,Sint16 Right,Sint16 Bottom,Uint16 Zlimit,
+              Sint16 CentX,Sint16 CentY)
+******************************************************************************
+
+Function: 
+Sets a display region for sprites or polygons. The display area is a position
+on the screen that can be assigned twice during display.
+
+Zlimit stops display beyond the Z position.
+
+CentX and CentY defines the vanishing point for polygons.  They also serve as
+the origin point for sprites.
+
+The upper left position is (0, 0), and the lower right position is (319, 223)
+(for normal screen size).
+
+Note: 
+If sprite-related functions such as slPutPolygon() and slPutSprite() are used
+before slWindow() is called, a full screen size window will be used for these
+functions. The window set with slWindow() will be set separately.
+
+Normally,
+
+    slWindow(...) ;                /* Window 1 */
+        ...
+      slPutPolygon(...) ;
+      slPutSprite(...) ;
+        ...
+    slWindow(...) ;                /* Window 2 */
+        ...
+      slPutSprite(...) ;
+      slPutPolygon(...) ;
+
+The window is set at the start of processing. A separate window is set again
+at the switch point.
+
+******************************************************************************
+void slPerspective(ANGLE pers)
+******************************************************************************
+
+Function: 
+Sets the constant for the distance to the screen used for perspective 
+transforms. The rotation scroll screen's rotation center z position is also 
+set here.  The angle here is the visible horizontal screen width (not window 
+size). 
+
+******************************************************************************
+void slLight(VECTOR light)
+******************************************************************************
+
+Function: 
+Sets the light source direction.
+
+Note: 
+The light source is assumed to provide parallel rays that indicate direction.
+However, vectors must be defined as unit vectors. Overflow occurs if the size
+is greater than 1. Incorrect display will occur as a result (color display
+will be incorrect).
+
+If slScale() is used when a model is displayed, overflow may occur since 
+scaling is also performed on normals.  Limit the use of scaling so that this 
+problem does not occur.
+
+******************************************************************************
+Bool slZdspLevel(Uint16 level)
+******************************************************************************
+
+Function: 
+Sets the display distance on the Z-axis for polygons (or sprite data) in front
+of the screen. level is set to either 1, 2, or 3. Any other number will 
+generate an error.
+
+  1: Display area is 1/2 the distance to the screen (default).
+  2: Display area is 1/4 the distance to the screen.
+  3: Display area is 1/8 the distance to the screen.
+
+Note that the base Zlimit position for polygons (or sprites) set with slWindow
+will also be affected in the same manner when the display level changes.
+
+******************************************************************************
+Bool slPutPolygon(PDATA *pat)
+******************************************************************************
+
+Function: 
+Apply rotation, translation, and perspective transformation on the polygon 
+model defined by the current matrix and display the resulting data as a 
+polygon or distorted sprite.
+
+******************************************************************************
+Bool slPutPolygonS(PDATA *pat)
+******************************************************************************
+
+Function: 
+Apply rotation, translation, and perspective transformation on the polygon 
+model defined by the current matrix and display the resulting data as a 
+polygon or distorted sprite.
+
+Note: 
+slPutPolygon() above divides processing between the master and slave CPU 
+depending on the slave CPU state to perform parallel processing.  In 
+comparison, this function executes all tasks with the slave CPU.
+
+******************************************************************************
+Bool slDispSprite(FIXED pos[XYZS], ATTR *atrb, ANGLE Zrot)
+******************************************************************************
+
+Function: 
+Applies a position, scaling, and rotation angle to a sprite and displays it.
+A Z-sort occurs in the same manner as slPutPolygon(). When a negative value 
+is specified for the scaling amount, the display scale is calculated according
+to the scale determined by the Z position multiplied by the complement of the
+scaling factor. For example, if you apply a -2.0 scaling factor and the Z 
+position is 0.5 times the display position, the resulting display scaling will
+be 1.0 times.
+
+******************************************************************************
+Bool slDispSpriteHV(FIXED pos[XYZSS] , ATTR *atrb , ANGLE Zrot)
+******************************************************************************
+
+Function:
+Applies vertical and horizontal display scales to a sprite and displays it as
+a distorted sprite.  Compared with slDispSprite() above, the character is 
+reversed if a negative value is set to the scaling value.
+
+******************************************************************************
+Bool slDispSpriteSZ(FIXED pos[XYZSS] , ATTR *atrb , ANGLE Zrot)
+******************************************************************************
+
+Function:
+Applies vertical and horizontal display sizes to a sprite and displays it as a
+distorted sprite.  The sprite is displayed in reverse if a negative value is 
+set to the size.
+
+******************************************************************************
+Bool slDispSprite4P(FIXED pos[4][XY] , FIXED zpos , SPR_ATTR *atrb)
+******************************************************************************
+
+Function:
+
+Displays a distorted sprite at 4 user-defined points (vertices).  The 4 points
+are specified as offset values relative to the center of the window. A 
+representative (average) Z position is assigned separately.  The 4 points are 
+specified clockwise- upper left, upper right, lower right, lower left.
+
+******************************************************************************
+Bool slPutSprite(FIXED pos[XYZS], ATTR *atrb, ANGLE Zrot)
+******************************************************************************
+
+Function: 
+Uses the current matrix to calculate a position, and displays the scaled 
+sprite to match the perspective transformation.  Although scaling occurs in 
+the same manner as slDispSprite() above, the sign is inverted for the scaling
+factor when a negative value is specified.
+
+******************************************************************************
+Bool slSetSprite(SPRITE parms[], FIXED Zpos)
+******************************************************************************
+
+Function: 
+Sets the sprite control command data passed on to the hardware in a transfer 
+list. Use this function to set up distorted sprites that cannot be produced by
+the library functions or to set up a window that only affects specific sprites.
+
+******************************************************************************
+Bool slDispPolygon(PDATA *pat, Uint16 mode)
+******************************************************************************
+
+Function: 
+Applies rotation and translation to a polygon model defined by the current 
+matrix and displays it as a polygon or distorted sprite with orthogonal 
+projection. However, options such as light source calculation and clipping 
+cannot be used. mode is a flag that determines whether attributes are common 
+to all polygons.  When the flag is 0, data at the start of the attribute table
+is applied to all polygons. In other cases, each polygon is displayed 
+according to its specified attribute data.
+
+******************************************************************************
+Bool slPutObject(OBJECT *objptr)
+******************************************************************************
+
+Function:
+Applies translation, rotation, and scaling to a specified object structure and
+displays the resulting polygon models. This function has the same effect as 
+the execution of the following function.
+
+    void slPutObject(OBJECT *objptr){
+        slTranslate(objptr->pos[X], objptr->pos[Y], objptr->pos[Z]) ;
+        slRotZ(objptr->ang[Z]) ;
+        slRotY(objptr->ang[Y]) ;
+        slRotX(objptr->ang[X]) ;
+        slScale(objptr->scl[X], objptr->scl[Y], objptr->scl[Z]) ;
+        if(objptr->pat != NULL){
+            slPutPolygon(objptr->pat) ;
+        }
+    }
+
+Note: 
+This function modifies the current matrix, so execute the slPushMatrix() 
+function and preserve the matrix when necessary. Use a user-defined function
+to handle the parent-child relationship of a an object.
+
+Sample display program according to parent-child hierarchical structure:
+
+    void PutAll(OBJECT* obptr){
+        slPushMatrix() ;                 /* Preserve parent matrix */
+        {
+            slPutObject(obptr) ;         /* Display object */
+            if(obptr->child != NULL){
+            PutAll(obptr->child) ;       /* Display if child is present */
+            }
+        }
+        slPopMatrix() ;
+
+        if(obptr->sibling != NULL){
+            PutAll(obptr->sibling) ;     /* Display sibling object */
+        }
+    }
+
+******************************************************************************
+void slCurWindow(Uint8 win)
+******************************************************************************
+
+Function:
+Switches the display window. Specify either winFar (background) or winNear 
+(foreground) for win. Note that when this function is executed, the screen 
+position and display region are set, but the light source vector is not 
+changed.
+
+******************************************************************************
+Uint8 slSprWinNum()
+******************************************************************************
+
+Function: 
+Returns the window number of the window used for display.
+
+******************************************************************************
+void slFrameClipSize(Sint16 xsz , Sint16 ysz)
+******************************************************************************
+
+Function:
+Sets up a clipping area for polygons with a UseClip specification.  This 
+function can be used in conjunction with the sprite display functions 
+slDispSprite() and slPutSprite(). A polygon that goes out of bounds from a 
+specified area within a screen is not displayed.
+
+******************************************************************************
+void slSetScreenDist(FIXED dist)
+******************************************************************************
+
+Function:
+Sets the distance constant to the screen that is used to perform the 
+perspective transformation.  The rotation center Z position for the rotation 
+scroll screen is also set here.
+
+******************************************************************************
+void slGetFrameData(void* dst , Uint16 xsz , Uint16 ysz)
+******************************************************************************
+
+Function:
+Reads out the contents for 1 frame from the frame buffer and scales (inserts 
+space between pixels) the data according to the specified size.  Processing is
+done in 4 pixel units, so the X size is a multiple of 4.  2 bytes/pixel is 
+written to the buffer in low res.  1 byte/pixel is written in the case of high
+res.  To display the retrieved data as a sprite, do the following:
+
+  In low res, set
+  
+    slSpriteColMode(SPR_PAL_RGB) ;    /* default */
+    
+  and execute the sprite display function with the following attributes:
+
+    SPR_ATTRIBUTE(PN_???,No_Palet,No_Gouraud,SPdis|ECdis|CL32KRGB,sprN
+oflip) ;
+
+  In high res, set
+  
+    slSpriteColMode(SPR_PAL) ;
+
+  and display using the following attributes:
+  
+    SPR_ATTRIBUTE(PN_???,No_Palet,No_Gouraud,SPdis|ECdis|CL256Bnk,sprNof
+lip) ;
+    
+  Note:  This function waits for the completion of VDP1 draws and sets data
+         that is skip read from the frame buffer.  Since the latency to read
+         data from the frame buffer is long (it takes approximately 5 msec for
+         32 x 24 (=768) pixels), beware of processing times.  Processing seems
+         to be faster if a read buffer is kept in the work area and its
+         contents transferred to the VRAM during V-blanks instead of
+         transferring the data directly to VRAM.
+
+* About Polygon Data
+
+  Polygon data used by slPutPolygon() is in the following format.
+
+  .data.l  point_tbl     ; Vertex coordinate table
+  .data.l  NbPoint       ; Number of vertices to calculate
+  .data.l  polygon_tbl   ; Normal vector and vertex numbers for each polygon
+  .data.l  NbPolygon     ; Number of polygons to be calculate
+  .data.l  attribute_tbl ; Attribute table for each polygon
+
+point_tbl:
+  .data.l  X,Y,Z         ; Coordinate data of vertex number 0
+  .data.l  X,Y,Z         ; Coordinate data of vertex number 1
+      ...
+  .data.l  X,Y,Z         ; Coordinate data of vertex number NbPoint - 1
+
+  When creating a table in C, declare the POINT type.  The data table above
+  can be created by using the POStoFIXED macro.
+
+  Example:
+
+    static POINT point_CUBE[] = {
+        POStoFIXED(-80,-80,-80),
+        POStoFIXED( 80,-80,-80),
+        POStoFIXED( 80, 80,-80),
+        POStoFIXED(-80, 80,-80),
+
+        POStoFIXED( 80,-80, 80),
+        POStoFIXED(-80,-80, 80),
+        POStoFIXED(-80, 80, 80),
+        POStoFIXED( 80, 80, 80)
+    } ;
+
+polygon_tbl:
+  .data.l  Nx,Ny,Nz      ; Normal vector of polygon number 0
+  .data.w  P0,P1,P2,P3   ; Number of the point used by polygon number 0
+
+  (For triangular polygons, P2 and P3 are the same number.)
+
+      ...
+  .data.l  Nx,Ny,Nz      ; Normal vector of polygon number NbPolygon - 1
+  .data.w  P0,P1,P2,P3   ; # of vertices used by polygon number NbPolygon - 1
+
+  When creating tables in C, declare the POLYGON type. The table above can be
+  created by using the POStoFIXED macro.
+
+  Example:
+
+    static POLYGON polygon_CUBE[] = {
+        {POStoFIXED( 0, 0,-1), { 0, 1, 2, 3}},
+            |__ |__
+        {POStoFIXED( 1, 0, 0), { 1, 4, 7, 2}},
+        {POStoFIXED(-1, 0, 0), { 5, 0, 3, 6}},
+        {POStoFIXED( 0,-1, 0), { 4, 1, 0, 5}},
+        {POStoFIXED( 0, 1, 0), { 2, 7, 6, 3}},
+        {POStoFIXED( 0, 0, 1), { 4, 5, 6, 7}},
+    } ;
+
+attribute_tbl:
+  .data.b  RevCheck      ; Flag to determine whether to display a reversed
+                         ; plane based on an plane surface attribute check.
+                         ; Specify either SinglePlane or DualPlane.
+  .data.b  SortMode      ; Declares calculation method used for sorting and
+                         ; option functions.
+                         ;
+                         ; Choose SortCen, SortMin, SortMax, or SortBfr.
+                         ; SortCen : Average of the 4 specified Z positions.
+                         ; SortMin : Smallest Z position of the 4 points.
+                         ; SortMax : Largest Z position of the 4 points.
+                         ; SortBfr : Z position of the last-displayed polygon.
+                         ;           Always displayed in front of the last-
+                         ;           displayed polygon.
+                         ;
+                         ; Other options may also be added. The UseTexture,
+                         ; UseLight, and UseClip options may be specified
+                         ; multiple times.
+                         ; UseTexture: Specify when a texture (distorted
+                         ;             sprite) is used.
+                         ; UseLight:   Applies an offset to the polygon color
+                         ;             based on the product of the light
+                         ;             source and normal vectors. This cannot
+                         ;             be used simultaneously with UseTexture.
+                         ; UseClip:    Use this option if there are large
+                         ;             polygons that cause the display
+                         ;             position to overflow and create display
+                         ;             problems.
+
+  .data.w  TextNum       ; Character registration number for textures.
+  .data.w  DispMode      ; Specifies polygon display mode. Following are
+                         ; the available display modes:
+                         ; MSBon:     Sets the MSB to 1 during writes to the 
+                         ;            frame buffer. This is typically used to
+                         ;            cast shadows for sprites. 
+                         ; HSSon :  High-speed shrink on          **************Changes*******
+                         ; HSSoff:   High-speed shrink off (default) *************Changes********
+                         ; WindowIn:  Display inside a specified window.
+                         ; WindowOut: Display outside a specified window.
+                         ; NoWindow:  Display without regard to windows
+                         ;            (default).
+                         ;
+                         ; MESHon:    Displays with mesh.
+                         ; MESHoff:   No mesh (default).
+                         ;
+                         ; ECdis:     Ignores end code with textures.
+                         ; ECenb:     Treats end code as valid with textures
+                         ;            (default).                         
+                         ;
+                         ; SPdis:     Ignores space (displays as palette 0
+                         ;            color) with texture.
+                         ;            However, there is no display when data
+                         ;            written to the frame buffer is 0000.
+                         ;            Adjust values so that the data does not
+                         ;            become 0000.
+                         ; SPenb:     Handles space are valid with textures
+                         ;            (default).
+                         ; CL16Bnk:   Sets texture color mode to the 16 color
+                         ;            color bank format (default).
+                         ; CL16Look:  Sets texture color mode to the 16 color
+                         ;            CLUT format.
+                         ; CL64Bnk:   Sets texture color mode to the 64 color
+                         ;            color bank format.
+                         ; CL128Bnk:  Sets texture color mode to the 128 color
+                         ;            color bank format.
+                         ; CL256Bnk:  Sets texture color mode to the 256 color
+                         ;            color bank format.
+                         ; CL32KBnk:  Sets texture color mode to the 32K color
+                         ;            RGB format.
+                         ;
+                         ; CLrepl:    Sets replace mode (default).
+                         ; CLtrans:   Displays in half transparency mode.
+                         ; CLhalf:    Displays at half luminance.
+                         ; CLshadow:  Displays shadows.
+                         ; CLgouraud: Specifies Gouraud shading.
+
+  For the display mode, specify one from each group.
+
+  .data.w  Color         ; Specifies display color.
+
+  RGB mode must be used when light source effects are required or if a mode
+  other than CLrep1 is set for the display mode.  In addition, these settings
+  are ignored when textures are used in the CL32KRGB mode.
+
+  .data.w  GouraudTable  ; Specifies a Gouraud shading table.
+
+  When CLgouraud is specified, the Gouraud shading table offset position is
+  set. Specify the offset position from SpriteVRAM (0x25C0000) as 0 and
+  increment values by 1 for every 8 bytes. For example, when there is data at
+  0x25C12000,
+  
+    (25C12000 - 25C00000)/8 = 2400
+
+  (All numerical values are in hex)
+
+  .data.w  Function      ; Specifies the sprite display function.
+
+  Specifies whether to display as polygon, texture, or polyline. Select from
+  one of the following 6 settings:
+
+    sprNoflip:   Displays texture.
+    sprHflip:    Displays texture with horizontal flipped.
+    sprVflip:    Displays texture with vertical flipped.
+    sprHVflip:   Displays texture with both vertical and horizontal flipped.
+    sprPolygon:  Displays as a polygon.
+    sprPolyLine: Displays a polyline (only outline of polygon).
+
+  When creating tables using C, declare the type ATTR and use the ATTRIBUTE
+  macro.
+
+  Example:
+
+    static ATTR attr_CUBE[] = {
+        ATTRIBUTE(Single_Plane,SORT_MIN,No_Texture,CD_MediumGreen,
+                            No_Gouraud,Window_In,sprPolygon,UseLight),
+        ATTRIBUTE(Single_Plane,SORT_MIN,No_Texture,CD_MediumBlue,
+                            No_Gouraud,Window_In,sprPolygon,UseLight),
+        ATTRIBUTE(Single_Plane,SORT_MIN,No_Texture,CD_MediumMagenta,
+                            No_Gouraud,Window_In,sprPolygon,UseLight),
+        ATTRIBUTE(Single_Plane,SORT_MIN,No_Texture,CD_MediumWhite,
+                            No_Gouraud,Window_In,sprPolygon,UseLight),
+        ATTRIBUTE(Single_Plane,SORT_MIN,No_Texture,CD_MediumYellow,
+                            No_Gouraud,Window_In,sprPolygon,UseLight),
+        ATTRIBUTE(Single_Plane,SORT_MIN,No_Texture,CD_MediumRed,
+                            No_Gouraud,Window_In,sprPolygon,UseLight)
+    } ;
+
+* Sprite Display Function Attributes
+
+   Attribute tables used by slPutSprite() and slDispSprite() are similar to
+   those shown above for polygons, with the exception of the 2 data items at
+   the start of the table that are omitted.
+
+   When creating these tables using C language, declare the SPR_ATTR type and
+   use the SPR_ATTRIBUTE macro.
+
+   Example:
+   
+     SPR_ATTR attr_AM2Logo = {
+         SPR_ATTRIBUTE(PN_AM2_Logo,CL_AM2_Logo,No_Gouraud,Window_In|
+ECdis,
+             sprNoflip|_ZmCB)
+     } ;
+
+     _ZmCB specifies the position on the sprite. There are 9 pre-defined
+     positions.
+
+     _ZmLT   _ZmCT   _ZmRT
+        +-------+-------+
+        |       |       |
+  _ZmLC +----_ZmCC------+ _ZmRC
+        |       |       |
+        +-------+-------+
+     _ZmLB   _ZmCB   _ZmRB
+
+* Sprite Display Sample
+
+#define CGtop                 0x10000
+#define TEXTBL(hs,vs,cga)     {hs, vs, (cga)>>3, ((hs)&0x1f8)<<5|(vs)}
+#define AdjCG(cga,hs,vs,col)  ((cga + (((hs)*(vs)*4)>>(col)) + 0x1f) & 0x7ffe0)
+#define PICTBL(txno,cmod,cga) {txno, cmod, cga}
+#define CL_Triangle           0x00
+
+    static const Uint16 triangle[] = {
+        0x0000,0x0001,0x1000,0x0000,        /* Sprite character data */
+        0x0000,0x0012,0x2100,0x0000,
+        0x0000,0x0123,0x3210,0x0000,
+        0x0000,0x1234,0x4321,0x0000,
+        0x0001,0x2344,0x4432,0x1000,
+        0x0012,0x3333,0x3333,0x2100,
+        0x0122,0x2222,0x2222,0x2210,
+        0x1111,0x1111,0x1111,0x1111
+    } ;
+
+    enum patn{
+        PN_Triangle,                  /* Sprite pattern number */
+
+        Max_Texture,                  /* Total pattern count */
+        Max_Picture = Max_Texture     /* Total character count */
+    } ;
+
+    enum cga{                         /* Character address */
+        CG_Triangle = CGtop,
+        CG_Next = AdjCG(CG_Triangle,16,8,COL_16)
+    } ;
+
+    TEXTURE form_tbl[]={              /* Pattern size data */
+        TEXTBL(16,8,CG_Triangle)
+    } ;
+
+    PICTURE pic_tbl[]={               /* Character definition table */
+        PICTBL(PN_Triangle,COL_16,triangle)
+    } ;
+
+    static const Sint16 Triangle_Color[] = {        /* Color data */
+                       RGB(0,0,31), RGB(0,0,29), RGB(0,0,27),
+          RGB(0,0,25), RGB(0,0,23), RGB(0,0,21), RGB(0,0,19),
+          RGB(0,0,17), RGB(0,0,15), RGB(0,0,13), RGB(0,0,11),
+          RGB(0,0,9) , RGB(0,0,7) , RGB(0,0,5) , RGB(0,0,3)
+    } ;
+
+    typedef struct{                 /* Color definition structure */
+        Sint16        *src ;
+        void          *dst ;
+        Sint16        size ;
+    } COLMAP ;
+
+    static const COLMAP ctrns_list[] = {        /* Color definition table */
+        {Triangle_Color,(void*)(VDP2_COLRAM+(CL_Triangle+1)*2),sizeof(Triangle_
+Color)}
+    } ;
+
+    extern TEXTURE *FormTbl ;
+
+/*                         */
+/* Transfer character data */
+/*                         */
+
+
+void SetTexture(PICTURE *pcptr, Uint32 NbPicture){
+    TEXTURE *txptr ;
+
+    for(; NbPicture-- > 0 ; pcptr++){
+        txptr = FormTbl + pcptr->texno ;
+        slDMACopy(pcptr->pcsrc, (void *)(SpriteVRAM + ((txptr->CGadr) << 3)), 
+(txptr->Hsize * txptr->Vsize * 4) >> (pcptr->cmode)) ;
+    }
+}
+
+/*                                */
+/* Transfer color data            */
+/*                                */
+
+void SetColor(){
+    COLMAP      *cmptr ;
+    Sint16       cnt ;
+
+    slTVOff() ;
+    cmptr= ctrns_list ;
+    for(cnt = sizeof(ctrns_list) / sizeof(COLMAP) ; cnt-- > 0 ; cmptr++){
+        slDMACopy(cmptr->src, cmptr->dst, cmptr->size) ;
+    }
+    slTVOn() ;
+}
+
+/* Sample character display position */
+FIXED  tpos[] = {toFIXED(10.0), toFIXED(20.0), toFIXED(200.0), toFIXED(4.0)} ;
+/*                  |              |              |            |__ Display scale      
+*/
+/*             X position     Y position     Z position        |__ (If == scale, set  
+*/
+/*                                                                  
+toFIXED(ORIGINAL) */
+
+/* Sample character data */
+SPR_ATTR tattr =
+ SPR_ATTRIBUTE(PN_Triangle,CL_Triangle,No_Gouraud,CL16Bnk,sprNoflip|_Zm
+CC) ;
+/*             |           |           |          |       |          |__ Rot ctr 
+*/
+/*             |           |           |          |       |              pos.    
+*/
+/*             |           |           |          |       |__ No character flip  
+*/
+/*             |           |           |          |__ 16 color bank mode   */
+/*             |           |           |___ Gouraud shading not used             
+*/
+/*         Pattern number  Color bank number                                     
+*/
+
+main(){
+    ANGLE        ang = DEGtoANG(0.0) ;
+
+    *(Uint32 *)(0x06002500) = (Uint32)(0x060007f0) ;
+/* During a clock change, the sound subsystem's 68000 reads the switch data,
+   and places data at the address set here.  However, this does not seem to
+   work properly, so at least enter the address that contains the "no switch 
+   input" null data 0xFFFF. */
+
+   slInitSystem(TV_320x224, form_tbl, 1) ; /* Initialize system */
+   SetTexture(pic_tbl, Max_Picture) ;      /* Set character data */
+   SetColor() ;                            /* Set color data */
+   while(-1){
+       slDispSprite(tpos, &tattr, ang) ;   /* Register sprite */
+       ang += DEGtoANG(3.0) ;
+       slSynch() ;           /* Sync with screen display and output sprites */
+   }
+}
+ 

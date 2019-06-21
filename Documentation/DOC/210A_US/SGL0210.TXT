@@ -1,0 +1,59 @@
+*****SGL0210.txt
+
+
+1)	Change in the SGL work area setting method
+
+Although it was possible to change the SGL system area even in previous versions, 
+starting with Version 2.1 the SGL system area has been removed from the library 
+(LIBSGL.A), and is now linked as an object file.
+
+Under the default settings, a file named "SGLAREA.O" is prepared in the LIB directory, 
+and if there are no problems with the current settings, the system can run with the 
+same settings as before simply by linking SGLAREA.0.  When customizing the system 
+area, make the necessary changes within a file called "workarea.c" within WORKAREA 
+in the SAMPLE directory, and then link that file in place of SGLAREA.0.
+
+2) Addition of the slSynchFunction function (INIT.TXT)
+
+A function has been registered that is executed while waiting for a blanking interrupt 
+by the slSynch function.  Do not use this function to perform processing with a heavy 
+load.
+
+3) Addition of slConvert3Dto2D function (MATH.TXT)
+
+A function has been added that returns the screen coordinate values when the current 
+matrix is used to display 3D relative coordinates on the actual screen.
+
+4) CD-related upgrades
+
+Ver. 2.10 includes the following library versions.
+
+*	CD communications interface (CDC) Ver. 1.20 (no change from Ver. 2.0a)
+*	File system library (GFS) Ver. 2.11
+*	Stream system library (STM) Ver. 2.11
+
+LIBCD.A does not have any support functions for file system library debugging.  
+LIBCD_D.A does include support functions for file system (GFS) debugging, and is 
+capable of accessing SIMMs.  For details on these changes, refer to MANGFS.TXT and 
+MANSTM.TXT.
+
+5) GCC linker command change
+
+Linking from this version of the sample program is now performed by the GDD in the 
+same manner as when compiling an execution file from the LD.  From now on, when 
+linking in the GNU environment, do not use the LD; instead, perform the linking 
+operation with the GCC.
+
+6) Scroll set variable bug fix
+
+The problem with the setting of the pattern name supplementary data in the 
+slCharNBGx (RBG0) function and the slPageNBGx (RBG0) function was fixed.
+
+7) Addition of various functions
+
+Functions that were described in the Ver. 2.0A documentation but not built in have been 
+added.
+
+******
+
+

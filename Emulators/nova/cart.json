@@ -1,0 +1,646 @@
+{
+    "RAM1M": {
+		"T-3116G": "SAMURAI SPIRITS AMAKUSA KOURIN",
+		"T-3118G": "SAMURAI SPIRITS AMAKUSA KOURIN",
+		"T-3105G": "REAL BOUT",
+		"T-3108G": "KOF '96",
+		"T-3109G": "KOF '96",
+		"T-1239G": "MARVEL SUPER HEROES VS. STREET FIGHTER",
+		"T-1238G": "MARVEL SUPER HEROES VS. STREET FIGHTER"
+    },
+
+    "RAM4M": {
+		"T-1521G": "ASTRA SUPERSTARS",
+		"T-9904G": "COTTON2",
+		"T-1216G": "CYBER BOTS",
+		"T-1217G": "CYBER BOTS",
+		"T-1224G": "DUNGEONS AND DRAGONS COLLECTION",
+		"T-1245G": "DUNGEONS AND DRAGONS COLLECTION",
+		"GS-9153": "FIGHTERS HISTORY DYNAMITE",
+		"GS-9107": "FIGHTERS HISTORY DYNAMITE",
+		"T-1248G": "FINAL FIGHT REVENGE",
+		"T-1249G": "FINAL FIGHT REVENGE",
+		"T-20109G": "FRIENDS",
+		"T-14413G": "GROOVE ON FIGHT",
+		"T-14411G": "GROOVE ON FIGHT",
+		"T-1215G": "MARVEL SUPER HEROES",
+		"T-1214H": "MARVEL SUPER HEROES",
+		"T-7032H": "MARVEL SUPER HEROES",
+		"T-3111G": "METAL SLUG",
+		"T-3114G": "METAL SLUG",
+		"T-22206G": "NOEL3",
+		"T-22205G": "NOEL3",
+		"T-20114G": "WELCOME TO PIA  CARROT 2",
+		"T-20121M": "WELCOME TO PIA  CARROT 2",
+		"T-1230G": "POCKET FIGHTER", 
+		"T-3117G": "REALBOUT SPECIAL",
+		"T-3119G": "REALBOUT SPECIAL",
+		"T-3106G": "SAMURAI SPIRITS ZANKURO MUSOKEN",
+		"T-3104G": "SAMURAI SPIRITS ZANKURO MUSOKEN",
+		"T-1247G": "STREET FIGHTER ZERO3",
+		"T-1246G": "STREET FIGHTER ZERO3",
+		"T-1203M": "STREET FIGHTER ZERO3",
+		"T-1230M": "STREET FIGHTER ALPHA3 MATCHING SERVICE",
+		"T-7005D": "STREET FIGHTER ALPHA3",
+		"T-16510G": "SUPERREALMAHJONG_P7_GENTEIBAN",
+		"T-16509G": "SUPERREALMAHJONG_P7",
+		"T-3120G": "KOF '97",
+		"T-3121G": "KOF '97",
+		"T-1228G": "VAMPIRE SAVIOR",
+		"T-1229G": "VAMPIRE SAVIOR",
+		"T-1515G": "WAKUWAKU7",
+		"T-1516G": "WAKUWAKU7",
+		"T-1227G": "X-MEN VS STREET FIGHTER",
+		"T-1226G": "X-MEN VS STREET FIGHTER"
+    },
+
+    "ROM": {
+        "T-3101G": "THE KING OF FIGHTERS'95",
+		"MK-81088": "THE KING OF FIGHTERS'95",
+		"T-13308G": "ULTRAMAN"
+    },
+	
+	"TITAN": {
+		"astrass": {
+			"epr20825.13": { "size": "00100000", "crc": "94a9ad8f", "offset": "00000000", "pattern": "_O" },
+			"mpr20827.2": { "size": "00400000", "crc": "65cabbb3", "offset": "00400000", "pattern": "OE" },
+			"mpr20828.3": { "size": "00400000", "crc": "3934d44a", "offset": "00800000", "pattern": "OE" },
+			"mpr20829.4": { "size": "00400000", "crc": "814308c3", "offset": "00c00000", "pattern": "OE" },
+			"mpr20830.5": { "size": "00400000", "crc": "ff97fd19", "offset": "01000000", "pattern": "OE" },
+			"mpr20831.6": { "size": "00400000", "crc": "4408e6fb", "offset": "01400000", "pattern": "OE" },
+			"mpr20826.1": { "size": "00400000", "crc": "bdc4b941", "offset": "01800000", "pattern": "OE" },
+			"mpr20832.8": { "size": "00400000", "crc": "af1b0985", "offset": "01c00000", "pattern": "OE" },
+			"mpr20833.9": { "size": "00400000", "crc": "cb6af231", "offset": "02000000", "pattern": "OE" }
+		},
+
+		"bakubaku": {
+			"fpr17969.13": { "size": "00100000", "crc": "bee327e5", "offset": "00000000", "pattern": "_O" },
+			"mpr17970.2": { "size": "00400000", "crc": "bc4d6f91", "offset": "00400000", "pattern": "OE" },
+			"mpr17971.3": { "size": "00400000", "crc": "c780a3b3", "offset": "00800000", "pattern": "OE" },
+			"mpr17972.4": { "size": "00400000", "crc": "8f29815a", "offset": "00c00000", "pattern": "OE" },
+			"mpr17973.5": { "size": "00400000", "crc": "5f6e0e8b", "offset": "01000000", "pattern": "OE" }
+		},
+
+		"batmanfr": {
+			"350-mpa1.u19": { "size": "00100000", "crc": "2a5a8c3a", "offset": "00000000", "pattern": "OE" },
+			"350-mpa1.u16": { "size": "00100000", "crc": "735e23ab", "offset": "00000000", "pattern": "_O" },
+			"gfx0.u1": { "size": "00400000", "crc": "a82d0b7e", "offset": "00400000", "pattern": "OE" },
+			"gfx1.u3": { "size": "00400000", "crc": "a41e55d9", "offset": "00800000", "pattern": "OE" },
+			"gfx2.u5": { "size": "00400000", "crc": "4c1ebeb7", "offset": "00c00000", "pattern": "OE" },
+			"gfx3.u8": { "size": "00400000", "crc": "f679a3e7", "offset": "01000000", "pattern": "OE" },
+			"gfx4.u12": { "size": "00400000", "crc": "52d95242", "offset": "01400000", "pattern": "OE" },
+			"gfx5.u15": { "size": "00400000", "crc": "e201f830", "offset": "01800000", "pattern": "OE" },
+			"gfx6.u18": { "size": "00400000", "crc": "c6b381a3", "offset": "01c00000", "pattern": "OE" },
+			"350snda1.u52": { "size": "00080000", "crc": "9027e7a0", "offset": "00000000", "pattern": "OE" },
+			"snd0.u48": { "size": "00200000", "crc": "02b1927c", "offset": "00000000", "pattern": "OE" },
+			"snd1.u49": { "size": "00200000", "crc": "58b18eda", "offset": "00200000", "pattern": "OE" },
+			"snd2.u50": { "size": "00200000", "crc": "51d626d6", "offset": "00400000", "pattern": "OE" },
+			"snd3.u51": { "size": "00200000", "crc": "31af26ae", "offset": "00600000", "pattern": "OE" }
+		},
+
+		"colmns97": {
+			"fpr19553.13": { "size": "00100000", "crc": "d4fb6a5e", "offset": "00000000", "pattern": "_O" },
+			"mpr19554.2": { "size": "00400000", "crc": "5a3ebcac", "offset": "00400000", "pattern": "OE" },
+			"mpr19555.3": { "size": "00400000", "crc": "74f6e6b8", "offset": "00800000", "pattern": "OE" }
+		},
+
+		"cotton2": {
+			"mpr20122.7": { "size": "00200000", "crc": "d616f78a", "offset": "00200000", "pattern": "OE" },
+			"mpr20117.2": { "size": "00400000", "crc": "893656ea", "offset": "00400000", "pattern": "OE" },
+			"mpr20118.3": { "size": "00400000", "crc": "1b6a1d4c", "offset": "00800000", "pattern": "OE" },
+			"mpr20119.4": { "size": "00400000", "crc": "5a76e72b", "offset": "00c00000", "pattern": "OE" },
+			"mpr20120.5": { "size": "00400000", "crc": "7113dd7b", "offset": "01000000", "pattern": "OE" },
+			"mpr20121.6": { "size": "00400000", "crc": "8c8fd521", "offset": "01400000", "pattern": "OE" },
+			"mpr20116.1": { "size": "00400000", "crc": "d30b0175", "offset": "01800000", "pattern": "OE" },
+			"mpr20123.8": { "size": "00400000", "crc": "35f1b89f", "offset": "01c00000", "pattern": "OE" }
+		},
+
+		"cottonbm": {
+			"mpr21075.7": { "size": "00200000", "crc": "200b58ba", "offset": "00200000", "pattern": "OE" },
+			"mpr21070.2": { "size": "00400000", "crc": "56c0bf1d", "offset": "00400000", "pattern": "OE" },
+			"mpr21071.3": { "size": "00400000", "crc": "2bb18df2", "offset": "00800000", "pattern": "OE" },
+			"mpr21072.4": { "size": "00400000", "crc": "7c7cb977", "offset": "00c00000", "pattern": "OE" },
+			"mpr21073.5": { "size": "00400000", "crc": "f2e5a5b7", "offset": "01000000", "pattern": "OE" },
+			"mpr21074.6": { "size": "00400000", "crc": "6a7e7a7b", "offset": "01400000", "pattern": "OE" },
+			"mpr21069.1": { "size": "00400000", "crc": "6a28e3c5", "offset": "01800000", "pattern": "OE" }
+		},
+
+		"critcrsh": {
+			"epr-18821.ic13": { "size": "00080000", "crc": "9a6658e2", "offset": "00000000", "pattern": "_O" },
+			"mpr-18789.ic8": { "size": "00400000", "crc": "b388616f", "offset": "01c00000", "pattern": "OE" },
+			"mpr-18788.ic9": { "size": "00400000", "crc": "feae5867", "offset": "02000000", "pattern": "OE" }
+		},
+
+		"danchih": {
+			"mpr21974.7": { "size": "00200000", "crc": "e7472793", "offset": "00200000", "pattern": "OE" },
+			"mpr21970.2": { "size": "00400000", "crc": "34dd7f4d", "offset": "00400000", "pattern": "OE" },
+			"mpr21971.3": { "size": "00400000", "crc": "8995158c", "offset": "00800000", "pattern": "OE" },
+			"mpr21972.4": { "size": "00400000", "crc": "68a39090", "offset": "00c00000", "pattern": "OE" },
+			"mpr21973.5": { "size": "00400000", "crc": "b0f23f14", "offset": "01000000", "pattern": "OE" }
+		},
+
+		"danchiq": {
+			"ic22": { "size": "00200000", "crc": "e216bfc8", "offset": "00200000", "pattern": "OE" },
+			"ic24": { "size": "00200000", "crc": "b95aa5ac", "offset": "00400000", "pattern": "OE" },
+			"ic26": { "size": "00200000", "crc": "df6ebd48", "offset": "00600000", "pattern": "OE" },
+			"ic28": { "size": "00200000", "crc": "cf6a2b76", "offset": "00800000", "pattern": "OE" },
+			"ic30": { "size": "00200000", "crc": "0b6a9901", "offset": "00a00000", "pattern": "OE" },
+			"ic32": { "size": "00200000", "crc": "0b4604f5", "offset": "00c00000", "pattern": "OE" },
+			"ic34": { "size": "00200000", "crc": "616e20fa", "offset": "00e00000", "pattern": "OE" },
+			"ic36": { "size": "00200000", "crc": "43474e08", "offset": "01000000", "pattern": "OE" },
+			"ic23": { "size": "00200000", "crc": "d080eb71", "offset": "01200000", "pattern": "OE" },
+			"ic25": { "size": "00200000", "crc": "9a4109e5", "offset": "01400000", "pattern": "OE" }
+		},
+
+		"decathlt": {
+			"epr18967a.13": { "size": "00100000", "crc": "ac59c186", "offset": "00000000", "pattern": "_O" },
+			"mpr18968.2": { "size": "00400000", "crc": "11a891de", "offset": "00400000", "pattern": "OE" },
+			"mpr18969.3": { "size": "00400000", "crc": "199cc47d", "offset": "00800000", "pattern": "OE" },
+			"mpr18970.4": { "size": "00400000", "crc": "8b7a509e", "offset": "00c00000", "pattern": "OE" },
+			"mpr18971.5": { "size": "00400000", "crc": "c87c443b", "offset": "01000000", "pattern": "OE" },
+			"mpr18972.6": { "size": "00400000", "crc": "45c64fca", "offset": "01400000", "pattern": "OE" }
+		},
+
+		"decathlto": {
+			"epr18967.13": { "size": "00100000", "crc": "c0446674", "offset": "00000000", "pattern": "_O" }
+		},
+
+		"diehard": {
+			"fpr19119.13": { "size": "00100000", "crc": "de5c4f7c", "offset": "00000000", "pattern": "_O" },
+			"mpr19115.2": { "size": "00400000", "crc": "6fe06a30", "offset": "00400000", "pattern": "OE" },
+			"mpr19116.3": { "size": "00400000", "crc": "af9e627b", "offset": "00800000", "pattern": "OE" },
+			"mpr19117.4": { "size": "00400000", "crc": "74520ff1", "offset": "00c00000", "pattern": "OE" },
+			"mpr19118.5": { "size": "00400000", "crc": "2c9702f0", "offset": "01000000", "pattern": "OE" }
+		},
+
+		"dnmtdeka": {
+			"fpr19114.13": { "size": "00100000", "crc": "1fd22a5f", "offset": "00000000", "pattern": "_O" }
+		},
+
+		"ejihon": {
+			"epr18137.13": { "size": "00080000", "crc": "151aa9bc", "offset": "00000000", "pattern": "_O" },
+			"mpr18138.2": { "size": "00400000", "crc": "f5567049", "offset": "00400000", "pattern": "OE" },
+			"mpr18139.3": { "size": "00400000", "crc": "f36b4878", "offset": "00800000", "pattern": "OE" },
+			"mpr18140.4": { "size": "00400000", "crc": "228850a0", "offset": "00c00000", "pattern": "OE" },
+			"mpr18141.5": { "size": "00400000", "crc": "b51eef36", "offset": "01000000", "pattern": "OE" },
+			"mpr18142.6": { "size": "00400000", "crc": "cf259541", "offset": "01400000", "pattern": "OE" }
+		},
+
+		"elandore": {
+			"mpr21307.7": { "size": "00200000", "crc": "966ad472", "offset": "00200000", "pattern": "OE" },
+			"mpr21301.2": { "size": "00400000", "crc": "1a23b0a0", "offset": "00400000", "pattern": "OE" },
+			"mpr21302.3": { "size": "00400000", "crc": "1c91ca33", "offset": "00800000", "pattern": "OE" },
+			"mpr21303.4": { "size": "00400000", "crc": "07b2350e", "offset": "00c00000", "pattern": "OE" },
+			"mpr21304.5": { "size": "00400000", "crc": "cfea52ae", "offset": "01000000", "pattern": "OE" },
+			"mpr21305.6": { "size": "00400000", "crc": "46cfc2a2", "offset": "01400000", "pattern": "OE" },
+			"mpr21306.1": { "size": "00400000", "crc": "87a5929c", "offset": "01800000", "pattern": "OE" },
+			"mpr21308.8": { "size": "00400000", "crc": "336ec1a4", "offset": "01c00000", "pattern": "OE" }
+		},
+
+		"ffreveng": {
+			"opr21872.7": { "size": "00200000", "crc": "32d36fee", "offset": "00200000", "pattern": "OE" },
+			"mpr21873.2": { "size": "00400000", "crc": "dac5bd98", "offset": "00400000", "pattern": "OE" },
+			"mpr21874.3": { "size": "00400000", "crc": "0a7be2f1", "offset": "00800000", "pattern": "OE" },
+			"mpr21875.4": { "size": "00400000", "crc": "ccb75029", "offset": "00c00000", "pattern": "OE" },
+			"mpr21876.5": { "size": "00400000", "crc": "bb92a7fc", "offset": "01000000", "pattern": "OE" },
+			"mpr21877.6": { "size": "00400000", "crc": "c22a4a75", "offset": "01400000", "pattern": "OE" },
+			"opr21878.1": { "size": "00200000", "crc": "2ea4a64d", "offset": "01800000", "pattern": "OE" }
+		},
+
+		"fhboxers": {
+			"fr18541a.13": { "size": "00100000", "crc": "8c61a17c", "offset": "00000000", "pattern": "_O" },
+			"mpr18538.7": { "size": "00200000", "crc": "7b5230c5", "offset": "00200000", "pattern": "OE" },
+			"mpr18533.2": { "size": "00400000", "crc": "7181fe51", "offset": "00400000", "pattern": "OE" },
+			"mpr18534.3": { "size": "00400000", "crc": "c87ef125", "offset": "00800000", "pattern": "OE" },
+			"mpr18535.4": { "size": "00400000", "crc": "929a64cf", "offset": "00c00000", "pattern": "OE" },
+			"mpr18536.5": { "size": "00400000", "crc": "51b9f64e", "offset": "01000000", "pattern": "OE" },
+			"mpr18537.6": { "size": "00400000", "crc": "c364f6a7", "offset": "01400000", "pattern": "OE" },
+			"mpr18532.1": { "size": "00400000", "crc": "39528643", "offset": "01800000", "pattern": "OE" },
+			"mpr18539.8": { "size": "00400000", "crc": "62b3908c", "offset": "01c00000", "pattern": "OE" },
+			"mpr18540.9": { "size": "00400000", "crc": "4c2b59a4", "offset": "02000000", "pattern": "OE" }
+		},
+
+		"findlove": {
+			"epr20424.13": { "size": "00100000", "crc": "4e61fa46", "offset": "00000000", "pattern": "_O" },
+			"mpr20431.7": { "size": "00200000", "crc": "ea656ced", "offset": "00200000", "pattern": "OE" },
+			"mpr20426.2": { "size": "00400000", "crc": "897d1747", "offset": "00400000", "pattern": "OE" },
+			"mpr20427.3": { "size": "00400000", "crc": "a488a694", "offset": "00800000", "pattern": "OE" },
+			"mpr20428.4": { "size": "00400000", "crc": "4353b3b6", "offset": "00c00000", "pattern": "OE" },
+			"mpr20429.5": { "size": "00400000", "crc": "4f566486", "offset": "01000000", "pattern": "OE" },
+			"mpr20430.6": { "size": "00400000", "crc": "d1e11979", "offset": "01400000", "pattern": "OE" },
+			"mpr20425.1": { "size": "00400000", "crc": "67f104c4", "offset": "01800000", "pattern": "OE" },
+			"mpr20432.8": { "size": "00400000", "crc": "79fcdecd", "offset": "01c00000", "pattern": "OE" },
+			"mpr20433.9": { "size": "00400000", "crc": "82289f29", "offset": "02000000", "pattern": "OE" },
+			"mpr20434.10": { "size": "00400000", "crc": "85c94afc", "offset": "02400000", "pattern": "OE" },
+			"mpr20435.11": { "size": "00400000", "crc": "263a2e48", "offset": "02800000", "pattern": "OE" },
+			"mpr20436.12": { "size": "00400000", "crc": "e3823f49", "offset": "02c00000", "pattern": "OE" }
+		},
+
+		"finlarch": {
+			"finlarch.13": { "size": "00100000", "crc": "4505fa9e", "offset": "00000000", "pattern": "_O" },
+			"mpr18257.2": { "size": "00400000", "crc": "137fdf55", "offset": "00400000", "pattern": "OE" },
+			"mpr18258.3": { "size": "00400000", "crc": "f519c505", "offset": "00800000", "pattern": "OE" },
+			"mpr18259.4": { "size": "00400000", "crc": "5cabc775", "offset": "00c00000", "pattern": "OE" },
+			"mpr18260.5": { "size": "00400000", "crc": "f5b92082", "offset": "01000000", "pattern": "OE" }
+		},
+
+		"gaxeduel": {
+			"epr17766.13": { "size": "00080000", "crc": "a83fcd62", "offset": "00000000", "pattern": "_O" },
+			"mpr17768.2": { "size": "00400000", "crc": "d6808a7d", "offset": "00400000", "pattern": "OE" },
+			"mpr17769.3": { "size": "00400000", "crc": "3471dd35", "offset": "00800000", "pattern": "OE" },
+			"mpr17770.4": { "size": "00400000", "crc": "06978a00", "offset": "00c00000", "pattern": "OE" },
+			"mpr17771.5": { "size": "00400000", "crc": "aea2ea3b", "offset": "01000000", "pattern": "OE" },
+			"mpr17772.6": { "size": "00400000", "crc": "b3dc0e75", "offset": "01400000", "pattern": "OE" },
+			"mpr17767.1": { "size": "00400000", "crc": "9ba1e7b1", "offset": "01800000", "pattern": "OE" }
+		},
+
+		"grdforce": {
+			"mpr20844.7": { "size": "00200000", "crc": "283e7587", "offset": "00200000", "pattern": "OE" },
+			"mpr20839.2": { "size": "00400000", "crc": "facd4dd8", "offset": "00400000", "pattern": "OE" },
+			"mpr20840.3": { "size": "00400000", "crc": "fe0158e6", "offset": "00800000", "pattern": "OE" },
+			"mpr20841.4": { "size": "00400000", "crc": "d87ac873", "offset": "00c00000", "pattern": "OE" },
+			"mpr20842.5": { "size": "00400000", "crc": "baebc506", "offset": "01000000", "pattern": "OE" },
+			"mpr20843.6": { "size": "00400000", "crc": "263e49cc", "offset": "01400000", "pattern": "OE" }
+		},
+
+		"groovef": {
+			"mpr19820.7": { "size": "00100000", "crc": "e93c4513", "offset": "00200000", "pattern": "OE" },
+			"mpr19815.2": { "size": "00400000", "crc": "1b9b14e6", "offset": "00400000", "pattern": "OE" },
+			"mpr19816.3": { "size": "00400000", "crc": "83f5731c", "offset": "00800000", "pattern": "OE" },
+			"mpr19817.4": { "size": "00400000", "crc": "525bd6c7", "offset": "00c00000", "pattern": "OE" },
+			"mpr19818.5": { "size": "00400000", "crc": "66723ba8", "offset": "01000000", "pattern": "OE" },
+			"mpr19819.6": { "size": "00400000", "crc": "ee8c55f4", "offset": "01400000", "pattern": "OE" },
+			"mpr19814.1": { "size": "00400000", "crc": "8f20e9f7", "offset": "01800000", "pattern": "OE" },
+			"mpr19821.8": { "size": "00400000", "crc": "f69a76e6", "offset": "01c00000", "pattern": "OE" },
+			"mpr19822.9": { "size": "00200000", "crc": "5e8c4b5f", "offset": "02000000", "pattern": "OE" }
+		},
+
+		"hanagumi": {
+			"mpr20143.7": { "size": "00100000", "crc": "7bfc38d0", "offset": "00200000", "pattern": "OE" },
+			"mpr20138.2": { "size": "00400000", "crc": "fdcf1046", "offset": "00400000", "pattern": "OE" },
+			"mpr20139.3": { "size": "00400000", "crc": "7f0140e5", "offset": "00800000", "pattern": "OE" },
+			"mpr20140.4": { "size": "00400000", "crc": "2fa03852", "offset": "00c00000", "pattern": "OE" },
+			"mpr20141.5": { "size": "00400000", "crc": "45d6d21b", "offset": "01000000", "pattern": "OE" },
+			"mpr20142.6": { "size": "00400000", "crc": "e38561ec", "offset": "01400000", "pattern": "OE" },
+			"mpr20137.1": { "size": "00400000", "crc": "181d2688", "offset": "01800000", "pattern": "OE" },
+			"mpr20144.8": { "size": "00400000", "crc": "235b43f6", "offset": "01c00000", "pattern": "OE" },
+			"mpr20145.9": { "size": "00400000", "crc": "aeaac7a1", "offset": "02000000", "pattern": "OE" },
+			"mpr20146.10": { "size": "00400000", "crc": "39bab9a2", "offset": "02400000", "pattern": "OE" },
+			"mpr20147.11": { "size": "00400000", "crc": "294ab997", "offset": "02800000", "pattern": "OE" },
+			"mpr20148.12": { "size": "00400000", "crc": "5337ccb0", "offset": "02c00000", "pattern": "OE" }
+		},
+
+		"introdon": {
+			"epr18937.13": { "size": "00080000", "crc": "1f40d766", "offset": "00000000", "pattern": "_O" },
+			"mpr18944.7": { "size": "00100000", "crc": "f7f75ce5", "offset": "00200000", "pattern": "OE" },
+			"mpr18939.2": { "size": "00400000", "crc": "ef95a6e6", "offset": "00400000", "pattern": "OE" },
+			"mpr18940.3": { "size": "00400000", "crc": "cabab4cd", "offset": "00800000", "pattern": "OE" },
+			"mpr18941.4": { "size": "00400000", "crc": "f4a33a20", "offset": "00c00000", "pattern": "OE" },
+			"mpr18942.5": { "size": "00400000", "crc": "8dd0a446", "offset": "01000000", "pattern": "OE" },
+			"mpr18943.6": { "size": "00400000", "crc": "d8702a9e", "offset": "01400000", "pattern": "OE" },
+			"mpr18938.1": { "size": "00400000", "crc": "580ecb83", "offset": "01800000", "pattern": "OE" }
+		},
+
+		"kiwames": {
+			"epr18737.13": { "size": "00080000", "crc": "cfad6c49", "offset": "00000000", "pattern": "_O" },
+			"mpr18738.2": { "size": "00400000", "crc": "4b3c175a", "offset": "00400000", "pattern": "OE" },
+			"mpr18739.3": { "size": "00400000", "crc": "eb41fa67", "offset": "00800000", "pattern": "OE" },
+			"mpr18740.4": { "size": "00200000", "crc": "9ca7962f", "offset": "00c00000", "pattern": "OE" }
+		},
+
+		"magzun": {
+			"flash.ic13": { "size": "00100000", "crc": "e6f0aca0", "offset": "00000000", "pattern": "_O" },
+			"mpr-19354.ic2": { "size": "00400000", "crc": "a23822e7", "offset": "00400000", "pattern": "OE" },
+			"mpr-19355.ic3": { "size": "00400000", "crc": "d70e5ebc", "offset": "00800000", "pattern": "OE" },
+			"mpr-19356.ic4": { "size": "00400000", "crc": "3bc43fe9", "offset": "00c00000", "pattern": "OE" },
+			"mpr-19357.ic5": { "size": "00400000", "crc": "aa749370", "offset": "01000000", "pattern": "OE" },
+			"mpr-19358.ic6": { "size": "00400000", "crc": "0969f1ec", "offset": "01400000", "pattern": "OE" },
+			"mpr-19359.ic1": { "size": "00400000", "crc": "b0d06f9c", "offset": "01800000", "pattern": "OE" }
+		},
+
+		"maruchan": {
+			"epr20416.13": { "size": "00100000", "crc": "8bf0176d", "offset": "00000000", "pattern": "_O" },
+			"mpr20417.2": { "size": "00400000", "crc": "636c2a08", "offset": "00400000", "pattern": "OE" },
+			"mpr20418.3": { "size": "00400000", "crc": "3f0d9e34", "offset": "00800000", "pattern": "OE" },
+			"mpr20419.4": { "size": "00400000", "crc": "ec969815", "offset": "00c00000", "pattern": "OE" },
+			"mpr20420.5": { "size": "00400000", "crc": "f2902c88", "offset": "01000000", "pattern": "OE" },
+			"mpr20421.6": { "size": "00400000", "crc": "cd0b477c", "offset": "01400000", "pattern": "OE" },
+			"mpr20422.1": { "size": "00400000", "crc": "66335049", "offset": "01800000", "pattern": "OE" },
+			"mpr20423.8": { "size": "00400000", "crc": "2bd55832", "offset": "01c00000", "pattern": "OE" },
+			"mpr20443.9": { "size": "00400000", "crc": "8ac288f5", "offset": "02000000", "pattern": "OE" }
+		},
+
+		"mausuke": {
+			"ic13.bin": { "size": "00100000", "crc": "b456f4cd", "offset": "00000000", "pattern": "_O" },
+			"mcj-00.2": { "size": "00200000", "crc": "4eeacd6f", "offset": "00400000", "pattern": "OE" },
+			"mcj-01.3": { "size": "00200000", "crc": "365a494b", "offset": "00800000", "pattern": "OE" },
+			"mcj-02.4": { "size": "00200000", "crc": "8b8e4931", "offset": "00c00000", "pattern": "OE" },
+			"mcj-03.5": { "size": "00200000", "crc": "9015a0e7", "offset": "01000000", "pattern": "OE" },
+			"mcj-04.6": { "size": "00200000", "crc": "9d1beaee", "offset": "01400000", "pattern": "OE" },
+			"mcj-05.1": { "size": "00200000", "crc": "a7626a82", "offset": "01800000", "pattern": "OE" },
+			"mcj-06.8": { "size": "00200000", "crc": "1ab8e90e", "offset": "01c00000", "pattern": "OE" }
+		},
+
+		"micrombc": {
+			"ic22": { "size": "00200000", "crc": "8385bc45", "offset": "00200000", "pattern": "OE" },
+			"ic24": { "size": "00200000", "crc": "84ecb42f", "offset": "00400000", "pattern": "OE" },
+			"ic26": { "size": "00200000", "crc": "869bc19c", "offset": "00600000", "pattern": "OE" },
+			"ic28": { "size": "00200000", "crc": "0c3db354", "offset": "00800000", "pattern": "OE" },
+			"ic30": { "size": "00200000", "crc": "03b9eacf", "offset": "00a00000", "pattern": "OE" },
+			"ic32": { "size": "00200000", "crc": "62c10626", "offset": "00c00000", "pattern": "OE" },
+			"ic34": { "size": "00200000", "crc": "8d89877e", "offset": "01000000", "pattern": "OE" },
+			"ic36": { "size": "00200000", "crc": "8d89877e", "offset": "01200000", "pattern": "OE" }
+		},
+
+		"myfairld": {
+			"mpr21000.7": { "size": "00200000", "crc": "2581c560", "offset": "00200000", "pattern": "OE" },
+			"mpr20995.2": { "size": "00400000", "crc": "1bb73f24", "offset": "00400000", "pattern": "OE" },
+			"mpr20996.3": { "size": "00400000", "crc": "993c3859", "offset": "00800000", "pattern": "OE" },
+			"mpr20997.4": { "size": "00400000", "crc": "f0bf64a4", "offset": "00c00000", "pattern": "OE" },
+			"mpr20998.5": { "size": "00400000", "crc": "d3b19786", "offset": "01000000", "pattern": "OE" },
+			"mpr20999.6": { "size": "00400000", "crc": "82e31f25", "offset": "01400000", "pattern": "OE" },
+			"mpr20994.1": { "size": "00400000", "crc": "a69243a0", "offset": "01800000", "pattern": "OE" },
+			"mpr21001.8": { "size": "00400000", "crc": "95fbe549", "offset": "01c00000", "pattern": "OE" }
+		},
+
+		"nclubv3": {
+			"ic22": { "size": "00200000", "crc": "b4008ed0", "offset": "00200000", "pattern": "OE" },
+			"ic24": { "size": "00200000", "crc": "4e894850", "offset": "00400000", "pattern": "OE" },
+			"ic26": { "size": "00200000", "crc": "5b6b023f", "offset": "00600000", "pattern": "OE" },
+			"ic28": { "size": "00200000", "crc": "b7beab03", "offset": "00800000", "pattern": "OE" },
+			"ic30": { "size": "00200000", "crc": "a9f81069", "offset": "00a00000", "pattern": "OE" },
+			"ic32": { "size": "00200000", "crc": "02708d66", "offset": "00c00000", "pattern": "OE" },
+			"ic34": { "size": "00200000", "crc": "c79d0537", "offset": "00e00000", "pattern": "OE" },
+			"ic36": { "size": "00200000", "crc": "0c9df896", "offset": "01000000", "pattern": "OE" },
+			"ic23": { "size": "00200000", "crc": "bd922829", "offset": "01200000", "pattern": "OE" },
+			"ic25": { "size": "00200000", "crc": "f77f9e24", "offset": "01400000", "pattern": "OE" }
+		},
+
+		"othellos": {
+			"mpr20967.7": { "size": "00200000", "crc": "efc05b97", "offset": "00200000", "pattern": "OE" },
+			"mpr20963.2": { "size": "00400000", "crc": "2cc4f141", "offset": "00400000", "pattern": "OE" },
+			"mpr20964.3": { "size": "00400000", "crc": "5f5cda94", "offset": "00800000", "pattern": "OE" },
+			"mpr20965.4": { "size": "00400000", "crc": "37044f3e", "offset": "00c00000", "pattern": "OE" },
+			"mpr20966.5": { "size": "00400000", "crc": "b94b83de", "offset": "01000000", "pattern": "OE" }
+		},
+
+		"pblbeach": {
+			"epr18852.13": { "size": "00080000", "crc": "d12414ec", "offset": "00000000", "pattern": "_O" },
+			"mpr18853.2": { "size": "00400000", "crc": "b9268c97", "offset": "00400000", "pattern": "OE" },
+			"mpr18854.3": { "size": "00400000", "crc": "3113c8bc", "offset": "00800000", "pattern": "OE" },
+			"mpr18855.4": { "size": "00400000", "crc": "daf6ad0c", "offset": "00c00000", "pattern": "OE" },
+			"mpr18856.5": { "size": "00400000", "crc": "214cef24", "offset": "01000000", "pattern": "OE" }
+		},
+
+		"pclub2": {
+			"ic22": { "size": "00200000", "crc": "d2ceade7", "offset": "00200000", "pattern": "OE" },
+			"ic24": { "size": "00200000", "crc": "0e968c2d", "offset": "00400000", "pattern": "OE" },
+			"ic26": { "size": "00200000", "crc": "ab51da70", "offset": "00600000", "pattern": "OE" },
+			"ic28": { "size": "00200000", "crc": "3a654b2a", "offset": "00800000", "pattern": "OE" },
+			"ic30": { "size": "00200000", "crc": "8d89877e", "offset": "00a00000", "pattern": "OE" }
+		},
+
+		"pclub2v3": {
+			"ic24": { "size": "00200000", "crc": "b5871198", "offset": "00400000", "pattern": "OE" },
+			"ic26": { "size": "00200000", "crc": "d97034ed", "offset": "00600000", "pattern": "OE" },
+			"ic28": { "size": "00200000", "crc": "f1421506", "offset": "00800000", "pattern": "OE" }
+		},
+
+		"pclubpok": {
+			"ic22": { "size": "00200000", "crc": "48ab8371", "offset": "00200000", "pattern": "OE" },
+			"ic24": { "size": "00200000", "crc": "9915faea", "offset": "00400000", "pattern": "OE" },
+			"ic26": { "size": "00200000", "crc": "054ad120", "offset": "00600000", "pattern": "OE" },
+			"ic28": { "size": "00200000", "crc": "3a654b2a", "offset": "00800000", "pattern": "OE" },
+			"ic30": { "size": "00200000", "crc": "98747bef", "offset": "00a00000", "pattern": "OE" }
+		},
+
+		"prikura": {
+			"mpr19337.7": { "size": "00200000", "crc": "76f69ff3", "offset": "00200000", "pattern": "OE" },
+			"mpr19333.2": { "size": "00400000", "crc": "eb57a6a6", "offset": "00400000", "pattern": "OE" },
+			"mpr19334.3": { "size": "00400000", "crc": "c9979981", "offset": "00800000", "pattern": "OE" },
+			"mpr19335.4": { "size": "00400000", "crc": "9e000140", "offset": "00c00000", "pattern": "OE" },
+			"mpr19336.5": { "size": "00400000", "crc": "2363fa4b", "offset": "01000000", "pattern": "OE" }
+		},
+
+		"puyosun": {
+			"epr19531.13": { "size": "00080000", "crc": "ac81024f", "offset": "00000000", "pattern": "_O" },
+			"mpr19533.2": { "size": "00400000", "crc": "17ec54ba", "offset": "00400000", "pattern": "OE" },
+			"mpr19534.3": { "size": "00400000", "crc": "820e4781", "offset": "00800000", "pattern": "OE" },
+			"mpr19535.4": { "size": "00400000", "crc": "94fadfa4", "offset": "00c00000", "pattern": "OE" },
+			"mpr19536.5": { "size": "00400000", "crc": "5765bc9c", "offset": "01000000", "pattern": "OE" },
+			"mpr19537.6": { "size": "00400000", "crc": "8b736686", "offset": "01400000", "pattern": "OE" },
+			"mpr19532.1": { "size": "00400000", "crc": "985f0c9d", "offset": "01800000", "pattern": "OE" },
+			"mpr19538.8": { "size": "00400000", "crc": "915a723e", "offset": "01c00000", "pattern": "OE" },
+			"mpr19539.9": { "size": "00400000", "crc": "72a297e5", "offset": "02000000", "pattern": "OE" }
+		},
+
+		"rsgun": {
+			"mpr20958.7": { "size": "00200000", "crc": "cbe5a449", "offset": "00200000", "pattern": "OE" },
+			"mpr20959.2": { "size": "00400000", "crc": "a953330b", "offset": "00400000", "pattern": "OE" },
+			"mpr20960.3": { "size": "00400000", "crc": "b5ab9053", "offset": "00800000", "pattern": "OE" },
+			"mpr20961.4": { "size": "00400000", "crc": "0e06295c", "offset": "00c00000", "pattern": "OE" },
+			"mpr20962.5": { "size": "00400000", "crc": "f1e6c7fc", "offset": "01000000", "pattern": "OE" }
+		},
+
+		"sandor": {
+			"sando-r.13": { "size": "00100000", "crc": "fe63a239", "offset": "00000000", "pattern": "_O" },
+			"mpr18635.8": { "size": "00400000", "crc": "441e1368", "offset": "01c00000", "pattern": "OE" },
+			"mpr18636.9": { "size": "00400000", "crc": "fff1dd80", "offset": "02000000", "pattern": "OE" },
+			"mpr18637.10": { "size": "00400000", "crc": "83aced0f", "offset": "02400000", "pattern": "OE" },
+			"mpr18638.11": { "size": "00400000", "crc": "caab531b", "offset": "02800000", "pattern": "OE" }
+		},
+
+		"sanjeon": {
+			"ic11": { "size": "00200000", "crc": "9abae8d4", "offset": "00000000", "pattern": "_O" },
+			"ic13": { "size": "00200000", "crc": "f72c1d13", "offset": "00400000", "pattern": "OE" },
+			"ic14": { "size": "00200000", "crc": "bcd72105", "offset": "00600000", "pattern": "OE" },
+			"ic15": { "size": "00200000", "crc": "8c9c8352", "offset": "00800000", "pattern": "OE" },
+			"ic16": { "size": "00200000", "crc": "07e11512", "offset": "00a00000", "pattern": "OE" },
+			"ic17": { "size": "00200000", "crc": "46b7b344", "offset": "00c00000", "pattern": "OE" },
+			"ic18": { "size": "00200000", "crc": "d48404e1", "offset": "00e00000", "pattern": "OE" },
+			"ic19": { "size": "00200000", "crc": "33d23bb9", "offset": "01000000", "pattern": "OE" },
+			"ic20": { "size": "00200000", "crc": "f8cc1038", "offset": "01200000", "pattern": "OE" },
+			"ic21": { "size": "00200000", "crc": "74ceb649", "offset": "01400000", "pattern": "OE" },
+			"ic22": { "size": "00200000", "crc": "85f31277", "offset": "01600000", "pattern": "OE" },
+			"ic12": { "size": "00400000", "crc": "d5ebc84e", "offset": "01800000", "pattern": "OE" }
+		},
+
+		"sasissu": {
+			"epr20542.13": { "size": "00100000", "crc": "0e632db5", "offset": "00000000", "pattern": "_O" },
+			"mpr20544.2": { "size": "00400000", "crc": "661fff5e", "offset": "00400000", "pattern": "OE" },
+			"mpr20545.3": { "size": "00400000", "crc": "8e3a37be", "offset": "00800000", "pattern": "OE" },
+			"mpr20546.4": { "size": "00400000", "crc": "72020886", "offset": "00c00000", "pattern": "OE" },
+			"mpr20547.5": { "size": "00400000", "crc": "8362e397", "offset": "01000000", "pattern": "OE" },
+			"mpr20548.6": { "size": "00400000", "crc": "e37534d9", "offset": "01400000", "pattern": "OE" },
+			"mpr20543.1": { "size": "00400000", "crc": "1f688cdf", "offset": "01800000", "pattern": "OE" }
+		},
+
+		"seabass": {
+			"seabassf.13": { "size": "00100000", "crc": "6d7c39cc", "offset": "00000000", "pattern": "_O" },
+			"mpr20551.2": { "size": "00400000", "crc": "9a0c6dd8", "offset": "00400000", "pattern": "OE" },
+			"mpr20552.3": { "size": "00400000", "crc": "5f46b0aa", "offset": "00800000", "pattern": "OE" },
+			"mpr20553.4": { "size": "00400000", "crc": "c0f8a6b6", "offset": "00c00000", "pattern": "OE" },
+			"mpr20554.5": { "size": "00400000", "crc": "215fc1f9", "offset": "01000000", "pattern": "OE" },
+			"mpr20555.6": { "size": "00400000", "crc": "3f5186a9", "offset": "01400000", "pattern": "OE" },
+			"mpr20550.1": { "size": "00400000", "crc": "083e1ca8", "offset": "01800000", "pattern": "OE" },
+			"mpr20556.8": { "size": "00400000", "crc": "1fd70c6c", "offset": "01c00000", "pattern": "OE" },
+			"mpr20557.9": { "size": "00400000", "crc": "3c9ba442", "offset": "02000000", "pattern": "OE" }
+		},
+
+		"shanhigw": {
+			"mpr18341.7": { "size": "00200000", "crc": "cc5e8646", "offset": "00200000", "pattern": "OE" },
+			"mpr18340.2": { "size": "00200000", "crc": "8db23212", "offset": "00400000", "pattern": "OE" }
+		},
+
+		"shienryu": {
+			"mpr19631.7": { "size": "00200000", "crc": "3a4b1abc", "offset": "00200000", "pattern": "OE" },
+			"mpr19632.2": { "size": "00400000", "crc": "985fae46", "offset": "00400000", "pattern": "OE" },
+			"mpr19633.3": { "size": "00400000", "crc": "e2f0b037", "offset": "00800000", "pattern": "OE" },
+			"eeprom-shienryu.bin": { "size": "00000080", "crc": "98db6925", "offset": "00000000", "pattern": "OE" }
+		},
+
+		"smleague": {
+			"epr18777.13": { "size": "00080000", "crc": "8d180866", "offset": "00000000", "pattern": "_O" },
+			"mpr18778.8": { "size": "00400000", "crc": "25e1300e", "offset": "01c00000", "pattern": "OE" },
+			"mpr18779.9": { "size": "00400000", "crc": "51e2fabd", "offset": "02000000", "pattern": "OE" },
+			"mpr18780.10": { "size": "00400000", "crc": "8cd4dd74", "offset": "02400000", "pattern": "OE" },
+			"mpr18781.11": { "size": "00400000", "crc": "13ee41ae", "offset": "02800000", "pattern": "OE" },
+			"mpr18782.12": { "size": "00200000", "crc": "9be2270a", "offset": "02c00000", "pattern": "OE" }
+		},
+
+		"sokyugrt": {
+			"fpr19188.13": { "size": "00100000", "crc": "45a27e32", "offset": "00000000", "pattern": "_O" },
+			"mpr19189.2": { "size": "00400000", "crc": "0b202a3e", "offset": "00400000", "pattern": "OE" },
+			"mpr19190.3": { "size": "00400000", "crc": "1777ded8", "offset": "00800000", "pattern": "OE" },
+			"mpr19191.4": { "size": "00400000", "crc": "ec6eb07b", "offset": "00c00000", "pattern": "OE" },
+			"mpr19192.5": { "size": "00200000", "crc": "cb544a1e", "offset": "01000000", "pattern": "OE" }
+		},
+
+		"sss": {
+			"epr21488.13": { "size": "00080000", "crc": "71c9def1", "offset": "00000000", "pattern": "_O" },
+			"mpr21489.2": { "size": "00400000", "crc": "4c85152b", "offset": "00400000", "pattern": "OE" },
+			"mpr21490.3": { "size": "00400000", "crc": "03da67f8", "offset": "00800000", "pattern": "OE" },
+			"mpr21491.4": { "size": "00400000", "crc": "cf7ee784", "offset": "00c00000", "pattern": "OE" },
+			"mpr21492.5": { "size": "00400000", "crc": "57753894", "offset": "01000000", "pattern": "OE" },
+			"mpr21493.6": { "size": "00400000", "crc": "efb2d271", "offset": "01400000", "pattern": "OE" }
+		},
+
+		"stress": {
+			"epr-21300a.ic13": { "size": "00100000", "crc": "899d829e", "offset": "00000000", "pattern": "_O" },
+			"mpr-21290.ic2": { "size": "00400000", "crc": "a49d29f3", "offset": "00400000", "pattern": "OE" },
+			"mpr-21291.ic3": { "size": "00400000", "crc": "9452ba20", "offset": "00800000", "pattern": "OE" },
+			"mpr-21292.ic4": { "size": "00400000", "crc": "f60268e2", "offset": "00c00000", "pattern": "OE" },
+			"mpr-21293.ic5": { "size": "00400000", "crc": "794946e0", "offset": "01000000", "pattern": "OE" },
+			"mpr-21294.ic6": { "size": "00400000", "crc": "550843bb", "offset": "01400000", "pattern": "OE" },
+			"mpr-21289.ic1": { "size": "00400000", "crc": "c2ee8bea", "offset": "01800000", "pattern": "OE" },
+			"mpr-21296.ic8": { "size": "00400000", "crc": "b825c42a", "offset": "01c00000", "pattern": "OE" },
+			"mpr-21297.ic9": { "size": "00400000", "crc": "4bff7469", "offset": "02000000", "pattern": "OE" },
+			"mpr-21298.ic10": { "size": "00400000", "crc": "68d07144", "offset": "02400000", "pattern": "OE" },
+			"mpr-21299.ic11": { "size": "00400000", "crc": "ecc521c6", "offset": "02800000", "pattern": "OE" }
+		},
+
+		"suikoenb": {
+			"fpr17834.13": { "size": "00100000", "crc": "746ef686", "offset": "00000000", "pattern": "_O" },
+			"mpr17836.2": { "size": "00400000", "crc": "55e9642d", "offset": "00400000", "pattern": "OE" },
+			"mpr17837.3": { "size": "00400000", "crc": "13d1e667", "offset": "00800000", "pattern": "OE" },
+			"mpr17838.4": { "size": "00400000", "crc": "f9e70032", "offset": "00c00000", "pattern": "OE" },
+			"mpr17839.5": { "size": "00400000", "crc": "1b2762c5", "offset": "01000000", "pattern": "OE" },
+			"mpr17840.6": { "size": "00400000", "crc": "0fd4c857", "offset": "01400000", "pattern": "OE" },
+			"mpr17835.1": { "size": "00400000", "crc": "77f5cb43", "offset": "01800000", "pattern": "OE" },
+			"mpr17841.8": { "size": "00400000", "crc": "f48beffc", "offset": "01c00000", "pattern": "OE" },
+			"mpr17842.9": { "size": "00400000", "crc": "ac8deed7", "offset": "02000000", "pattern": "OE" }
+		},
+
+		"techbowl": {
+			"ic22": { "size": "00200000", "crc": "5058db21", "offset": "00200000", "pattern": "OE" },
+			"ic24": { "size": "00200000", "crc": "34090f6d", "offset": "00400000", "pattern": "OE" },
+			"ic26": { "size": "00200000", "crc": "fb073352", "offset": "00600000", "pattern": "OE" },
+			"ic28": { "size": "00200000", "crc": "530e0ceb", "offset": "00800000", "pattern": "OE" },
+			"ic30": { "size": "00200000", "crc": "8d89877e", "offset": "00a00000", "pattern": "OE" }
+		},
+
+		"thunt": {
+			"th-ic7_2.stv": { "size": "00080000", "crc": "c4e993de", "offset": "00200000", "pattern": "OE" },
+			"th-ic7_1.stv": { "size": "00080000", "crc": "1355cc18", "offset": "00200001", "pattern": "_O" },
+			"th-e-2.ic2": { "size": "00400000", "crc": "47315694", "offset": "00400000", "pattern": "OE" },
+			"th-e-3.ic3": { "size": "00400000", "crc": "c9290b44", "offset": "00800000", "pattern": "OE" },
+			"th-e-4.ic4": { "size": "00400000", "crc": "c672e40b", "offset": "00c00000", "pattern": "OE" },
+			"th-e-5.ic5": { "size": "00400000", "crc": "3914b805", "offset": "01000000", "pattern": "OE" }
+		},
+
+		"thuntk": {
+			"2.ic13_2": { "size": "00080000", "crc": "6cae2926", "offset": "00200000", "pattern": "OE" },
+			"1.ic13_1": { "size": "00080000", "crc": "460727c8", "offset": "00200001", "pattern": "_O" },
+			"bom210-10.ic2": { "size": "00400000", "crc": "f59d0827", "offset": "01c00000", "pattern": "UNKOWN_PATTERN" },
+			"bom210-11.ic3": { "size": "00400000", "crc": "44e5a13e", "offset": "02000000", "pattern": "UNKOWN_PATTERN" },
+			"bom210-12.ic4": { "size": "00400000", "crc": "deabc701", "offset": "02400000", "pattern": "UNKOWN_PATTERN" },
+			"bom210-13.ic5": { "size": "00400000", "crc": "5ece1d5c", "offset": "02800000", "pattern": "UNKOWN_PATTERN" }
+		},
+
+		"twcup98": {
+			"epr20819.13": { "size": "00100000", "crc": "d930dfc8", "offset": "00000000", "pattern": "_O" },
+			"mpr20821.2": { "size": "00400000", "crc": "2d930d23", "offset": "00400000", "pattern": "OE" },
+			"mpr20822.3": { "size": "00400000", "crc": "8b33a5e2", "offset": "00800000", "pattern": "OE" },
+			"mpr20823.4": { "size": "00400000", "crc": "6e6d4e95", "offset": "00c00000", "pattern": "OE" },
+			"mpr20824.5": { "size": "00400000", "crc": "4cf18a25", "offset": "01000000", "pattern": "OE" }
+		},
+
+		"vfkids": {
+			"fpr18914.13": { "size": "00100000", "crc": "cd35730a", "offset": "00000000", "pattern": "_O" },
+			"mpr18916.4": { "size": "00400000", "crc": "4aae3ddb", "offset": "00c00000", "pattern": "OE" },
+			"mpr18917.5": { "size": "00400000", "crc": "edf6edc3", "offset": "01000000", "pattern": "OE" },
+			"mpr18918.6": { "size": "00400000", "crc": "d3a95036", "offset": "01400000", "pattern": "OE" },
+			"mpr18915.1": { "size": "00400000", "crc": "09cc38e5", "offset": "01800000", "pattern": "OE" },
+			"mpr18919.8": { "size": "00400000", "crc": "4ac700de", "offset": "01c00000", "pattern": "OE" },
+			"mpr18920.9": { "size": "00400000", "crc": "0106e36c", "offset": "02000000", "pattern": "OE" },
+			"mpr18921.10": { "size": "00400000", "crc": "c23d51ad", "offset": "02400000", "pattern": "OE" },
+			"mpr18922.11": { "size": "00400000", "crc": "99d0ab90", "offset": "02800000", "pattern": "OE" },
+			"mpr18923.12": { "size": "00400000", "crc": "30a41ae9", "offset": "02c00000", "pattern": "OE" }
+		},
+
+		"vfremix": {
+			"epr17944.13": { "size": "00100000", "crc": "a5bdc560", "offset": "00000000", "pattern": "_O" },
+			"mpr17946.2": { "size": "00400000", "crc": "4cb245f7", "offset": "00400000", "pattern": "OE" },
+			"mpr17947.3": { "size": "00400000", "crc": "fef4a9fb", "offset": "00800000", "pattern": "OE" },
+			"mpr17948.4": { "size": "00400000", "crc": "3e2b251a", "offset": "00c00000", "pattern": "OE" },
+			"mpr17949.5": { "size": "00400000", "crc": "b2ecea25", "offset": "01000000", "pattern": "OE" },
+			"mpr17950.6": { "size": "00400000", "crc": "5b1f981d", "offset": "01400000", "pattern": "OE" },
+			"mpr17945.1": { "size": "00200000", "crc": "03ede188", "offset": "01800000", "pattern": "OE" }
+		},
+
+		"vmahjong": {
+			"mpr19620.7": { "size": "00200000", "crc": "c98de7e5", "offset": "00200000", "pattern": "OE" },
+			"mpr19615.2": { "size": "00400000", "crc": "c62896da", "offset": "00400000", "pattern": "OE" },
+			"mpr19616.3": { "size": "00400000", "crc": "f62207c7", "offset": "00800000", "pattern": "OE" },
+			"mpr19617.4": { "size": "00400000", "crc": "ab667e19", "offset": "00c00000", "pattern": "OE" },
+			"mpr19618.5": { "size": "00400000", "crc": "9782ceee", "offset": "01000000", "pattern": "OE" },
+			"mpr19619.6": { "size": "00400000", "crc": "0b76866c", "offset": "01400000", "pattern": "OE" },
+			"mpr19614.1": { "size": "00400000", "crc": "b83b3f03", "offset": "01800000", "pattern": "OE" },
+			"mpr19621.8": { "size": "00400000", "crc": "f92616b3", "offset": "01c00000", "pattern": "OE" }
+		},
+
+		"winterht": {
+			"fpr20108.13": { "size": "00100000", "crc": "1ef9ced0", "offset": "00000000", "pattern": "_O" },
+			"mpr20110.2": { "size": "00400000", "crc": "238ef832", "offset": "00400000", "pattern": "OE" },
+			"mpr20111.3": { "size": "00400000", "crc": "b0a86f69", "offset": "00800000", "pattern": "OE" },
+			"mpr20112.4": { "size": "00400000", "crc": "3ba2b49b", "offset": "00c00000", "pattern": "OE" },
+			"mpr20113.5": { "size": "00400000", "crc": "8c858b41", "offset": "01000000", "pattern": "OE" },
+			"mpr20114.6": { "size": "00400000", "crc": "b723862c", "offset": "01400000", "pattern": "OE" },
+			"mpr20109.1": { "size": "00400000", "crc": "c1a713b8", "offset": "01800000", "pattern": "OE" },
+			"mpr20115.8": { "size": "00400000", "crc": "dd01f2ad", "offset": "01c00000", "pattern": "OE" }
+		},
+
+		"znpwfv": {
+			"epr20398.13": { "size": "00100000", "crc": "3fb56a0b", "offset": "00000000", "pattern": "_O" },
+			"mpr20400.2": { "size": "00400000", "crc": "1edfbe05", "offset": "00400000", "pattern": "OE" },
+			"mpr20401.3": { "size": "00400000", "crc": "99e98937", "offset": "00800000", "pattern": "OE" },
+			"mpr20402.4": { "size": "00400000", "crc": "4572aa60", "offset": "00c00000", "pattern": "OE" },
+			"mpr20403.5": { "size": "00400000", "crc": "26a8e13e", "offset": "01000000", "pattern": "OE" },
+			"mpr20404.6": { "size": "00400000", "crc": "0b70275d", "offset": "01400000", "pattern": "OE" },
+			"mpr20399.1": { "size": "00400000", "crc": "c178a96e", "offset": "01800000", "pattern": "OE" },
+			"mpr20405.8": { "size": "00400000", "crc": "f53337b7", "offset": "01c00000", "pattern": "OE" },
+			"mpr20406.9": { "size": "00400000", "crc": "b677c175", "offset": "02000000", "pattern": "OE" },
+			"mpr20407.10": { "size": "00400000", "crc": "58356050", "offset": "02400000", "pattern": "OE" }
+		}
+	}
+}

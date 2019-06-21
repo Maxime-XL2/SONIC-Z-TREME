@@ -1,0 +1,104 @@
+
+* System Work RAM Area Customization
+
+Although the system variable area starting from 060FFC00 is reserved by the 
+system, the work RAM area (default mode: 060C0000~) can be customized by 
+defining the following variables. (Please note that even if there is a partial 
+change, all the variables must be set.)
+
+void*   MasterStack = (void*)0x60ffc00 ;    /* Master Stack area End */
+void*   SlaveStack  = (void*)0x6001e00 ;    /* Slave Stack area End */
+Uint16  MaxVertices = 2500 ;             /* Calculable number of vertices */
+Uint16  MaxPolygons = 1786 ;             /* Calculable number of polygons */
+Uint16  EventSize = 0x80 ;               /* sizeof(EVENT) */
+Uint16  WorkSize = 0x40 ;                /* sizeof(WORK) */
+Uint16  MaxEvents = 64 ;                 /* Usable number of Events */
+Uint16  MaxWorks = 256 ;                 /* Usable number of Work */
+void*   SortList = (void*)0x60c0000 ;    /* SCU DMA Table */
+Uint32  SortListSize = 0x5400 ;             /* Sprite transfer request table size */
+void*   TransList = (void*)0x60fb800 ;      /* SCU D.M.A. Table */
+void*   Zbuffer = (void*)0x60c5800 ;        /* (128 + 128 + 256) * 4 Bytes fix */
+void*   SpriteBuf (void*)0x60c6000 ;        /* Sprite control data buffer */
+Uint32  SpriteBufSize = 0x1f7b8 ;           /* Sprite control data buffer size */
+void*   Pbuffer = (void*)0x60e57b8 ;        /* Point calculate buffer */
+void*   CLOfstBuf = (void*)0x60c5400 ;      /* 32 * 32 Bytes fix */
+void*   CommandBuf = (void*)0x60ef3f8 ;     /* Command for slave CPU buffer */
+void*   PCM_Work = (void*)0x25a78000 ;      /* PCM data buffer */
+Uint32  PCM_WkSize = 0x8000 ;            /* PCM data buffer size */
+
+EVENT   EventBuf[MAX_EVENTS] ;           /* buffer for Event use */
+WORK    WorkBuf[MAX_WORKS] ;             /* buffer for Work use */
+EVENT*  RemainEvent[MAX_EVENTS] ;        /* Remaining Event address buffer 
+*/
+WORK*   RemainWork[MAX_WORKS] ;          /* Remaining Work address buffer 
+*/
+
+Please observe the following precautions for the setup of each area:
+
+(1) SortList and TransList use indirect SCU DMA.  Adjust the area in powers of
+    2 so that it exceeds the table size. SortList is used in transfers of
+    sprite (polygon) data and for data such as window data; make sure to
+    allocate entries for the maximum number of displayed sprites + 6 entries.
+
+    Use a 12-byte table for each entry.
+    For example, to display 1000 sprites,
+
+      (1000+6) * 12 = 12072 (2F28H)
+
+    Therefore, set at a 4000H boundary address.
+
+    Also, TransList is used during V-blank transfer requests and extends to 20
+    entries. Therefore,
+
+      20 * 12 = 240(F0H) bytes required.
+
+    Therefore, set at a 100H boundary address.
+
+(2) Zbuffer and CLOfstBuf have fixed sizes; therefore, set them to 4-byte
+    boundary addresses.
+
+(3) Allocate a size that is approximately equal to 
+
+        the display control function (such as slPutPolygon and slDispSprite)
+        execution count * 80 bytes + 100H 
+
+    for the CommandBuf. When the execution function can be determined
+    specifically, set the buffer size according to the following list:
+
+        slPutPolygon   72 bytes
+        slDispPolygon  16 bytes
+        slPutSprite    36 bytes
+        slDispSprite   36 bytes
+        slSetSprite    16 bytes
+        slPerspective   8 bytes
+        slWindow       20 bytes
+        slLight        16 bytes
+        slZdspLevel     4 bytes
+
+    The system sends functions other than these per each frame, so take this
+    overhead into account.
+
+(4) SpriteBuf is a buffer for setting sprite control data. The buffer is used
+    by alternating between the first half of the buffer and the second half
+    for each frame.  Accordingly, a buffer equivalent to 
+
+        (displayed number of sprites [polygons] + 5) * 36 bytes * 2 banks
+
+    in size is required.
+
+(5) Since Pbuffer is used as a coordinate and perspective transform
+    calculation buffer for displaying polygon models, it does not need to be
+    used by applications that do not use slPutPolygon and slDispPolygon.
+    Therefore, another buffer may overlap Pbuffer.
+
+(6) MaxPolygons and MaxVertices are used to check buffer overflow when
+    executing display control functions. However, the check is performed
+    on the polygon and vertex entries and not the displayed image. Therefore,
+    MaxPolygons does not necessarily need to match SortListSize and
+    SpriteBufSize.
+
+(7) PCM-Work is in the sound CPU area with the size in 2000H units. Please
+    make sure it is set after consulting with the sound designer.
+
+The following is a sample (sample/workarea.c) to set the work RAM:
+ 

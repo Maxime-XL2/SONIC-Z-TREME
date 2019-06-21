@@ -1,0 +1,1 @@
+Yabause documentation is located at: http://wiki.yabause.org/index.php5?title=Documentations

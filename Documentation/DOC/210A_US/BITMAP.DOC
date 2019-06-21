@@ -1,0 +1,135 @@
+******************************************************************************
+Bitmap Graphics Functions
+******************************************************************************
+
+A bit map uses one VDP2 scroll screen for graphics display.  Only the 256
+color palette mode is supported by SGL.
+
+After normal initialization processing is completed, the bitmap library can be
+initialized by executing slInitBitMap().
+
+******************************************************************************
+Bool slInitBitMap((Uint16)scrn, (Uint16)size, (void*)adr)
+******************************************************************************
+
+Function:
+Sets the bit map screen to the 256-color mode. The screen is not cleared.
+
+scrn:
+Sets either bmNBG0, bmNBG1, or bmRBG0.
+
+size:
+Sets either BM_512x256, BM_512x512, BM_1024x256, or BM_1024x512.
+
+adr:
+Sets the start address of the VRAM area used as the bit map.
+This area must be within a 20000H boundary. In this function,
+slBitMapNbg0(Nbg1, Rbg0) is executed. The center point of the screen is set as
+the origin.
+
+******************************************************************************
+void slBitMapBase((Sint16)xbase, (Sint16)ybase)
+******************************************************************************
+
+Function:
+Sets the origin point of the bit map screen.
+Specifies the upper left of the screen as (0, 0).
+
+******************************************************************************
+Sint8  *slLocateBitMap((Sint16)xps, (Sint16)yps)
+******************************************************************************
+
+Function:
+Returns the VRAM address of the specified position.
+When the position is outside the screen, NULL is returned.
+
+******************************************************************************
+void slClearBitMap((Sint8)color);
+******************************************************************************
+
+Function:
+Clears the bit map screen with the specified color.
+
+******************************************************************************
+Bool slBMPset((Sint16)xps, (Sint16)yps, (Sint8)color)
+******************************************************************************
+
+Function:
+Draws a pixel at the specified position. When the position is outside the
+screen, FALSE is returned.
+
+******************************************************************************
+Sint8 slBMPoint((Sint16)xps, (Sint16)yps)
+******************************************************************************
+
+Function:
+Reads the pixel at the specified position and returns its palette code.
+When the coordinate is outside the screen, 0 is returned.
+
+******************************************************************************
+void slBMCircle((Sint16)xps, (Sint16)yps, (Sint16)radius, (Sint8)color)
+******************************************************************************
+
+Function:
+Draws a circle with the specified position as its center.
+
+******************************************************************************
+Bool slBMLine((Sint16)xps0, (Sint16)yps0, (Sint16)xps1, (Sint16)yps1,
+(Sint8)color)
+******************************************************************************
+
+Function:
+Draws a straight line which connects two specified points.
+When the position is outside the screen, FALSE is returned.
+
+******************************************************************************
+Bool slBMBox((Sint16)xps0, (Sint16)yps0, (Sint16)xps1, (Sint16)yps1,
+(Sint8)color)
+******************************************************************************
+
+Function:
+Draws a rectangle with the specified points as its vertices.
+When the points are outside the screen, FALSE is returned.
+
+******************************************************************************
+Bool slBMBoxFill((Sint16)xps0, (Sint16)yps0, (Sint16)xps1, (Sint16)yps1,
+(Sint8)color)
+******************************************************************************
+
+Function:
+Draws a rectangle with specified points as its vertices.
+The interior of the rectangle is also filled. When the points are outside the
+screen, FALSE is returned.
+
+******************************************************************************
+Bool slBMGet((Sint16)xps0, (Sint16)yps0, (Sint16)xps1, (Sint16)yps1,
+(Sint8*)ptr)
+******************************************************************************
+
+Function:
+Copies bit map data into the buffer for a rectangle with two specified points
+as its vertices. If a part of the rectangle is outside of the screen, the data
+for that portion is not copied. When the entire rectangle is outside the
+screen, FALSE is returned.
+
+******************************************************************************
+Bool slBMPut((Sint16)xps0, (Sint16)yps0, (Sint16)xps1, (Sint16)yps1,
+(Sint8*)ptr)
+******************************************************************************
+
+Function:
+Copies bit map data from the buffer into a rectangle with two specified points
+as its vertices. If a part of the rectangle is outside of the screen, the data
+for that portion is not copied. When the entire rectangle is outside the
+screen, FALSE is returned.
+
+******************************************************************************
+Bool slBMSprPut((Sint16)xps0, (Sint16)yps0, (Sint16)xps1, (Sint16)yps1,
+(Sint8*)ptr)
+******************************************************************************
+
+Function:
+Copies bit map data from the buffer into a rectangle with two specified points
+as its vertices. However, spaces (palette code 0) are not copied. If part of
+the rectangle is outside the screen, that portion is not copied. When the
+entire rectangle is outside the screen, FALSE is returned.

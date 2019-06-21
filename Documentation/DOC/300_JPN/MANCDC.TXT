@@ -1,0 +1,116 @@
+*******************************************************************************
+●ドキュメント種別      ：各ライブラリ説明ファイル
+●ファイル記号名称      ：mancdc.doc
+●対象ライブラリ記号名称：CDC
+●対象ライブラリ名称    ：ＣＤ通信インタフェース
+●バージョン            ：1.20
+●作成者                ：M.M.
+●作成日                ：1995-03-31
+●その他のメッセージ    ：なし
+*******************************************************************************
+
+１．　ＣＤパートの変更内容（Ver.1.10→Ver.1.20）
+
+１．１　ヘッダファイル（sega_cdc.h）の変更
+
+（１）　定数値の変更
+
+/* バッファ区画のセクタ範囲（セクタ位置とセクタ数）の特殊指定 */
+/* （いずれも下位16ビットが有効で、内部的には0xffffと同値） */
+#define CDC_SPOS_END    -1  /* 区画最後のセクタ位置を示す */
+#define CDC_SNUM_END    -1  /* 指定ｾｸﾀ位置から区画最後までのｾｸﾀ数を示す */
+
+/* その他の特殊指定 */
+#define CDC_NUL_FID     -1      /* ファイル識別子の特殊値 (0xffffff) */
+
+/* 再生モード（ＣＤ再生パラメータ内） */
+#define CDC_PM_NOCHG        -1      /* 再生モードを変更しない (0xff) */
+
+/* セクタ長 */
+enum CdcSctLen {
+    CDC_SLEN_NOCHG = -1     /* 設定を変更しない (0xff) */
+};
+
+（２）　定数名の追加
+
+/* その他の特殊指定 */
+#define CDC_PARA_DFL    0       /* パラメータの省略値指定 */
+#define CDC_PARA_NOCHG  -1      /* パラメータの未変更指定 */
+
+/* ＣＤフラグ */
+#define CDC_CDFLG_ROM   0x80    /* CD-ROMデコード中 */
+
+/* ハードウェアフラグ（ハードウェア情報内） */
+#define CDC_HFLAG_MPEG  0x02    /* MPEGあり */
+#define CDC_HFLAG_HERR  0x80    /* ハードウェアエラー発生 */
+
+/* ファイルアトリビュート（ファイル情報内） */
+#define CDC_ATR_DIRFG   0x02    /* ディレクトリである */
+#define CDC_ATR_FORM1   0x08    /* Form1セクタを含む */
+#define CDC_ATR_FORM2   0x10    /* Form2セクタを含む */
+#define CDC_ATR_INTLV   0x20    /* インタリーブセクタを含む */
+#define CDC_ATR_CDDA    0x40    /* CD-DAファイル */
+#define CDC_ATR_DIRXA   0x80    /* ディレクトリファイル */
+
+/* スタンバイタイム */
+#define CDC_STNBY_MIN   60      /* 最小値 */
+#define CDC_STNBY_MAX   900     /* 最大値 */
+
+/* サブコードフラグ */
+#define CDC_SCD_PACK    0x01    /* パックデータエラー */
+#define CDC_SCD_OVER    0x02    /* オーバーランエラー */
+
+/* ＣＤブロックの転送ワード数 */
+#define CDC_DEND_ERR    0xffffff    /* データ転送でエラーが発生 */
+
+/* 実データサイズ */
+#define CDC_ACTSIZ_ERR  0xffffff    /* 計算を実行できなかった */
+
+/* フレームアドレス検索結果（セクタ位置とフレームアドレス） */
+#define CDC_SPOS_ERR    0xffff      /* 検索でエラーが発生 */
+#define CDC_FAD_ERR     0xffffff    /* 検索を実行できなかった */
+
+（３）　処理マクロの追加
+
+/* ＣＤステータス情報からステータスコードを取得 */
+#define CDC_GET_STC(stat)       (CDC_STAT_STATUS(stat) & CDC_STC_MSK)
+
+/* ＣＤステータス情報からリピート回数を取得 */
+#define CDC_GET_REPEAT(stat)    (CDC_STAT_FLGREP(stat) & 0x0f)
+
+１．２　関数仕様の変更
+
+（１）　フレームアドレス検索結果の取得関数（CDC_GetFadSearch）
+　検索エラーの場合、検索結果のセクタ位置の定数名を次のように変更します。
+　・CDC_SPOS_END→CDC_SPOS_ERR
+
+（２）　レジスタアクセス関数
+　無駄なゼロ拡張を防ぐため、以下のレジスタアクセス関数の仕様をUint16→Sint32に変更します。
+　・Sint32  CDC_GetHirqReq(void);
+　・void    CDC_ClrHirqReq(Sint32 bitpat);
+　・Sint32  CDC_GetHirqMsk(void);
+　・void    CDC_SetHirqMsk(Sint32 bitpat);
+
+１．３　処理内容の変更
+
+（１）　内部構造の見直し
+　パフォーマンス向上のため内部構造を見直し、プログラムサイズを縮小しました。
+
+２．　MPEGパートの組み込み
+　今回のライブラリからMPEGパートの機能が正式に組み込まれています。今後マニュアル等を提供して、仕様を公開する予定です。
+
+３．　SCU-DMA使用時の注意事項
+　SCU-DMA転送中はA-Busアクセス禁止のため、全てのCDC関数の使用を禁止します。
+　詳細は次の文書を参照してください。
+　・Developer's Information STN-10「SCU仕様変更による制限事項・注意事項」
+　　No.08「A-Bus ←→ B-BusのDMA動作中のCPUからのA-Bus, B-Busへのアクセス禁止」
+
+４．　ＣＤ関連ライブラリの対応バージョン
+　ＣＤ関連ライブラリは、以下のバージョンを使用してください。
+　・ＣＤ通信インタフェースライブラリ（CDC）：Ver.1.20
+　・ファイルシステムライブラリ      （GFS）：Ver.1.21以降
+　・ストリームシステムライブラリ    （STM）：Ver.1.21以降
+　・MPEGライブラリ                  （MPG）：Ver.1.20以降
+
+********************************* end of file *********************************
+

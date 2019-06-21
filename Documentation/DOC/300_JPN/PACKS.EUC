@@ -1,0 +1,162 @@
+
+◎ デバッグ用テキスト表示ライブラリ
+
+void *slLocate((Uint16)xps , (Uint16)yps)
+    機能 : テキスト表示用のアドレス(カレントスクリーン)を返します。
+	   xps , yps は 画面上でのセル位置(通常０〜６３)で指定します。
+
+void slCurScrn((Uint16)scrn)
+    機能 : slLocate() および、set_vbar() で使用するスクリーンを設定します。
+	   scrn には以下の６つの内のいずれかを指定します。
+	   scnNBG0 , scnNBG1 , scnNBG2 , scnNBG3 , scnRBGA , scnRBGB
+
+void slCurColor((Uint16)Palette)
+    機能 : slPrint???() , slDisp???() で表示する文字のパレット番号を指定しま
+	   す。Palette には ０〜１５ のいずれかを指定します。
+
+void slDispHex((Uint32)val , (void *)dspadd)
+    機能 : 指定された変数を８桁の１６進数で表示します。
+
+void slPrintHex((Uint32)val , (void *)dspadd)
+    機能 : 指定された変数を８桁の１６進数で表示します。
+	   上位の０はスペースに代ります。
+
+void slPrintFX((FIXED)val , (void *)dspadd)
+    機能 : 固定小数点のデータを小数点表示します。
+	   整数部上位の０と、小数部下位の０はスペースに代ります。
+	   整数部、小数部はそれぞれ５桁の１０進数になります。
+
+void slPrintMatrix((MATRIX)mtrx , (void *)dspadd)
+    機能 : slPrintFX() を使用して、マトリクス(３x４)の表示をします。
+	   mtrx に CURRENT を指定した場合、マトリクススタックのカレントマトリ
+	   クスを表示します。
+
+Uint32 slHex2Dec((Uint32)val)
+    機能 : ３２ビットのバイナリデータを８桁までのＢ.Ｃ.Ｄ.データに変換します。
+	   ８桁を越えるような値(１０００００００(d) = ５Ｆ５Ｅ１００(h) 以上)
+	   を指定した場合、最上位の値がおかしくなります。
+
+void slPrint((char *)string , (void *)dspadd)
+    機能 : 指定された文字列を表示します。
+	   文字列の終了コードは ＮＵＬＬ 文字(コード０) です。
+
+void slExtendScroll((void *)tbl , (void *)dspadd)
+    機能 : コマンド圧縮されたスクロールマップをＶＲＡＭに展開します。
+	   使用できるファンクションには以下のものがあり、 sl_macro.h 内に登録
+	   されています。
+
+ ファンクション :	機能
+  End()			圧縮データの終了
+  LocateA0(adr)		ＶＲＡＭＡ０領域でのアドレス指定
+  LocateA1(adr)		ＶＲＡＭＡ１領域でのアドレス指定
+  LocateB0(adr)		ＶＲＡＭＢ０領域でのアドレス指定
+  LocateB1(adr)		ＶＲＡＭＢ１領域でのアドレス指定
+  Set(cnt)		指定された個数だけデータをセット(この後に実データが続く)
+  Stock(cnt)		ストックバッファにセットしながらデータをセット(″)
+  Same(cnt,chr)		同じキャラクタを続けてセットする
+  Inc(cnt,chr)		キャラクタナンバーを増やしながらセットする
+  Inc2(cnt,chr)		キャラクタナンバーを２ずつ増やしながらセットする
+  Dec(cnt,chr)		キャラクタナンバーを減らしながらセットする
+  Dec2(cnt,chr)		キャラクタナンバーを２ずつ減らしながらセットする
+  Vline(cnt,chr)	同じキャラクタを縦に並べる
+  VlineMinus(cnt,chr)	同じキャラクタを縦に並べる(上方へ)
+  Skip(offset)		表示アドレスをオフセット分ずらす(オフセットは１バイト)
+  Skip2(offset)		表示アドレスをオフセット分ずらす(オフセットは２バイト)
+  Copy(src,cnt)		すでにセットされているデータをコピーする(コピー元はアドレス)
+  RelCopy(src,cnt)	すでにセットされているデータをコピーする(コピー元は相対)
+  Fill(cnt,chr)		同じキャラクタを続けてセットする(ポインタは動かない)
+			(ＣＰＵのＤ.Ｍ.Ａ.を使用)
+  Block(hcnt,vcnt)	横、縦のセル数を指定し、その中に続くデータをセットします。
+			(ポインタはブロックの右隣へ移動する)
+  BlockInc(hcnt,vcnt,chr) 横、縦のセル数を指定し、その中をキャラクタナンバーを
+			増やしながら埋める(ポインタはブロックの右隣へ移動する)
+  BlockInc2(hcnt,vcnt,chr) 横、縦のセル数を指定し、その中をキャラクタナンバーを
+			２ずつ増やしながら埋める(ポインタはブロックの右隣へ移動する)
+  One(chr)		ひとつだけキャラクタをセットします。
+  High(cnt,chr)		上位バイトの同じキャラクタをセットします。カウントはこのセルを
+			含めた数をセットし、このマクロの後には LChar マクロが続きます。
+  BlockFill(hcnt,vcnt,chr) 横、縦のセル数を指定し、その中を同じキャラクタナンバーで
+			埋めます(ポインタはブロックの右隣へ移動する)。
+  Add(cnt,chr,add)	キャラクタナンバーを指定された数ずつ増やしながらセットする。
+			(加える値は符号付き８ビット)
+  BlockAdd(hcnt,vcnt,chr,add) 横、縦のセル数を指定し、その中をキャラクタナンバーを増や
+			しながらセットする(ポインタはブロックの右隣へ移動する)。
+			(加える値は符号付き８ビット)
+  Loop(cnt)		次の Until() までの間を指定された回数繰り返し実行する。
+  Until()		ただし、ネストすることはできない。
+
+  Char1(c)		１セル分の実データ
+  Char2(c1,c2)		２セル分の実データ
+   ...
+  Char8(c1,c2,c3,c4,c5,c6,c7,c8) ８セル分の実データ
+  LChar1(c)		High 用の キャラクタデータ(下位バイトのみ)
+  LChar2(c1,c2)		２セル分の下位バイトデータ
+   ...
+  LChar8(c1,c2,c3,c4,c5,c6,c7,c8) ８セル分の下位バイトデータ
+
+
+ 使用例)
+
+#define	    SpaceCHR	0x0000
+#define	    WhiteCHR	0x00fe
+
+    Uint8 SceneMap_1[] = {
+	Fill(Page , Space) ,			/* １ページ分をスペースでうめる */
+	Loop(4) ,				/* この後、Until() 迄を４回繰り返す */
+	    BlockFill(8 , 8 , WhiteCHR) ,	/* ８x８のブロックを WhiteCHR でうめる */
+	    Skip(8) ,				/* ブロックの次の位置から８セル分ポインタを移動 */
+	    BlockFill(8 , 8 , WhiteCHR) ,
+	    Skip(8) ,
+	    BlockFill(8 , 8 , WhiteCHR) ,
+	    Skip(8) ,
+	    BlockFill(8 , 8 , WhiteCHR) ,
+	    Skip2(7 * Line + 16) ,		/* ポインタの移動量が１バイトを超えているので Skip2 を使用 */
+	    BlockFill(8 , 8 , WhiteCHR) ,
+	    Skip(8) ,
+	    BlockFill(8 , 8 , WhiteCHR) ,
+	    Skip(8) ,
+	    BlockFill(8 , 8 , WhiteCHR) ,
+	    Skip(8) ,
+	    BlockFill(8 , 8 , WhiteCHR) ,
+	    Skip2(7 * Line) ,
+	Until() ,
+	End()
+    } ;
+
+void set_vbar((Uint16)xps)
+    機能 : ＣＰＵの稼動時間を調べるための縦棒を表示します。ｘｐｓは表示桁位置です。
+
+void reset_vbar((Uint16)xps)
+    機能 : 上記の set_vbar() で表示された縦棒を消します。
+
+    これら２つの関数と、ビデオ同期関数 slSynch() とを組み合わせて ＣＰＵの稼動時間を
+    調べます。
+
+  例)
+    while(-1){
+	slExecuteEvent() ;	/* イベント処理 */
+
+	reset_vbar(39) ;	/* 縦棒の消去 */
+	slSynch() ;		/* ビデオ同期待ち */
+	set_vbar(39) ;		/* 縦棒の表示 */
+    }
+
+    画面表示が始まるのが slSynch() 終了直後ですから、ここでＶＲＡＭに縦棒をセットし
+    ます。 slExecuteEvent() で、イベント処理が実行され、すべてのイベントが終了した
+    ところで、この縦棒をＶＲＡＭから消去すると、そのタイミングから後の表示では縦棒
+    が見えなくなり、縦棒の見えていた長さがＣＰＵが稼動していた時間になります。
+  注意 : この関数は縦の解像度によりセットするキャラクタの行数が変化します。
+    低解像度(２２４または２４０ライン)の場合、上部の３２行分、高解像度(４４８または
+    ４８０ライン インタレース)の場合６４行分を書き換えます。
+
+void *slLocateNbg((Uint16)xps , (Uint16)yps , (Uint16)scrn)
+    機能 : ノーマルスクロール面の表示アドレスを返します。
+	   xps , yps は 画面上でのセル位置(通常０〜１２７)で指定します。
+	   scrn は scnNBG0,scnNBG1,scnNBG2,scnNBG3 のいずれかを指定します。
+
+void *slLocatePage((Uint16)xps , (Uint16)yps , (Uint16)page)
+    機能 : スクロール面の表示アドレスを返します。
+	   xps , yps は 画面上でのセル位置(通常０〜６３)で指定します。
+	   page は ＶＲＡＭの先頭から０ｘ２０００単位で数えたページナンバーを指定し
+	   ます。
+

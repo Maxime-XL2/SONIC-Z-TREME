@@ -1,0 +1,8 @@
+create  sega_mem.lib
+add	mem_call.obj
+add	mem_free.obj
+add	mem_init.obj
+add	mem_mall.obj
+add	mem_real.obj
+exit
+

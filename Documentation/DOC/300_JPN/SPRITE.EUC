@@ -1,0 +1,497 @@
+
+◎ スプライト、及びポリゴンに関する関数について
+
+Bool slWindow(Sint16 Left,Sint16 Top,Sint16 Right,Sint16 Bottom,Uint16 Zlimit,
+		Sint16 CentX,Sint16 CentY)
+
+  機能 : スプライト、及びポリゴンの表示を制限する範囲を設定します。
+	 表示範囲は TV 画面上での位置で、表示中に２回まで指定できます。
+	 Zlimit は これより先が表示されなくなります。
+	 CentX , CentY は ポリゴンでは消失点の位置、スプライトでは座標原点に
+	 なります。
+	 画面上での位置は左上が(０,０)、右下が(３１９,２２３) <通常画面サイズ>
+	 です。
+
+  注意 : slWindow() を 呼ぶ前に slPutPolygon() , slPutSprite() 等のスプライト
+	 をセットする関数を使用すると、それらには全画面サイズのウィンドウが使
+	 用され、改めて呼ばれた slWindow() で設定されるウィンドウが二つ目にな
+	 ります。
+	 通常は
+		slWindow(...) ;		/* Window 1 */
+		    ...
+		  slPutPolygon(...) ;
+		  slPutSprite(...) ;
+		    ...
+		slWindow(...) ;		/* Window 2 */
+		    ...
+		  slPutSprite(...) ;
+		  slPutPolygon(...) ;
+
+	 のように、処理のはじめにウィンドウをセットし、切替えたい所でもう一度
+	 別のウィンドウをセットするようにします。
+
+
+void slPerspective(ANGLE pers)
+  機能 : 透視変換をする時に使用する スクリーンまでの距離定数を設定します。
+	 回転スクロールの回転中心Ｚ位置も設定します。
+	 画角はスクリーンの横幅(ウィンドウのサイズではない)に視野が入る角度と
+	 して使用します。
+
+void slLight(VECTOR light)
+  機能 : 光源の方向を設定します。
+  注意 : 光源は平行光線で、方向のみを表しますが、ベクトルは単位ベクトルでなけ
+	 ればいけません。大きさが１を越えた場合、オーバーフローしますので、正
+	 しく表示できません(おかしなカラーで表示されます)。
+	 また、モデルを表示するときに slScale() を使用していると 法線も同様に
+	 スケーリングされてしまうため、オーバーフローしてしまう場合があります
+	 ので、スケーリングしないようにして下さい。
+
+Bool slZdspLevel(Uint16 level)
+  機能 : スクリーンよりも手前にあるポリゴン(あるいはスプライトデータ)をどこま
+	で表示するのかを切り替えます。
+	level は１、２、３のいずれかで、それ以外はエラーになります。
+	１: スクリーンまでの距離の１/２までを表示範囲にします(default)。
+	２: スクリーンまでの距離の１/４までを表示範囲にします。
+	３: スクリーンまでの距離の１/８までを表示範囲にします。
+	レベルを切り替えるとそれ以降に表示するポリゴン(あるいはスプライト)に
+	対して、slWindow で指定したZlimitの基準位置も同様に変化しますので、注
+	意して下さい。
+
+Bool slPutPolygon(PDATA *pat)
+  機能 : カレントマトリクスを使用して与えられたポリゴンモデルを回転・平行移動
+	 し、透視変換を行ない、ポリゴン及び、変形スプライトとして表示します。
+
+Bool slPutPolygonS(PDATA *pat)
+  機能 : カレントマトリクスを使用して与えられたポリゴンモデルを回転・平行移動
+	 し、透視変換を行ない、ポリゴン及び、変形スプライトとして表示します。
+  注意 : 上記の slPutPolygon() 関数では、スレーブＣＰＵの状況に応じて処理を
+	 分担し、マスターＣＰＵと並列実行しますが、本関数では、全てをスレーブ
+	 ＣＰＵが実行します。
+
+Bool slDispSprite(FIXED pos[XYZS] , ATTR *atrb , ANGLE Zrot)
+  機能 : ポジション、スケール、回転角を指定し、スプライトを表示します。
+	 slPutPolygon() と同様 Z値によりソーティングもします。
+	 スケールにマイナスの値を指定した場合、Ｚポジションによりスケールを算
+	 出し、スケールの補数を掛け、表示用のスケールとします。
+	 例えば、スケールに−２.０を指定した場合、０.５倍で表示されるような位
+	 置(Ｚポジション)にあれば、１.０倍になって表示されます。
+
+Bool slDispSpriteHV(FIXED pos[XYZSS] , ATTR *atrb , ANGLE Zrot)
+  機能 : 縦、横の表示スケールを指定して、変形スプライトを表示します。
+	 上記の slDispSprite() 関数と異なり、スケールにマイナスを指定した場合
+	 キャラクターは反転して表示されます。
+
+Bool slDispSpriteSZ(FIXED pos[XYZSS] , ATTR *atrb , ANGLE Zrot)
+  機能 : 縦、横の表示サイズを指定して、変形スプライトを表示します。
+	 サイズにマイナスが指定された場合には、反転して表示されます。
+
+Bool slDispSprite4P(FIXED pos[4][XY] , FIXED zpos , SPR_ATTR *atrb)
+  機能 : 画面上の４点を指定して、変形スプライトを表示します。
+	 ４点はウィンドウ中心に対するオフセット位置で指定し、全体を代表する
+	 Ｚ位置を別に指定します。
+	 ４点は左上、右上、右下、左下の順(時計回り)で指定します。
+
+Bool slPutSprite(FIXED pos[XYZS] , ATTR *atrb , ANGLE Zrot)
+  機能 : カレントマトリクスを使用してポジションを算出し、透視変換に合わせてス
+	 ケーリングされたスプライトを表示します。
+	 上記の slDispSprite() と同じように 指定されたスケール倍されますが、
+	 マイナスを指定した場合、符号反転してスケーリングされます。
+
+Bool slSetSprite(SPRITE parms[] , FIXED Zpos)
+  機能 : ハードウエアに渡すスプライトコントロールコマンドデータを転送リストに
+	 セットします。
+	 ライブラリ関数では作成できないような変形スプライトや、特定のスプライ
+	 トにのみ影響するウィンドウの設定をしたい場合などに使用します。
+
+Bool slDispPolygon(PDATA *pat , Uint16 mode)
+  機能 : カレントマトリクスを使用して与えられたポリゴンモデルを回転・平行移動
+	 し、正投影のまま、ポリゴン及び、変形スプライトを表示します。
+	 ただし、光源計算、クリッピング等のオプションは使用できません。
+	 mode は アトリビュートを総てのポリゴンが共有するかどうかのフラグで、
+	 ０の時、アトリビュートテーブルの先頭のデータで、各ポリゴンが表示され
+	 ます。それ以外の場合には指定されたアトリビュートデータで表示されます。
+
+Bool slPutObject(OBJECT *objptr)
+  機能 : 指定されたオブジェクト構造体で指定された平行移動、回転、スケーリング
+	 を行ない、ポリゴンモデルを表示します。本関数は以下の関数を実行したも
+	 のと同じ結果となります。
+
+    void slPutObject(OBJECT *objptr){
+	slTranslate(objptr->pos[X] , objptr->pos[Y] , objptr->pos[Z]) ;
+	slRotZ(objptr->ang[Z]) ;
+	slRotY(objptr->ang[Y]) ;
+	slRotX(objptr->ang[X]) ;
+	slScale(objptr->scl[X] , objptr->scl[Y] , objptr->scl[Z]) ;
+	if(objptr->pat != NULL){
+	    slPutPolygon(objptr->pat) ;
+	}
+    }
+
+  注意 : 本関数はカレントマトリクスを変更しますので、必要に応じてslPushMatrix()
+	 関数を実行してマトリクスの退避を行なって下さい。
+	 また、オブジェクトの親子関係についてはユーザー関数で対応して下さい。
+
+  親子構造にしたがった表示のサンプルプログラム
+
+	void PutAll(OBJECT* obptr){
+	    slPushMatrix() ;			/* 親のマトリクスを退避 */
+	    {
+		slPutObject(obptr) ;		/* オブジェクトの表示 */
+		if(obptr->child != NULL){
+		    PutAll(obptr->child) ;	/* 子がいれば表示 */
+		}
+	    }
+	    slPopMatrix() ;
+
+	    if(obptr->sibling != NULL){
+		PutAll(obptr->sibling) ;	/* 兄弟オブジェクトの表示 */
+	    }
+	}
+
+void slCurWindow(Uint8 win)
+  機能 : 表示するウィンドウを切り替えます。
+	 win には winFar (奥側) , winNear (手前側) のいずれかを指定します。
+	 本関数を実行すると、スクリーン位置、表示領域が設定されますが、
+	 光源ベクトルは変更されませんので、注意して下さい。
+
+Uint8 slSprWinNum()
+  機能 : 表示に使用されているウィンドウ番号を返します。
+
+void slFrameClipSize(Sint16 xsz , Sint16 ysz)
+  機能 : スプライト表示関数[ slDispSprite() , slPutSprite()] と、UseClip オ
+	 プションを指定したポリゴンを表示する範囲を設定します。
+	 ウィンドウサイズに対し、上下左右にそれぞれ指定された幅を加えた領域
+	 から外れた点に対し非表示とします。
+
+void slSetScreenDist(FIXED dist)
+  機能 : 透視変換をする時に使用する スクリーンまでの距離定数を設定します。
+	 回転スクロールの回転中心Ｚ位置も設定します。
+
+void slGetFrameData(void* dst , Uint16 xsz , Uint16 ysz)
+  機能 : フレームバッファの内容(１画面分)を読み出し、指定されたサイズに
+	 スケーリング(間引き)してセットします。
+	 ４ドット単位で処理しているので、Ｘサイズは４の倍数とします。
+	 バッファには低解像度の場合２バイト/ドット、高解像度の場合１バイト/
+	 ドットで、書き込みます。
+	 読み出したデータをスプライトとして表示したい場合には、
+    低解像度:
+	slSpriteColMode(SPR_PAL_RGB) ;	/* default */
+    とし、
+	SPR_ATTRIBUTE(PN_???,No_Palet,No_Gouraud,SPdis|ECdis|CL32KRGB,sprNoflip) ;
+    といったアトリビュートでスプライト表示関数を実行します。
+
+    高解像度の場合には
+	slSpriteColMode(SPR_PAL) ;
+
+	SPR_ATTRIBUTE(PN_???,No_Palet,No_Gouraud,SPdis|ECdis|CL256Bnk,sprNoflip) ;
+    のアトリビュートで表示させます。
+
+  注意 : この関数ではＶＤＰ１の描画終了を待ち、フレームバッファを飛ばし読み
+	 して、バッファにセットしています。フレームバッファの読み出しにはか
+	 なりのウェイトが入るため、３２ｘ２４(=７６８)ドットで５ｍｓｅｃ.程
+	 度の時間がかかるので、処理時間に注意して使用して下さい。
+	 読み込むバッファをワーク上にとり、ブランキングでＶＲＡＭに転送する
+	 方が、直接ＶＲＡＭに展開するよりはウェイトが少ないようです。
+
+
+◎ ポリゴンのデータについて
+
+  slPutPolygon() で使用するポリゴンデータは以下のフォーマットになっています。
+
+    .data.l	point_tbl	; 頂点座標のテーブル
+    .data.l	NbPoint		; 計算させる頂点の数
+    .data.l	polygon_tbl	; 各ポリゴンの法線ベクトルと頂点番号のテーブル
+    .data.l	NbPolygon	; 計算させるポリゴンの数
+    .data.l	attribute_tbl	; 各ポリゴンのアトリビュートのテーブル
+
+point_tbl:
+    .data.l	X,Y,Z		; 頂点番号０の座標データ
+    .data.l	X,Y,Z		; 頂点番号１の座標データ
+	...
+    .data.l	X,Y,Z		; 頂点番号 NbPoint - 1 の座標データ
+
+    Ｃ言語でテーブルを作成する場合、POINT型が宣言されており、POStoFIXED
+    マクロを使用することで、上記のデータテーブルを作成することができます。
+  例)
+	static POINT point_CUBE[] = {
+	    POStoFIXED(-80,-80,-80) ,
+	    POStoFIXED( 80,-80,-80) ,
+	    POStoFIXED( 80, 80,-80) ,
+	    POStoFIXED(-80, 80,-80) ,
+
+	    POStoFIXED( 80,-80, 80) ,
+	    POStoFIXED(-80,-80, 80) ,
+	    POStoFIXED(-80, 80, 80) ,
+	    POStoFIXED( 80, 80, 80)
+	} ;
+
+polygon_tbl:
+    .data.l	Nx,Ny,Nz	; ポリゴン番号０の法線ベクトル
+    .data.w	P0,P1,P2,P3	; ポリゴン番号０で使用する頂点の番号
+	(三角形のポリゴンの場合、P2 と P3 が同じ番号になる)
+	...
+    .data.l	Nx,Ny,Nz	; ポリゴン番号 NbPolygon - 1 の法線ベクトル
+    .data.w	P0,P1,P2,P3	; ポリゴン番号 NbPolygon - 1 で使用する頂点の
+				; 番号
+
+    Ｃ言語でテーブルを作成する場合、POLYGON型が宣言されており、POStoFIXED
+    マクロを使用することで、上記のデータテーブルを作成することができます。
+  例)
+	static POLYGON polygon_CUBE[] = {
+	    {POStoFIXED( 0 , 0 ,-1) , { 0 , 1 , 2 , 3}} ,
+		|__ |__
+	    {POStoFIXED( 1 , 0 , 0) , { 1 , 4 , 7 , 2}} ,
+	    {POStoFIXED(-1 , 0 , 0) , { 5 , 0 , 3 , 6}} ,
+	    {POStoFIXED( 0 ,-1 , 0) , { 4 , 1 , 0 , 5}} ,
+	    {POStoFIXED( 0 , 1 , 0) , { 2 , 7 , 6 , 3}} ,
+	    {POStoFIXED( 0 , 0 , 1) , { 4 , 5 , 6 , 7}} ,
+	} ;
+
+attribute_tbl:
+    .data.b	RevCheck	; 表裏判定により裏側になった面を表示するかどう
+				  かのフラグ
+			SinglePlane と DualPlane のいずれかを指定します。
+    .data.b	SortMode	; ソーティングの基準にする位置の算出方法とオプ
+				  ション機能の使用を宣言します。
+			SortCen , SortMin , SortMax , SortBfr の いずれか
+	SortCen : 指定された４点のＺ位置の平均をソーティングの基準に使用します
+	SortMin : ４点の内、最も小さいＺ位置を使用します
+	SortMax : ４点の内、最も大きいＺ位置を使用します
+	SortBfr : 直前に表示されたポリゴンのＺ位置を使用します
+		  直前のポリゴンの常に手前に表示されます
+			オプションはこれらに加えて指定します
+			UseTexture , UseLight , UseClip オプションは複数指定す
+			ることができます。
+	UseTexture : テクスチャ(変形スプライト)を使用する場合に指定します。
+	UseLight : 光源ベクトルと法線ベクトルとの内積によりポリゴンのカラーに
+		オフセットを掛け明暗を表現します。
+		UseTexture と 同時には使用できません。
+	UseClip : 大きなポリゴンを使用する場合、表示位置がオーバーフローして正
+		しく表示できないような時に使用します。
+
+    .data.w	TextNum		; テクスチャを使用する場合、キャラクタの登録番
+				  号として使用します。
+    .data.w	DispMode	; ポリゴンの表示モードを指定します。
+				  指定できる表示モードには以下のものがあります
+	MSBon : フレームバッファへの書き込みにおいて最上位ビットのみを１にします。
+		(スプライトへのシャドウは通常これを使用します)
+	HSSon : ハイスピードシュリンク有効
+	HSSoff: ハイスピードシュリンク無効(default)
+	WindowIn : 指定したウィンドウの内側に表示します。
+	WindowOut : ウィンドウの外側に表示します。
+	NoWindow : (default)ウィンドウに影響されずに表示します。
+
+	MESHon : メッシュで表示します。
+	MESHoff : (default)通常表示をします。
+
+	ECdis : テクスチャを使用する時、エンドコードを無効にします。
+	ECenb : (default)テクスチャを使用する時、エンドコードを有効にします。
+
+	SPdis : テクスチャを使用する時、スペースを無効(パレット０のカラーで
+		表示)にします。
+		ただし、フレームバッファへの書き込みデータが ００００になる
+		場合には、表示されませんので、プライオリティ等の値を調整して
+		００００にならないようにして下さい。
+	SPenb : (default)テクスチャを使用するとき、スペースを有効にします。
+
+	CL16Bnk : (default)テクスチャのカラーモードを１６色のカラーバンク方式
+		にします。
+	CL16Look : テクスチャのカラーモードを１６色のルックアップテーブル方式
+		にします。
+	CL64Bnk : テクスチャのカラーモードを６４色のカラーバンク方式にします。
+	CL128Bnk : テクスチャのカラーモードを１２８色のカラーバンク方式にしま
+		す。
+	CL256Bnk : テクスチャのカラーモードを２５６色のカラーバンク方式にしま
+		す。
+	CL32KRGB : テクスチャのカラーモードを３２０００色のＲＧＢ方式にします
+
+	CLrepl : (default)書き換えモードにします。
+	CLtrans : 半透明で表示します。
+	CLhalf : 半輝度で表示します。
+	CLshadow : シャドウ表示にします。
+	CLgouraud : グーローシェーディングを指定します。
+
+	表示モードは各グループのいずれかひとつずつを指定します。
+
+    .data.w	Color		; 表示カラーを指定します。
+	光源の影響を受ける場合、また、表示モードで CLrepl 以外を指定する場合に
+	はＲＧＢモードでなければなりません。
+	また、テクスチャを使用する場合で、CL32KRGBモードの場合には、ここでの指
+	定は無視されます。
+
+    .data.w	GouraudTable	; グーローシェーディングテーブルを指定します。
+	CLgouraud を指定した場合、グーローシェーディングテーブルのオフセット位
+	置を指示します。オフセット位置はＳｐｒｉｔｅＶＲＡＭ(０ｘ２５Ｃ００００
+	)を０とし、８バイトごとに１進む値で指定します。
+	例えば、０ｘ２５Ｃ１２０００にデータがある場合
+	(２５Ｃ１２０００−２５Ｃ０００００)／８ ＝ ２４００
+						(数値はすべて１６進数)
+
+    .data.w	Function	; スプライト表示ファンクションを指定します。
+	ポリゴン、テクスチャ、ポリラインのいずれとして表示するかを指定します。
+	指定には以下の６つからひとつを選びます。
+	sprNoflip  : テクスチャを表示します。
+	sprHflip   : テクスチャを横方向に反転して表示します。
+	sprVflip   : テクスチャを縦方向に反転して表示します。
+	sprHVflip  : テクスチャを縦、横双方に反転して表示します。
+	sprPolygon : ポリゴンとして表示します。
+	sprPolyLine: ポリライン(ポリゴンの輪郭のみ)を表示します。
+
+    Ｃ言語でテーブルを作成する場合、ATTR型が宣言されており、ATTRIBUTE
+    マクロを使用することで、上記のデータテーブルを作成することができます。
+  例)
+	static ATTR attr_CUBE[] = {
+	    ATTRIBUTE(Single_Plane,SORT_MIN,No_Texture,CD_MediumGreen  ,
+				No_Gouraud,Window_In,sprPolygon,UseLight) ,
+	    ATTRIBUTE(Single_Plane,SORT_MIN,No_Texture,CD_MediumBlue   ,
+				No_Gouraud,Window_In,sprPolygon,UseLight) ,
+	    ATTRIBUTE(Single_Plane,SORT_MIN,No_Texture,CD_MediumMagenta,
+				No_Gouraud,Window_In,sprPolygon,UseLight) ,
+	    ATTRIBUTE(Single_Plane,SORT_MIN,No_Texture,CD_MediumWhite  ,
+				No_Gouraud,Window_In,sprPolygon,UseLight) ,
+	    ATTRIBUTE(Single_Plane,SORT_MIN,No_Texture,CD_MediumYellow ,
+				No_Gouraud,Window_In,sprPolygon,UseLight) ,
+	    ATTRIBUTE(Single_Plane,SORT_MIN,No_Texture,CD_MediumRed    ,
+				No_Gouraud,Window_In,sprPolygon,UseLight)
+	} ;
+
+◎ スプライト表示関数用のアトリビュートについて
+
+  slPutSprite() 、slDispSprite() で使用するアトリビュートテーブルは、上記のポ
+  リゴン用のものとほぼ同じですが、先頭の２つのデータがなくなっています。
+    Ｃ言語でこのテーブルを作成する場合、SPR_ATTR型が宣言されており、
+  SPR_ATTRIBUTEマクロを使用することができます。
+  例)
+	SPR_ATTR attr_AM2Logo = {
+	    SPR_ATTRIBUTE(PN_AM2_Logo,CL_AM2_Logo,No_Gouraud,Window_In|ECdis,
+		sprNoflip|_ZmCB)
+	} ;
+
+	_ZmCB はポジションがスプライトのどの位置を指すかを指定するもので、
+	以下の９つが定義されています。
+
+	_ZmLT	_ZmCT	_ZmRT
+	   +-------+-------+
+	   |       |       |
+     _ZmLC +----_ZmCC------+ _ZmRC
+	   |       |       |
+	   +-------+-------+
+	_ZmLB	_ZmCB	_ZmRB
+
+◎ スプライト表示サンプル
+
+#define		CGtop			0x10000
+#define		TEXTBL(hs,vs,cga)	{hs , vs , (cga)>>3 , ((hs)&0x1f8)<<5|(vs)}
+#define		AdjCG(cga,hs,vs,col)	((cga + (((hs)*(vs)*4)>>(col)) + 0x1f) & 0x7ffe0)
+#define		PICTBL(txno,cmod,cga)	{txno , cmod , cga}
+#define		CL_Triangle		0x00
+
+    static const Uint16 triangle[] = {
+	0x0000,0x0001,0x1000,0x0000,	/* スプライトのキャラクタデータ */
+	0x0000,0x0012,0x2100,0x0000,
+	0x0000,0x0123,0x3210,0x0000,
+	0x0000,0x1234,0x4321,0x0000,
+	0x0001,0x2344,0x4432,0x1000,
+	0x0012,0x3333,0x3333,0x2100,
+	0x0122,0x2222,0x2222,0x2210,
+	0x1111,0x1111,0x1111,0x1111
+    } ;
+
+    enum patn{
+	PN_Triangle ,			/* スプライトパターンナンバー */
+
+	Max_Texture ,			/* 総パターン数 */
+	Max_Picture = Max_Texture	/* 総キャラクタ数 */
+    } ;
+
+    enum cga{				/* キャラクタアドレス */
+	CG_Triangle = CGtop ,
+	CG_Next = AdjCG(CG_Triangle,16,8,COL_16)
+    } ;
+
+    TEXTURE form_tbl[]={		/* パターンサイズデータ */
+        TEXTBL(16,8,CG_Triangle)
+    } ;
+
+    PICTURE pic_tbl[]={			/* キャラクタ定義テーブル */
+        PICTBL(PN_Triangle,COL_16,triangle)
+    } ;
+
+    static const Sint16 Triangle_Color[] = {	/* カラーデータ */
+                        RGB(0,0,31) , RGB(0,0,29) , RGB(0,0,27) ,
+          RGB(0,0,25) , RGB(0,0,23) , RGB(0,0,21) , RGB(0,0,19) ,
+          RGB(0,0,17) , RGB(0,0,15) , RGB(0,0,13) , RGB(0,0,11) ,
+          RGB(0,0,9)  , RGB(0,0,7)  , RGB(0,0,5)  , RGB(0,0,3)
+    } ;
+
+    typedef struct{			/* カラー定義用構造体 */
+	Sint16	    *src ;
+	void	    *dst ;
+	Sint16	     size ;
+    } COLMAP ;
+
+    static const COLMAP ctrns_list[] = {	/* カラー定義テーブル */
+        {Triangle_Color,(void*)(VDP2_COLRAM+(CL_Triangle+1)*2),sizeof(Triangle_Color)}
+    } ;
+
+    extern TEXTURE *FormTbl ;
+
+/*						*/
+/*  キャラクタデータ転送			*/
+/*						*/
+
+void SetTexture(PICTURE *pcptr , Uint32 NbPicture){
+    TEXTURE *txptr ;
+
+    for(; NbPicture-- > 0 ; pcptr++){
+        txptr = FormTbl + pcptr->texno ;
+        slDMACopy(pcptr->pcsrc , (void *)(SpriteVRAM + ((txptr->CGadr) << 3)) , (txptr->Hsize * txptr->Vsize * 4) >> (pcptr->cmode)) ;
+    }
+}
+
+/*						*/
+/*  カラーデータ転送				*/
+/*						*/
+
+void SetColor(){
+    COLMAP      *cmptr ;
+    Sint16       cnt ;
+
+    slTVOff() ;
+    cmptr= ctrns_list ;
+    for(cnt = sizeof(ctrns_list) / sizeof(COLMAP) ; cnt-- > 0 ; cmptr++){
+        slDMACopy(cmptr->src , cmptr->dst , cmptr->size) ;
+    }
+    slTVOn() ;
+}
+
+/*  サンプルキャラクタ表示位置 */
+    FIXED  tpos[] = {toFIXED(10.0) , toFIXED(20.0) , toFIXED(200.0) , toFIXED(4.0)} ;
+/*			|		|		|		 |__ 表示スケール			*/
+/*			Ｘ位置		Ｙ位置		Ｚ位置		 |__ (等倍 なら toFIXED(ORIGINAL) を指定のこと)	*/
+
+/*  サンプルキャラクタデータ */
+    SPR_ATTR tattr = SPR_ATTRIBUTE(PN_Triangle,CL_Triangle,No_Gouraud,CL16Bnk,sprNoflip|_ZmCC) ;
+/*					|	    |		|	|	  |	  |__ 回転中心位置 */
+/*					|	    |		|	|	  |__ キャラクタ反転はなし */
+/*					|	    |		|	|__ １６色カラーバンクモード	   */
+/*					|	    |		|___ グーローシェーディングは使用しない	   */
+/*				パターンナンバー  カラーバンクナンバー					   */
+
+main(){
+    ANGLE	ang = DEGtoANG(0.0) ;
+
+    *(Uint32 *)(0x06002500) = (Uint32)(0x060007f0) ;
+/*  クロックチェンジ中はサウンド用の６８Ｋがスイッチデータを読み、ここにセットされた
+    アドレスにデータを用意するらしいのだが、うまく動いていないようなので、とりあえず
+    押されていないデータ０ｘＦＦＦＦのあるアドレスを入れておく */
+
+    slInitSystem(TV_320x224 , form_tbl , 1) ;	/* システム初期化 */
+    SetTexture(pic_tbl , Max_Picture) ;		/* キャラクタデータのセット */
+    SetColor() ;				/* カラーデータのセット */
+    while(-1){
+	slDispSprite(tpos , &tattr , ang) ;	/* スプライトの登録 */
+	ang += DEGtoANG(3.0) ;
+	slSynch() ;				/* 画面表示への同期とのスプライト出力 */
+    }
+}

@@ -1,0 +1,306 @@
+============================================
+Nova - A Sega Saturn/Titan Video emulator
+Copyright (C) 2017-2018 Steve Kwok
+Twitter: https://twitter.com/realSteveKwok
+Discord: https://discord.gg/yAQBa5C
+Patreon: https://www.patreon.com/nova_emu
+============================================
+
+
+What's new
+===============
+
+
+v0.5
+---------------
+VDP1: Refactored the entire architecture.
+VDP1: Disabled force_interlace.
+VDP1: Implemented better timing.
+VDP1: Implemented handling of the MODR register.
+VDP1: Implemented handling for invalid command table data.
+VDP1: Implemented Color Calculation Mode 5.
+VDP1: Implemented a new algorithm for quadrilateral rasterization.
+VDP1: Implemented anti-aliasing for Distorted Sprite and Polygon.
+VDP1: Rewrote user/system clipping and pre-cliping.
+VDP1: Rewrote end code process.
+VDP1: Rewrote High Speed Shrink.
+VDP1: Rewrote handling of the LOPR/COPR registers.
+VDP1: Rewrote manual frame change/erase.
+VDP1: Added access restrictions to the registers TVMR/FBCR.
+VDP1: Fixed a bug of EWLR/EWRR registers(Street Fighter Zero 3).
+VDP2: Disabled VDP2_JIT.
+VDP2: Refactored the entire architecture.
+VDP2: Removed Character Pattern cache.
+VDP2: Supported 1M VRAM.
+VDP2: Implemented Special High-Resolution Graphics Mode(preliminary).
+VDP2: Implemented HCNT/VCNT/EXLTEN handling(incomplete).
+VDP2: Implemented RBG1 and EXBG.
+VDP2: Implemented rotation calculation with coefficient data.
+VDP2: Implemented Rotation Parameter Mode 2 of RBG0.
+VDP2: Implemented Invalid Rotation Parameter Mode 2(when coefficient table is disabled) of RBG0.
+VDP2: Implemented coefficient data as part of LNCL data.
+VDP2: Implemented Screen Over Process Mode 1 of RBG0/RBG1.
+VDP2: Implemented Gradation.
+VDP2: Implemented Sprite Window.
+VDP2: Implemented sprite color calculation condition 3(MSB).
+VDP2: Added support of sprite type 0~7 for 8-bit data.
+VDP2: Added support of sprite type 8~F for 16-bit data.
+VDP2: Added Character Pattern cache again.
+VDP2: Rewrote priority handling.
+VDP2: Rewrote handling of the SPCLMD and SPWINEN bits of the register SPCTL(Dragon Force 2).
+VDP2: Rewrote Cycle Pattern handling(incomplete).
+VDP2: Rewrote TVSTAT handling.
+VDP2: Rewrote Special Priority function.
+VDP2: Rewrote Extended Color Calculation.
+VDP2: Rewrote Sprite Screen Over Process.
+VDP2: Rewrote Window Process.
+VDP2: Rewrote Shadow Process.
+VDP2: Rewrote LNCL insertion.
+VDP2: Rewrote scrolling/zooming calculation of NBG0/NBG1/NBG2/NBG3.
+VDP2: Rewrote Line Scroll/Vertical Cell Scroll process of NBG0/NBG1.
+VDP2: Fixed a bug of byte access of the color RAM(wrong mask).
+VDP2: Fixed a bug that the WxLWE bit of LWTA0U and LWTA1U are masked.
+VDP2: Fixed a bug of special color calculation mode 3(palette data MSB).
+VDP2: Fixed a bug of RGB0 color calculation ratio.
+VDP2: Fixed a bug when the data is RGB format and color calculation is indicated by MSB.
+VDP2: Fixed a bug of palette number.
+VDP2: Fixed a bug of color RAM address offset.
+VDP2: Fixed bugs of Character Number Supplement Modes.
+VDP2: Fixed bugs of Normal Line Window coordinates.
+VDP2: Fixed a bug of sprite transparent dot.
+VDP2: Fixed a bug of Pattern Name Table Lead Address calculation.
+VDP2: Fixed bugs of display/color mode limits by settings of the Reduction Enable Register.
+VDP2: Fixed bugs of display limits by settings of NBG0/NBG1 color modes.
+VDP2: Fixed bugs caused by changes in mid-frame.
+VDP2: Fixed bugs of NBG2/NBG3 scroll values.
+VDP2: Fixed bugs of LNCL/BACK screen in single interface mode.
+VDP2: Fixed a bug of vertical Reduction.
+VDP2: Fixed a bug of Screen Over Process Mode 3 when bitmap vertical size is 256.
+VDP2: Fixed a bug of rotation parameter when the graphic mode is hi-res or exclusive hi-res.
+VDP2: Fixed a bug of rotation parameter when it is double/single interlace.
+VDP2: Fixed a bug of Special Color Calculation Mode 2(by dot) when color format is RGB.
+VDP2: Fixed a bug of priority pattern(BIOS splash screen).
+VDP2: Fixed a bug that BGON changes in mid-frame(Lunar Silver Star Story).
+VDP2: Fixed a bug of sprite transparent dot.
+VDP2: Fixed a bug of single interface.
+VDP2: Fixed a bug of line scrolling.
+VDP2: Fixed a bug when the priority number is 0.
+SCU: Rolled back the fix of PPAF handling in v0.4(Thunder Force V).
+SCU: Fixed a bug of DMA indirect mode table address detection(Tactics Ogre).
+SCU: Fixed a bug of DMA range checking(Burning Rangers).
+SCU: Fixed a bug of DMA timing(too slow to end transfer of palette data during VBLANK).
+CDB: Fixed bugs of CdReport when the pickup is in the Lead In/Out area.
+CDB: Supported MPEG audio decoding.
+MISC: Added ON/OFF switch for the VDP2 BACK layer.
+MISC: Fixed another wrong track mode bug of the MDS parser.
+
+
+v0.4
+---------------
+CDB: Rewrote the entire Filter/Buffer/Partition/File system.
+CDB: Rewrote most of the commands.
+CDB: Rewrote the HIRQREQ register and interrupts handling.
+CDB: Rewrote the DATATRNS register and data transferring.
+CDB: Rewrote the periodic response procedure.
+CDB: Rewrote CdReport.
+CDB: Rewrote subcode Q decoding.
+CDB: Implemented rarely used commands.
+CDB: Implemented better timing for commands.
+CDB: Implemented subcode R~W decoding.
+CDB: Implemented REJECT/WAIT/ERROR handlings.
+CDB: Implemented Copy/Move between selectors.
+CDB: Improved status transition.
+CDB: Improved logging.
+CDB: Added timing for seeking process.
+CDB: Fixed a bug of doing power-on when it is already power-on.
+SCU: Improved PPAF handling, setting value by an event.
+SCU: Fixed a bug of DMA accessing area detection.
+VDP1: Fixed a bug of initializing.
+SYSTEM: Improved threads synchronization.
+SYSTEM: Rewrote CD reading.
+SYSTEM: Rewrote the CD reading thread.
+SYSTEM: Added new log types Notice and Remarks.
+BIOS: Fixed a bug of the HIRQREQ register initial value.
+MISC: Rewrote the BIN/ISO parser.
+MISC: Fixed a bug(wrong track mode) of the MDS parser.
+
+
+v0.3
+---------------
+SH2: Removed interrupts timing.
+SCU: Rewrote DSP flags handling.
+SCU: Rewrote DSP commands and opcodes mapping.
+SCU: Rewrote the DSP RA register handling.
+SCU: Rewrote PPAF register handling.
+SCU: Rewrote DSTA register handling.
+SCU: Rewrote DMAC priority handling.
+SCU: Rewrote INTC.
+SCU: Added timing for interrupt sending of INTC.
+SCU: Added DSP register TN0.
+SCU: Added DSP disassembly function.
+SCU: Added restrictions to the DMA add values.
+SCU: Added checking of DSP delay commands conflicts.
+SCU: Added checking of PPAF register read access while DSP is executing.
+SYSTEM: Supported adding user data to an event.
+
+
+v0.2.2
+---------------
+VDP2: Fixed a bug of MSB transparent shadow(Game no Tatsujin).
+CONTROLLER: Implemented
+	Analog Joystick(No analog data for now)
+	Keyboard(Game Basic for Sega Saturn)
+	Shuttle Mouse(Game no Tatsujin)
+	Mega Drive 6-Button Pad(for testing)
+	Mega Drive 3-Button Pad(for testing)
+
+
+v0.2.1
+---------------
+SMPC: Fixed command SYSRES(Force Master SH2 to run Power-On vector).
+VDP1: Fixed manual change/erase frame buffer(ST-V VDP1/VDP2 HARDWARE TEST).
+SYSTEM: Implemented TITAN mode(Preliminary).
+SYSTEM: Rewrote the startup procedure.
+SYSTEM: Rewrote the cartridge subsystem.
+SYSTEM: Refactored the CD subsystem.
+GRAPHIC: Fixed screen flickering.
+GUI: Enabled menu item "Boot".
+MISC: Supported CD drive(Preliminary).
+MISC: Added "Software Reset"(Hold <Shift> when "Reset", equivalent to START+A+B+C).
+MISC: Added more options in nova.ini.
+MISC: Fixed a bug of the INI parser when there are square brackets within a property.
+MISC: Fixed a bug of dragging and dropping files directly to the executable.
+MISC: Some file names were changed,
+      "primary_01.bup" >>> "sat_primary_01.bup"
+      "memcard_01.bup" >>> "sat_memcard_01.bup"
+	  "battery.sav" >>> "sat_battery.sav"
+
+
+v0.2
+---------------
+SH2: Fixed crashing bugs of the disassembler.
+SH2: Added a hook routine for special usage.
+SCU: Fixed a bug of table address boundary checking of DMAC indirect mode.
+SMPC: Added magic numbers to the battery save file.
+VDP1: Fixed MSBON of polygon.
+CDB: Added log messages for commands MpDisp, MpSetWin, MpSetBcolor, MpSetFade, MpSetVeff.
+SYSTEM: Implemented Nova BIOS(Preliminary).
+SYSTEM: Supported ROM cartridge.
+MISC: Implemented comments handling for the INI parser.
+MISC: Added new options in nova.ini.
+MISC: Some file names were changed,
+      "backup.bin" >>> "primary_01.bup"
+      "memcard_00.bin" >>> "memcard_01.bup"
+	  "smpc.bin" >>> "battery.sav"
+
+
+v0.1.9
+---------------
+SH2: Added read byte access of TIER register of FRT(3D Lemmings (E)).
+SCU: Refactored INTC.
+SCU: Made DSP and DMAC as separated excutable devices.
+SCU: Supported irregular(Transfer address is not aligned or transfer count is an odd number) DMA transfers.
+SCU: Implemented better timing for DMA transfers.
+SCU: Implemented better synchronization mechanism for DMAC.
+SCU: Implemented caching of DMA triggers.
+SCU: Implemented priority for the three DMA levels.
+SCU: Implemented all status(Access, Interruption, Standby, Operation) of DMA transfers.
+SCU: Implemented Force-Stop of DMA transfers.
+SCU: Implemented handling for illegal DMA.
+SCU: Implemented handling for the Status of Stopped DMA registers.
+SCU: Added handling for DSTA register.
+SCU: Added "Cool-down" time for interrupted/Force-Stopped DMA transfers.
+SCU: Added restrictions for register access.
+VDP1: Added restrictions for register access.
+VDP2: Fixed the VBLANK bit of TVSTAT register.
+CDB: Refactored handling of DATATRNS register.
+CDB: Added byte access of DATATRNS register(Steam Hearts via SCU DMA).
+SYSTEM: Added checking for accessing device registers from slave SH2.
+MISC: Refined regular expressions of the CUE parser.
+MISC: Fixed regular expression bugs of the INI parser.
+
+
+v0.1.8
+---------------
+SH2: Added timing for interrupt handling(Kidou Senshi Z Gundam).
+SH2: Rewrote address mapping/mirroring stuff again.
+SH2: Added handling for Slot illegal instruction.
+SCSP: Added read byte of SCIPD(Virtua Cop/Virtua Cop 2).
+CDB: Implemented several MPEG part commands(preliminary), Lunar-Silver Star Story MPEG Ban is playable now(No MPEG video/audio playing).
+MISC: Added NO_GFX mode to increase the debugging speed.
+
+VDP1: Fixed a bug of the clipping system not initialized when reseting(opening movie of Kidou Senshi Z Gundam).
+VDP2: Fixed a bug of PAL mode(Rayman (Europe)).
+SMPC: Tweaked timing of INTBACK command(autofire issue of Rayman).
+INPUT: Fixed a bug of key num4 on the numberpad which acts as same as the right key(Thanks ut0).
+
+
+v0.1.7
+---------------
+VDP2: Added byte access of cycle pattern registers(Sengoku Blade).
+SCSP: Implemented a new algorithm for MIBUF and MOBUF of MIDI.
+SCSP: Implemented cancellation of MIDI input/output interrupts.
+MISC: Added command FLAGS for the CUE parser.
+
+SCSP: Refactored INTC.
+
+VDP2: Fixed VRESO bits of TVMD register when its value is 2 or 3.
+VDP2: Fixed a bug of sprite shadow(Suiko Enbu).
+CDB: Fixed the pickup reset of CdPlay command, Steam-Heart's plays BGM properly now.
+MISC: Fixed the wrong file offset of the CUE parser(single BIN).
+
+
+v0.1.6
+---------------
+SYSTEM: Completed PAL mode support.
+
+MISC: Added command REM for the CUE parser.
+MISC: Refined the INI parser.
+
+SCSP: Fixed the random crash caused by CA(call address is out of range).
+MISC: Fixed the crash when dragging and dropping files directly to the executable.
+MISC: Fixed the crash of homebrews without a Product ID.
+MISC: Fixed the crash caused by incorrect use of std::getline.
+
+
+v0.1.5
+---------------
+MISC: Added configuration file.
+MISC: Implemented I18N.
+MISC: Rewrote the CUE parser.
+MISC: Implemented startup from command line.
+MISC: Implemented dragging and dropping files.
+
+SH2: Improved address mapping and mirroring.
+GUI: Improved the user interface.
+
+VDP1: Fixed Jump Call/Return.
+M68K: Fixed TAS instruction, 3D Baseball is in-game (Not playable due to graphic issues).
+
+
+v0.1.3
+---------------
+SCU: Added byte access of registers, Burning Rangers is playable now.
+VDP2: Added MSB color calculation.
+SCSP: Added read access of sound stack.
+SYSTEM: Preliminary support for PAL mode, Tomb Raider (Europe) is playable now.
+
+VDP1: Fixed MSBON.
+VDP2: Fixed issues of MSB shadow, resolved the shadow disappearance of Asuka 120% Burning Fest.
+
+
+v0.1.2
+---------------
+Fixed a mirroring bug of SH2 division unit, many games are playable now, sprites disappearance of some games is resolved too.
+
+
+v0.1.1
+---------------
+Disabled thousands of warnings of illegal memory access of m68k, make Lunar Silver Star Story playable.
+Fixed 4 instructions of m68k, CMP, CMPA, CMPI, CMPM, CD player and many games play sound properly now.
+Fixed the issue of always formatting backup RAM when startup.
+
+
+v0.1.0 (17.10.2017)
+---------------
+Initial release.

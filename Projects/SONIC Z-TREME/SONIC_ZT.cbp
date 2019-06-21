@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Z-Treme_Engine" />
+		<Option makefile="makefile" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/Z-Treme_Engine" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="Common.h" />
+		<Unit filename="SRC/audio.h" />
+		<Unit filename="SRC/controls.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="SRC/controls.h" />
+		<Unit filename="SRC/explosion.h" />
+		<Unit filename="SRC/game.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="SRC/game.h" />
+		<Unit filename="SRC/physics.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="SRC/physics.h" />
+		<Unit filename="SRC/sprites_data.h" />
+		<Unit filename="ZTE/ANORM.h" />
+		<Unit filename="ZTE/ZTE_DEF.H" />
+		<Unit filename="ZTE/ZT_ANIMATION.H" />
+		<Unit filename="ZTE/ZT_ANIMATION.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ZTE/ZT_AUDIO.H" />
+		<Unit filename="ZTE/ZT_AUDIO.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ZTE/ZT_CD.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ZTE/ZT_CD.h" />
+		<Unit filename="ZTE/ZT_COLLISION.H" />
+		<Unit filename="ZTE/ZT_COLLISION.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ZTE/ZT_FRUSTUM.H" />
+		<Unit filename="ZTE/ZT_FRUSTUM.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ZTE/ZT_GAME.H" />
+		<Unit filename="ZTE/ZT_GAME.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ZTE/ZT_LOADING.H" />
+		<Unit filename="ZTE/ZT_LOADING.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ZTE/ZT_LOAD_MODEL.H" />
+		<Unit filename="ZTE/ZT_LOAD_MODEL.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ZTE/ZT_MENU.H" />
+		<Unit filename="ZTE/ZT_MENU.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ZTE/ZT_PLAYER.H" />
+		<Unit filename="ZTE/ZT_RENDERING.H" />
+		<Unit filename="ZTE/ZT_RENDERING.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ZTE/ZT_SPRITES.H" />
+		<Unit filename="ZTE/ZT_SPRITES.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ZTE/ZT_SYSTEM.H" />
+		<Unit filename="ZTE/ZT_SYSTEM.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ZTE/ZT_TOOLS.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ZTE/ZT_TOOLS.h" />
+		<Unit filename="ZTE/ZT_VDP2.H" />
+		<Unit filename="ZTE/ZT_VDP2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ZTE/ZT_VECTOR.H" />
+		<Unit filename="ZTE/ZT_VECTOR.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ZTE/workarea.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

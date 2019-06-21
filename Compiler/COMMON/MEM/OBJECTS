@@ -1,0 +1,12 @@
+#
+#■このファイルは makefile から include されます。
+#  TARGET にはライブラリのファイル名を指定してください。
+#  OBJS にはライブラリを作るための dependencies を指定してください。
+#
+TARGET=	$(LIBDIR)/sega_mem.a
+
+OBJS=	$(OBJDIR)/mem_call.o\
+		$(OBJDIR)/mem_free.o\
+		$(OBJDIR)/mem_init.o\
+		$(OBJDIR)/mem_mall.o\
+		$(OBJDIR)/mem_real.o

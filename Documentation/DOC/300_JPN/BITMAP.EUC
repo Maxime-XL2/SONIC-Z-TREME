@@ -1,0 +1,72 @@
+
+ビットマップグラフィックス関数について
+
+ビットマップはＶＤＰ２のスクロール面のひとつをグラフィック画面として使用する
+もので、このライブラリでは２５６色パレットモードのみサポートします。
+通常の初期化処理を行なった後、 slInitBitMap() 関数を実行することで初期化でき
+ます。
+
+Bool slInitBitMap((Uint16)scrn , (Uint16)size , (void*)adr)
+  機能 : ビットマップ画面を２５６色モードで設定します。
+	 スクリーンクリアは行ないません。
+	 scrn : bmNBG0 , bmNBG1 , bmRBG0 のいずれかを指定します。
+	 size : BM_512x256 , BM_512x512 , BM_1024x256 , BM_1024x512 のいずれ
+		かを指定します。
+	 adr :  ビットマップとして使用するＶＲＡＭの先頭アドレスを指定します。
+		これは ２００００Ｈバウンダリでなければなりません。
+	 本関数の中で slBitMapNbg0(Nbg1 , Rbg0) が実行されます。
+	 画面の中心位置が原点に設定されます。
+
+void slBitMapBase((Sint16)xbase , (Sint16)ybase)
+  機能 : ビットマップ画面の原点位置を設定します。
+	 スクリーンの左上を(０、０)として指定します。
+
+Sint8  *slLocateBitMap((Sint16)xps , (Sint16)yps)
+  機能 : 指定位置のＶＲＡＭ上でのアドレスを返します。
+	 画面外であった場合には ＮＵＬＬ を返します。
+
+void slClearBitMap((Sint8)color) ;
+  機能 : ビットマップ画面を指定されたカラーでクリアします。
+
+Bool slBMPset((Sint16)xps , (Sint16)yps , (Sint8)color)
+  機能 : 指定された位置に点を描画します。
+	 画面外であった場合には FALSE を返します。
+
+Sint8 slBMPoint((Sint16)xps , (Sint16)yps)
+  機能 : 指定された位置の点を読み出し、パレットコードを返します。
+	 画面外であった場合には０が返ります。
+
+void slBMCircle((Sint16)xps , (Sint16)yps , (Sint16)radius , (Sint8)color)
+  機能 : 指定された位置を中心とした円を描画します。
+
+Bool slBMLine((Sint16)xps0,(Sint16)yps0,(Sint16)xps1,(Sint16)yps1,(Sint8)color)
+  機能 : 指定された２点間を結ぶ直線を描画します。
+	 画面外であった場合 FALSE を返します。
+
+Bool slBMBox((Sint16)xps0,(Sint16)yps0,(Sint16)xps1,(Sint16)yps1,(Sint8)color)
+  機能 : 指定された点を２頂点とする長方形を描画します。
+	 画面外であった場合 FALSE を返します。
+
+Bool slBMBoxFill((Sint16)xps0,(Sint16)yps0,(Sint16)xps1,(Sint16)yps1,(Sint8)color)
+  機能 : 指定された点を２頂点とする長方形を描画します。
+	 長方形の内部も描画します。
+	 画面外であった場合 FALSE を返します。
+
+Bool slBMGet((Sint16)xps0,(Sint16)yps0,(Sint16)xps1,(Sint16)yps1,(Sint8*)ptr)
+  機能 : 指定された点を２頂点とする長方形内のビットマップデータをバッファにコピ
+	 ーします。長方形の一部が画面外であった場合、その部分のデータはコピーさ
+	 れません。
+	 長方形全体が画面外であった場合 FALSE を返します。
+
+Bool slBMPut((Sint16)xps0,(Sint16)yps0,(Sint16)xps1,(Sint16)yps1,(Sint8*)ptr)
+  機能 : 指定された点を２頂点とする長方形内にバッファのビットマップデータをコピ
+	 ーします。長方形の一部が画面外であった場合、その部分のデータはコピーさ
+	 れません。
+	 長方形全体が画面外であった場合 FALSE を返します。
+
+Bool slBMSprPut((Sint16)xps0,(Sint16)yps0,(Sint16)xps1,(Sint16)yps1,(Sint8*)ptr)
+  機能 : 指定された点を２頂点とする長方形内にバッファのビットマップデータをコピ
+	 ーします。ただし、スペース部分(パレットコード０)はコピーしません、
+	 長方形の一部が画面外であった場合、その部分のデータはコピーされません。
+	 長方形全体が画面外であった場合 FALSE を返します。
+

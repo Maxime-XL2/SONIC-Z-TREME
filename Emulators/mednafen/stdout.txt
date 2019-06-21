@@ -1,0 +1,14 @@
+Starting Mednafen 1.21.1
+ Build information:
+   Compiled with gcc 4.9.4
+   Running with MinGW-W64 Runtime 5.0 (alpha - rev. 0) 0000-00-00
+   Compiled against zlib 1.2.8, running with zlib 1.2.8(flags=0x00000065)
+   Compiled against libiconv 15.1, running with libiconv 15.1
+   Compiled against SDL 2.0.8(hg-11835:f622a4457a25), running with SDL 2.0.8(hg-11835:f622a4457a25)
+   Running with libsndfile-1.0.28
+ Base directory: C:\Users\Maxime\OneDrive\Documents\SATURN\DEV\Emulators\mednafen
+ Emulation modules: nes snes gb gba pce lynx md pcfx ngp psx ss ssfplay vb wswan sms gg snes_faust pce_fast demo cdplay
+ Opening lockfile...
+ Loading settings from "C:\Users\Maxime\OneDrive\Documents\SATURN\DEV\Emulators\mednafen\mednafen.cfg"...
+  Loaded 7396 valid settings and 0 unknown settings.
+No command-line arguments specified.

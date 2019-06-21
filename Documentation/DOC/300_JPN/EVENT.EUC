@@ -1,0 +1,217 @@
+
+◎ イベントコントロール関係の関数について
+
+void slInitEvent(void)
+   機能 : イベント、ワーク管理用のバッファを初期化する。イベントは６４個、
+	  ワークは２５６個が用意される。
+   注意 : イベント、ワーク用のＲＡＭ自体は初期化されないので、領域を取り出
+	  した時に、ユーザープログラムが初期化すること。
+
+EVENT *slGetEvent(void)
+   機能 : イベント用に割り付けられたＲＡＭ領域を取り出し、そのポインタを返
+	  す。
+   注意 : １２８バイトの領域で、ユーザーが自由に使用できる。
+	  ６４個分用意されているが、使い切っている場合には ＮＵＬＬ コード
+	  を返す。
+
+EVENT *slSetEvent(void (*func)())
+   機能 : イベントを取り出し、実行リストの末尾に追加する。この際、指定され
+	  た関数を実行関数として登録する。
+   注意 : １２８バイトの領域であるが、先頭の１６バイトはシステムにより使用
+	  される。
+	  イベントが残っていない場合には ＮＵＬＬ コードを返す。
+
+EVENT *slSetEventNext(EVENT *evptr , void (*func)())
+   機能 : イベントを取り出し、指定されたイベントの次に実行されるように、実
+	  行リストに追加する。この際、指定された関数を実行関数として登録す
+	  る。
+   注意 : １２８バイトの領域であるが、先頭の１６バイトはシステムにより使用
+	  される。
+	  イベントが残っていない場合には ＮＵＬＬ コードを返す。
+
+void slReturnEvent(EVENT *evptr)
+   機能 : 実行リストに登録されていないイベントをシステムに返す。
+   注意 : 実行リストに登録されているイベントに対して、この関数を実行すると
+	  リストに登録されたままになるため、実行は継続される。
+	  戻されたポインタはシステムのバッファに再登録されるが、この際に登
+	  録済みであってもチェックされないので、同じポインタを複数回返却す
+	  ると、この後実行される slGetEvent(),slSetEvent(),slSetEventNext()
+	  において不具合が発生する。
+
+void slCloseEvent(EVENT *evptr)
+   機能 : 実行リストに登録されたイベントをリストから切り離し、システムに返
+	  す。また、ワークがセットされている場合、これらも戻す。
+   注意 : 実行リストに登録されていないイベントを指定すると、リスト情報が正
+	  しくないため、不当なイベントに対して、リスト変更処理をすることに
+	  なり、予測できないアドレスに対する書き込みが発生し、最悪の場合、
+	  ＣＰＵが停止する場合がある。
+	  戻されたポインタはシステムのバッファに再登録されるが、この際に登
+	  録済みであってもチェックされないので、同じポインタを複数回返却す
+	  ると、この後実行される slGetEvent(),slSetEvent(),slSetEventNext()
+	  において不具合が発生する。
+
+void slExecuteEvent(void)
+   機能 : 実行リストに登録されたイベントを先頭から順に実行する。
+   注意 : メインループごとに実行する。
+
+WORK *slGetWork(void)
+   機能 : ワーク用に割り付けられたＲＡＭ領域を取り出し、そのポインタを返す。
+   注意 : ワークは６４バイトの領域で、先頭の４バイトをリスト用のポインタと
+	  して、システムで使用する。残りの６０バイトはユーザーが自由に使用
+	  できる。
+	  ＥＶＥＮＴ 構造体の ＷＯＲＫ に ポインタをセットしていればイベン
+	  トをクローズする場合に、システムに返却される。
+
+void slReturnWork(WORK *wkptr)
+   機能 : ワークとして使用していたＲＡＭ領域をシステムに戻す。
+   注意 : 戻されたポインタはシステムのバッファに再登録されるが、この際に登
+	  録済みであってもチェックされないので、同じポインタを複数回返却す
+	  ると、この後に実行される slGetWork() において不具合が発生する。
+
+
+◎ イベントの登録と実行について
+
+  slInitEvent() を実行した時には実行リストはクリアされますので、実行したい
+  イベントをリストに登録しなければなりません。
+  イベントの登録には slSetEvent() あるいは slSetEventNext() を使用します。
+
+    void *eventtbl[] = {
+	init_camera ,
+	init_player1 ,
+	init_player2 ,
+	init_enemyctrl
+    } ;
+
+    void InitGame(){
+	void  **evrdptr ;
+	EVENT  *evptr ;
+	int	cnt ;
+
+	slInitEvent() ;		/* イベント管理用変数の初期化 */
+	evrptr = eventtbl ;
+	for(cnt = sizeof(eventtbl) / sizeof(void *) ; cnt-- > 0 ;){
+	    evptr = slSetEvent(*evrptr++) ;
+	}
+	slInitPolygon(TV_320x224) ;
+    }
+
+    void Game(){
+	slExecuteEvent() ;	/* イベントの実行 */
+	slSynch() ;		/* ポリゴンデータの出力とビデオ表示同期 */
+    }
+
+  イベントは slExecuteEvent() 関数を呼び出すごとに実行されます。
+  各イベントは基本的に、登録された順に実行されます。
+  はじめに登録されたイベントは システムの EventTop 変数に定義され、これを
+  起点として、イベントのポインタを順次 EventNow 変数に定義しながら、各イベ
+  ントの処理関数を呼び出します。処理関数は以下の形式で定義しておきます。
+
+  void function(EVENT *evptr){
+	...		/* イベント処理 */
+  }
+
+  アセンブリ言語で書く場合には
+
+  _function:
+	...		; イベント処理
+			; イベントのポインタは r４レジスタにセットされている
+	rts
+	nop
+
+  ひとつのイベントが終わると、そのイベントの構造体にある next ポインタを
+  EventNow 変数に入れ、同様に処理関数に実行を移します。これらは next ポインタ
+  が ＮＵＬＬ となるまで繰り返されます。
+
+  EventTop: ----+
+	 	|
+	 	|    +------------------+
+	 	+--> | *work = NULL	|
+		     | *before = NULL	|
+		+--  | *next		|
+		|    | *exad()		|
+		|    |  user[]		|
+		|    +------------------+
+		|
+		|    +------------------+	+------------------+
+		+--> | *work		|  ---> | *next		   | -+
+		     | *before		|	|		   |  |
+		+--  | *next		|	|		   |  |
+		|    | *exad()		|	+------------------+  |
+		|    |  user[]		|   +-------------------------+
+		|    +------------------+   |
+		|			    |	+------------------+
+		|    +------------------+   +-> | *next = NULL     | 
+  EventLast: ---+--> | *work		|	|		   |
+		     | *before		|	|		   |
+		     | *next = NULL	|	+------------------+
+		     | *exad()		|
+		     |  user[]		|
+		     +------------------+
+
+  EventLast 変数には最後に実行されるイベントのポインタが定義されており、イベ
+  ントを追加する際に使用されます。
+  ユーザーがＲＡＭを使用するには、ユーザー用に構造体を定義し、イベントＲＡＭ
+  の user[] を その構造体に cast します。
+
+  例)
+    typedef struct rob{
+	FIXED  posX , posY , posZ ;
+	ANGLE  angX , angY , angZ ;
+	PDATA *pat ;
+    } ROBOT ;		/* この構造体は１１２バイトを越えない様にすること */
+
+    void rob_control(EVENT *evptr){
+	ROBOT *rbptr ;
+
+	rbptr = (ROBOT *)evptr->user ;
+	rbptr->posX = to_fixed(0) ;
+	rbptr->posY = to_fixed(0) ;
+	rbptr->posZ = to_fixed(0) ;
+	rbptr->pat = &PD_Robot ;
+    }
+
+  ワークはポインタのリストによりつなげて持つことができます。
+  ひとつのイベントで複数のキャラクタを動かす場合にはワークを使用して、ＲＡＭ
+  を確保します。
+
+    typedef struct road{
+	struct road *next ;
+	FIXED  posX , posY , posZ ;
+	PDATA *pat ;
+    } ROAD ;
+
+    typedef struct rdat{
+	Sint16 px , py , pz ;
+	Uint16 pn ;
+    } ROAD_DAT ;
+
+    ROAD_DAT roadtbl[] = {
+	{   0 ,   0 ,   0 , PN_ROAD} ,
+	{   0 ,   0 , 100 , PN_ROAD} ,
+	{   0 ,   0 , 200 , PN_ROAD}
+    } ;
+
+    void InitRoadControl(EVENT *evptr){
+	WORK  *wkptr ;
+	ROAD  *rdptr ;
+	ROAD_DAT *rdtptr ;
+	int    cnt ;
+
+	rdptr = (ROAD *)evptr ;
+	rdtptr = roadtbl ;
+	for(cnt = sizeof(roadtbl) / sizeof(ROAD_DAT) ; cnt-- > 0 ;){
+	    if((wkptr = slGetWork()) == NULL){
+		break ;
+	    }
+	    rdptr->next = (ROAD *)wkptr ;	/* ひとつめのポインタは */
+						/* イベントの work に入る */
+	    rdptr = (ROAD *)wkptr ;
+	    rdptr->posX = rdtptr->px << 16 ;	/* ポジション */
+	    rdptr->posY = rdtptr->py << 16 ;
+	    rdptr->posZ = rdtptr->pz << 16 ;
+	    rdptr->pat = pattbl[rdptr->pn] ;	/* パターンデータ */
+	    rdtptr++ ;
+	}
+	rdptr->next = NULL ;			/* End mark */
+	evptr->exad = (void *)RoadControl ;
+    }

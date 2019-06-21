@@ -1,0 +1,33 @@
+CC = gcc
+AS = gasm
+AR = ar
+
+GCC     = ../../gccsh
+
+LIBDIR  = .
+INCDIR  = ../include
+OBJDIR  = .
+SRCDIR  = .
+CFLAGS  = -g -Wall -m2 -D_SH -DMODEL_S -I$(GCC)/include -I$(INCDIR)
+ASFLAGS =
+ARFLAGS = rv
+
+include	$(SRCDIR)/objects
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(AR) $(ARFLAGS) $(_ARFLAGS) $@ $?
+
+.SUFFIXES:
+.SUFFIXES: .a .o .src .c
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	$(CC) -c $(CFLAGS) $(_CFLAGS) -o $@ $<
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.src
+	$(AS) $< $(ASFLAGS) $(_ASFLAGS) -o $@
+
+clean:
+	del *.o
+

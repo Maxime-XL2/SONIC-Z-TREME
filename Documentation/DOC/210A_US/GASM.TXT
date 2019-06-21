@@ -1,0 +1,78 @@
+****** gasm.txt
+
+*	SGL assembler source
+
+The assembler program provided for the Sega Saturn that includes the SGL is designed to be able to 
+assemble everything with the SH program.  This allows for unified control of the source files.  When 
+assembling with the GNU assembler, AWK (a pattern description language) is used to convert the files so 
+that they can be used by the GNU assembler.
+
+The conversion tool name is GASM, and the tool is created in the C shell script under UNIX and in a batch 
+file under a DOS environment.  GASM converts programs for use with the SH assembler into a form that 
+can be assembled by the GNU assembler, and then creates an object file.
+
+GASM performs the following tasks:
+
+(1) Comment deletion (COMMENT.AWK)
+
+
+Uses AWK to delete comments that begin with ";".
+
+(2) Keyword conversion (KEYWORD.AWK)
+
+Uses AWK to convert instructions and register names described in upper-case letters to lower-case 
+letters.
+
+(3) Section format change (SECTION.AWK)
+
+Uses AWK to change the method of description for sections.
+
+(4) GNU GASP (GNU Assembler Preprocessor) execution
+
+Uses GASP to change files into a format that can permits assembly with the AS (GNU Assembler).
+
+(5) Deletion of codes before and after EQU and ASSIGN
+
+Uses AWK to deleted spaces and tabs before and after EQU and ASSIGN.
+
+(6) Re-execution of GNU GASP (GNU Assembler Preprocessor)
+
+(7) Literal pool allocation (POOL.AWK)
+
+Uses AWK to convert for assembly with the AS (GNU Assembler)
+
+(8) GNU AS (GNU Assembler) execution
+
+Creates an object file.
+
+*	AWK for PCs
+
+While AWK (a pattern description language) is a standard tool in UNIX, it is not used very much under 
+DOS.
+
+In this version, we are providing two types of freeware AWK in the SGL/AWK directory, GAWK.EXE and 
+GAWK_EMX.EXE.  The reason we are providing two types of AWK is that, depending on the 
+environment, an AWK tool may generate operating environment errors.  In our own environments, we 
+have observed the following results:
+
+*	MS-DOS environment: GAWK_EMX.EXE runs.
+*	MS-DOS prompt under Windows 3.1: GAWK_EMX.EXE runs.
+*	MS-DOS prompt under Windows 95: GAWK.EXE runs.
+
+Therefore, we have provided GASM.BAT, which uses GAWK.EXE, and GASM_EMX.BAT, which uses 
+GAWK_EMX.EXE, for the GASM batch files that convert the assembler source file, giving users the 
+opportunity to choose one or the other according to the environment that they are using.
+
+In the sample program, there are two "make" files ("makefile" and "makefile.emx") in SYS (a sample that 
+creates IPs) within the SAMPLE directory.
+
+*	When executing the PC version of GASM
+
+Set the directory containing the AWK tool and the script file in the environment variable AWKENV.  In 
+AWKENV.BAT in the SGL/AWK directory, "C:´SATURN´SGL´AWK" is set in the environment variable 
+AWKENV.
+
+******
+
+
+

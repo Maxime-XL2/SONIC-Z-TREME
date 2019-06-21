@@ -1,0 +1,1236 @@
+******************************************************************************
+SGL FAQ
+******************************************************************************
+
+1. SGL Techniques
+ 1-1 What to Check When a Scroll Screen Does Not Display Properly
+ 1-2 Changing Texture Tables
+ 1-3 Changing the Draw Processing Unit Specification
+ 1-4 Enabling Pause (Temporary Stop)
+ 1-5 Creating Resident/Non-Resident Programs
+
+2. SGL Function Application Notes
+ 2-1 Sprite Display Function Attribute Tables
+ 2-2 Cautions When Using the slLookAt Function
+ 2-3 Cautions When Using the slDispSprite Function
+ 2-4 Cautions When Using the slPutSprite Function
+ 2-5 Cautions When Using the slSlaveFunc Function
+ 2-6 Using the sl16MapRA Function
+ 2-7 SGL CD Library
+ 2-8 Cautions When Using the slScrAutoDisp Function
+
+*********************** Changes *******************************
+ 2-9 Notes on Using the slLight Function
+ 2-10 The "slPutPolygon" Function and the "slPutPolgonS" Function
+ 2-11 The "slCurWindow" Function
+********************** End of Changes ***************************
+
+3. SGL Internal Processing
+ 3-1 Interrupts Used by SGL
+ 3-2 Hardware Devices Used by SGL
+ 3-3 SGL 3D Transformations
+ 3-4 SGL Polygon Display Routine Processing Method
+
+ ******************** Changes ********************:
+ 3-5  Light Source Data Tables
+ 3-6  SGL Z-sort Processing and the Z-data Buffer
+ 3-7  Passing Data between the Master CPU and the Slave CPU
+ 3-8  Sound Control
+*********************** End of Changes ******************
+
+4. SGL Troubleshooting
+ 4-1 Dealing with Sprite/Polygon Afterimages
+
+
+1. SGL Techniques
+
+1-1 What to Check When a Scroll Screen Does Not Display Properly
+
+SGL maintains the preserved contents of the VDP2 registers within its system
+variables at 60FFCC0.  Most of the contents are copied to the VDP2 registers
+during V-blank processing.
+
+Since the VDP2 registers are write-only, it is not possible to access the
+values set by the user.  As a result, it is difficult to debug the cause of
+display problems.  However, it is possible to determine the settings made to
+the VDP2's registers by referring to SGL's system variable area.
+
+Use this memory area to debug your scroll display problems.
+
+1-2 Changing Texture Tables
+
+Do the following if you wish to modify the texture table set by slinitSystem
+function within your program.
+
+  extern TEXTURE *FormTbl;  /* Inside system variables (System Work) */
+  extern TEXTURE *textbl2;  /* Texture table to be changed  */
+            :
+    FormTbl = textbl2;        /* Set array */
+
+
+1-3 Changing the Draw Processing Unit Specification
+
+If you wish to change the draw processing unit specification set by
+slinitSystem function within your application, do the following:
+
+  extern Sint8 SynchConst;  /* System variables (System Work) */
+
+    SynchConst = Value to change;
+
+*** CAUTION ***
+
+From version 1.3,  support for VDP1's draw end wait frame change function was
+implemented (see init.doc).  It is now necessary to execute the function call
+shown below prior to changing variables when switching from/to a fixed period frame
+change setup.
+
+<Changing the Frame Change Setting from Fixed Period to VDP1 Draw End Wait>
+
+   extern Sint8 SynchConst;  /* System variable (System Work) */
+
+    slInitSystem( .. , .. , 2 );
+             :
+   slDynamicFrame(ON);
+     SynchConst = 2;
+
+<Changing the Frame Change Setting from VDP1 Draw End Wait to Fixed Period>
+
+   extern Sint8 SynchConst;  /* System variable (System Work) */
+
+    slInitSystem( .. , .. , -2 );
+             :
+   slDynamicFrame(OFF);
+     SynchConst = 2;
+
+1-4  Enabling Pause (Temporary Stop)
+
+It is now possible to temporarily halt the transfer of scroll and sprite data
+by setting the PauseFlag variable.
+
+  The meanings of each flag bit is described below:
+    _SysPause : This bit has no effect on SGL itself.  This is a status bit for
+                the user to determine whether the system is paused.
+    _ScrPause : Pause scroll data transfer.
+    _SprPause : Pause sprite (polygon) data transfer.
+
+It is possible to control pause states (temporary halt) within your
+application by using this variable.
+
+   extern Sint8 PauseFlag;
+
+    if(PadPush & PER_DGT_TS) {
+        PauseFlag ^= _SysPause | _SprPause;
+    }
+    if(PauseFlag == 0) {    /* When an event is used */
+        slExecuteEvent();
+    }
+
+1-5 Creating Resident/Non-Resident Programs
+
+When the amount of data becomes too large and cannot be stored completely
+within Saturn's memory, it is possible to preload only the portion of data that
+is used.  In the case of code, it is possible to use overlays.
+
+However, since an overlay feature is not provided on the Saturn, it is
+necessary to structure your application for this purpose as well as to use
+linker functions.
+
+Use the following example as a starting point:
+
+1. Creating Resident Programs
+
+A resident program contains minimal file I/O functions as well as shared-use
+libraries.  There are two ways of executing a non-resident program (module)
+that is loaded in from the CD-ROM to a specified address.
+
+a. Call Program from a Specified Address
+
+After the non-resident module is loaded, it is executed from a preset address.
+
+Coding Example:
+
+      fid = GFS_NameToId((Sint8 *)fname); /* fname is the non-resident module */
+      GFS_Load(fid, 0, 0x6080000, GFS_BUFSIZ_INF);
+
+   /* The starting address is read from the non-resident module's map file. */
+    ((volatile void (*)())(0x6081000))();
+
+  <Declaration of the program at link-time>
+
+      GCC -m2 -Xlinker -Tkernal.cof -Xlinker -e -Xlinker ___Start ....
+
+In this example, it will be necessary to recompile this program if the address
+of the non-resident module's execution start function changes.
+
+b. Define a function with an external declaration and set an address at link-
+time for the function with the -defsym option.  The function is executed after
+the non-resident module is read into memory.
+
+Coding Example:
+
+        extern void SUB_main1( void );
+        #define SUB_ADDR    0x06080000
+
+        void main( void )
+        {
+              :
+        /* Example of loading a non-resident module */
+            buf[0].type = CDBUF_COPY;
+            buf[0].trans.copy.addr = (Uint32)SUB_ADDR;
+                  :
+            slCdLoadFile();
+        /* Executing the non-resident module */
+            SUB_main1();
+              :
+        }
+   <Declaration of the program at link-time.>
+          GCC -m2 -Xlinker -defsym -Xlinker _SUB_main1=0x06081000 *
+            -Xlinker -Tkernal.cof -Xlinker -e -Xlinker ___Start ....
+
+Since the address of the non-resident module's execution start function is
+undefined, set a dummy address first and then set the real address later from
+the completed non-resident program's map.  It is necessary to link the program
+after resetting the address.
+
+
+2. Creating Non-Resident Programs (Modules)
+
+A non-resident module is a program that is not used constantly within the
+application.  For example, the program can be only used on a per-game stage
+basis.  Although multiple non-resident modules may exist, the following
+precautions must be taken when they are coded:
+
+a. Caution During Programming
+
+Name the object files so that they are not created with the same function name
+contained in the resident program (e.g. the main function may conflict).
+
+b. Caution When Loading the Non-Resident Module
+
+Set the start address of the non-resident module to the same address as the
+load address of the resident program.
+
+c. Passing the Resident Program's Map Data
+
+When creating the non-resident module, use the linker's -R option to specify
+the resident program's execution file (Kernal.COF in our example)
+
+     GCC -m2 -Xlinker -R -Xlinker kernal.cof.....
+
+With this setting, the resident program's symbols are extracted and included
+in the non-resident program.  If the same functions exist when libraries that
+are being used are linked in the same manner as the resident program, the
+information contained in the COFF file specified by the -R option overrides
+others.
+
+3. Resetting the Non-Resident Program's Execution Start Address Called by the
+Resident Program.
+
+After creating the non-resident program, check the function address called by
+the resident program from the map file.  Use that address to reset the
+execution start function address with the -defsym option at link-time.  This
+does not need to be done if the address is already the same as the resident
+program.
+
+2. SGL Function Application Notes
+
+2-1 Sprite Display Function Attribute Tables
+
+Although the attribute tables used by the slPutSprite and slDispSprite
+functions are basically the same for polygons, note that the two data items at
+the start of the table are not present.
+
+When this table is created in C, SPR_ATTR is declared and the SPR_ATTRIBUTE
+macro is used.
+
+Example:
+
+      SPR_ATTR attr_AM2Logo = {
+	      SPR_ATTRIBUTE(PN_AM2_Logo,CL_AM2_Logo,No_Gouraud,
+	      Window_In|ECdis,sprNoflip|_ZmCB)
+	  };
+
+  _ZmCB specifies the location of the sprite.  Nine positions are defined as
+shown here:
+
+        _ZmLT    _ZmCT    _ZmRT
+           +-------+-------+
+           |       |       |
+     _ZmLC +----_ZmCC------+ _ZmRC
+           |       |       |
+           +-------+-------+
+        _ZmLB    _ZmCB    _ZmRB
+
+2-2 Cautions When Using the slLookAt Function
+
+It is not possible to create a perspective that is parallel to the Y-axis with
+the slLookAt  function.  (When creating a perspective that looks directly
+above or down, offset the display either in the X or Z direction.)
+
+When setting up the camera, use either the slLookAt function or a combination
+of the slTranslate and slRot? functions.
+
+For example, do the following when you wish to create a view that looks out
+from the player's airplane:
+
+	slRotX(-plptr->ang[X]) ;
+	slRotY(-plptr->ang[Y]) ;
+	slRotZ(-plptr->ang[Z]) ;
+	slTranslate(-plptr->pos[X] , -plptr->pos[Y] , -plptr->pos[Z]) ;
+
+Moreover, do the following when chasing a car with a fixed camera:
+
+	slLookAt(cmptr->pos , tgptr->pos , toFIXED(0.0)) ;
+
+2-3 Cautions When Using the slDispSprite Function
+
+When 1.00 is specified for the scale parameter in the slDispSprite function,
+the resulting display will be 1 pixel larger than the original artwork.  This
+problem is caused by hardware.  If you wish to avoid this problem, specify
+0.99999 for the scale parameter.  This value is defined in the macro ORIGINAL
+contained in SL_DEF.H.
+
+2-4 Cautions When Using the slPutSprite Function
+
+An overflow error occurs when a large value is specified for the position
+parameter in the  slPutSprite function.  When this occurs, there are
+situations when the sprites outside the screens are displayed.
+
+Use the slTranslate function in conjunction with the slPutSprite function so
+that the position parameter that is passed on to slPutSprite is not excessive.
+
+2-5 Cautions When Using the slSlaveFunc Function
+
+Make sure that the functions executed by the slSlaveFunc do not overwrite the
+master CPU's variables.  If the variables need to be rewritten, purge the
+cache on the master CPU side.  In addition, do not execute functions that
+issue functions to the slave CPU (such as those related to sprite control).
+
+2-6 Using the sl16MapRA Function
+
+Although this is mentioned in scroll.doc, there have been many reports that
+the sl16MapRA function does not work properly.  This is attributed to a
+conflict between a page number's table that is passed to the function and the
+actual VRAM contents.
+
+The page numbers contained in the tables for the sl16MapRA and sl16MapRB
+functions are sequential numbers counted from the start of VRAM based on a
+multiple of 0x800 of the table's 0th entry.  The resulting values are set as
+addresses.
+
+For example if the following pattern names exist in bank B0 of VRAM,
+
+    #define    RBG0_CEL_ADR    (VDP2_VRAM_A0)
+    #define    RBG0_MAP_ADR    (VDP2_VRAM_B0)
+    #define    RBG0_COL_ADR    (VDP2_COLRAM)
+    #define    RBG0_KTB_ADR    (VDP2_VRAM_A1)
+    #define    RBG0_PRA_ADR    (VDP2_VRAM_A1+ 0x1fe00)
+
+values such as 128, 132, 136, and so on must be set in the table.   (Many seem
+to set 0, 4, 8, etc. instead.)
+
+    #define  MAPOFFSET  (RBG0_MAP_ADR-VDP_VRAM_A0)/0x800
+    #define    DD    4+MAPOFFSET
+    Uint8    map[16] = {
+         0*DD, 1*DD, 2*DD, 3*DD,
+         4*DD, 5*DD, 6*DD, 7*DD,
+         8*DD, 9*DD,10*DD,11*DD,
+        12*DD,13*DD,14*DD,15*DD,
+    };
+    #undef    DD
+    sl16MapRA(map);
+
+The example above will enable you to set up the function correctly.
+
+2-7 SGL CD Library
+
+Although the SGL uses the slCdxxxx function family to perform CD-ROM access,
+the functions cannot be used in a sophisticated manner.  When using Cinepak,
+MPEG or TrueMotion libraries, use the File (GFS_xxxx) or Stream (STM_xxxx)
+System Libraries.
+These libraries are built into "LIBCD.A", which is provided by the SGL.************** Changes **************
+2-8 Cautions When Using the slScrAutoDisp Function
+
+Although slScrAutoDisp is a useful function that can be used to set the scroll
+screen for display as well as to automatically create cycle pattern tables, it
+is not a function that can be used for all applications.  When debugging your
+application, make sure to always check the cycle pattern table data that is
+output by this function and to correct the contents as necessary.  The cycle
+pattern table set by the slScrAutoDisp function is stored in SGL's system
+variable area (060FFC00) from 0x0D0 to 0x0x0DF.
+
+****************************: Changes ********************************
+
+2-9  Notes on Using the slLight Function
+
+The SGL tutorial manual states that there may be instances where light source
+calculations are not performed correctly if the scaling operation is applied to
+the current matrix when the "slLight" function is specified (in the section on
+ "slLight" in the SGL Reference Manual).
+
+In the SGL's internal light source calculations, illumination calculations are
+ made on the basis of the light source vectors and the normal line vectors of
+each polygon.
+ Increasing the scale value has the effect of enlarging the normal line vector of
+each polygon.
+As a result, there are cases where there is no difference in illumination among
+polygons, and where
+the polygons suddenly darken upon entering a shaded area.
+
+In response to this problem, it is now possible, if the scaling operation
+was performed, to perform the scaling operation on the light source direction vector.
+
+For example, in order to obtain the same results as when the scaling value is "1",
+assuming:
+
+Original normal line vector: n:(nx, ny, nz)
+
+
+Scaling value:    m:( mx, my, mz )
+Light source vector:     l:( lx, ly, lz )
+
+then the inner product of the normal line vectors and the light source direction vectors
+ when scaling is not applied is as follows:
+
+    I1 = nx * lx + ny * ly + nz * lz
+
+and the inner product when scaling is applied is as follows:
+    n:( mx * nx, my * ny, mz * nz )
+
+If nothing is done with the light source vector:
+    I2  = mx * nx * lx + my * ny * ly + mz * nz * lz
+       != I1
+
+"l1" is different from the inner product value.
+In order to implement the response, each vector component is divided by the scaling
+value.
+
+
+l:( lx / mx, ly / my, lz / mz  )
+The inner product is thus:
+
+      I3 = mx * nx * lx / mx + my * ny * ly / my + mz * nz * lz / mz
+         = nx * lx + ny * ly + nz * lz
+         = I1
+
+"l1" is the same as the inner product value.
+
+Incorporated into a program, the result would be similar to the program shown below:
+
+
+<Example>
+
+extern FIXED MsLightVector[ XYZ ]; /* SGL light source information (system
+variables)
+
+typedef struct {
+        FIXED pos[XYZ];
+        ANGLE ang[XYZ];
+        FIXED sca[XYZ];
+        MATRIX base;
+    } CAMERA;
+    static CAMERA cam;
+
+    void main( void )
+    {
+        FIXED UnitLight[ XYZ ];
+        FIXED CurrentLight[ XYZ ];
+
+        slInitSystem(TV_320x224, NULL, 1);
+        slPrint("Sample slLight Function", slLocate(6,2));
+/* Camera position initialization */
+
+cam.pos[X] = cam.pos[Y] = toFIXED(0);
+        cam.pos[Z] = toFIXED(220.0);
+        cam.ang[X] = cam.ang[Y] = cam.ang[Z] = DEGtoANG(0);
+        cam.sca[X] = cam.sca[Y] = cam.sca[Z] = toFIXED(1);
+        slUnitMatrix( cam.base );
+
+/* Light source settings (do not overwrite the light source data directly, as doing so will
+allow error to creep into the calculations */
+
+UnitLight[ X ] = MsLightVector[ X ];
+        UnitLight[ Y ] = MsLightVector[ Y ];
+        UnitLight[ Z ] = toFIXED( 1.0 );
+        while(-1) {
+
+/* Function that gets pad information */
+
+get_pad();
+/* True when there has been a change in the pad information */
+
+if ( check_pad_change( &cam ) ){
+                slPushMatrix();
+                {
+                    slLoadMatrix(cam.base);
+                    slTransposeMatrix();
+
+slRotX(cam.ang[X]);
+                    slRotY(cam.ang[Y]);
+                    slRotZ(cam.ang[Z]);
+                    slTransposeMatrix();
+                    slGetMatrix(cam.base);
+                }
+                slPopMatrix();
+            }
+
+            slPushMatrix();
+            {
+                slTranslate(cam.pos[X], cam.pos[Y], cam.pos[Z]);
+                slMultiMatrix(cam.base);
+
+/* Scale processing */
+
+slScale(cam.sca[X], cam.sca[Y], cam.sca[Z]);
+/* Reflected scale processing in the light source vector.*/
+                CurrentLight[ X ] = slDivFX( cam.sca[ X ], UnitLight[ X ] );
+                CurrentLight[ Y ] = slDivFX( cam.sca[ Y ], UnitLight[ Y ] );
+                CurrentLight[ Z ] = slDivFX( cam.sca[ Z ], UnitLight[ Z ] );
+                slLight( CurrentLight );
+                slPutPolygon(pdata);
+            }
+            slPopMatrix();
+            slSynch();
+        }
+    }
+
+
+* MsLightVector is a system variable that indicates the current light vector.
+("MsLight" in the SGL Reference Manual has been changed; the new, correct system
+variable name is "MsLightVector".)
+
+
+2-10	slPutPolygon function and slPutPolygonS function
+
+Note the following differences in operation between the slPutPolygon function
+and the slPutPolygonS function.
+
+(1) Operation of the slPutPolygon function
+
+With the slPutPolygon function, the master CPU checks functions awaiting execution
+on the slave CPU and performs one of the following three types of processing:
+
+(a)	When there are no functions awaiting execution:
+
+Because all display operations are entrusted to the slave CPU, the following data
+ is loaded into the buffer and a request is issued to the slave CPU:
+
+*	Number of registered vertices
+*	Vertex data table address
+*	Number of register polygons
+*	Polygon data table address
+*	Attribute data table address
+*	Operation matrix
+
+(b)	When there is one function awaiting execution:
+
+The difference between the slave CPU's function read pointer and the master CPU's
+write pointer is checked, and if the difference is one unit of data, the master CPU
+ performs vertex data rotation, parallel movement, and perspective conversion.
+ After these operations are completed, the following data is loaded into the buffer
+and a request is issued to the slave CPU:
+
+*	Number of registered vertices
+*	Vertex data table address
+*	Number of register polygons
+*	Polygon data table address
+
+
+*	Attribute data table address
+*	Rotation portion of operation matrix (3 x 3)
+
+(c)	When there are two or more functions awaiting execution
+
+The master CPU performs all tasks related to polygon data creation.
+Because the data that is created is stored in the Z buffer, a request is issued to the slave
+CPU.
+
+*	Polygon (sprite) data table address
+*	Number of registered polygons
+*	Number of registered vertices
+
+The buffers used for polygon operations is shared by the master CPU and slave CPU ]
+in a way that prevents conflicts when writing.
+
+The buffers that are shared are the buffer that is used to store vertex data operation
+results and buffer for the final polygon data that is created.
+
+*	Vertex data operation buffer
+
+Because the size of the buffer that is used is determined by the number of vertices,
+both the master CPU and the slave CPU move their own pointers according to how
+much of
+the buffer they are using, including how much the other CPU is using, thus avoiding
+accidental overwrite problems.
+
+*	Polygon data buffer
+
+Because the amount of polygon data varies according to the number of polygons being
+displayed, the pointer does not advance according to the number of polygons registered
+ in the table.  Therefore, accidental overwrite problems are avoided by having the
+slave
+ CPU start using the buffer from the top, and having the master CPU start using the
+buffer
+from the bottom.
+
+(2) Operation of the slPutPolygonS function
+
+In the slPutPolygonS function, the slave CPU is forced to perform all display-related
+processing, without any check of the status of the processing being made.
+By forcing the slave CPU to perform all of the processing, the main CPU is allowed to
+perform all of the processing inherent to the application, with the end result being
+that processing of the program as a whole is fairly evenly balanced between the two
+CPUs.
+
+2-11 slCurWindow function
+
+While the slWindow function switched to the front window at the moment that the
+function
+was executed, the slCurWindow function permits specification of the display window.
+
+As a result, because the window information is always retained, the number of times
+a window is set is reduced.
+
+<Example>
+
+      slCurWindow(winFar);
+      slWindow(--- for Far side Window ---);
+      slCurWindow(winNear);
+      slWindow(--- for Near side Window ---);
+      ...
+      slCurWindow(winFar);
+      slPutPolygon(PD_XX);
+      slCurWindow(winNear);
+      slPutPolygon(PD_xx);
+
+      slCurWindow(...);
+
+/* Display on game screen */
+
+/* Display on map */
+
+The display window is displayed in winFar after the slSynch function is executed, and
+display
+processing is performed in the same window until the slWindow function is executed
+(after execution of a display function, such as the slPutPolygon function), changing the
+window,
+ or until the slCurWindow function is executed.
+
+One note of caution required when using this function is that the parameter changed by
+the
+ slCurWindow function is set by the following functions: the slWindow function, the
+slZdspLevel
+ function, and the slPerspective function.  Note also that the environment matrix and
+the light
+ source vectors are not reset.
+
+
+
+Executing the slSprWinNum function returns the current window number (winFar,
+winNear).
+
+********************************End of Changes********************:
+3. SGL Internal Processing
+
+3-1 Interrupts Used by SGL
+
+SGL uses the following interrupts.
+
+1. V-blank-In Interrupts
+
+SGL uses the V-blank-In interrupt to perform the following:
+
+* Read FRT counter and set counter value to the FRT_Count variable.
+
+* Transfer scroll data to VDP2 registers.
+
+Data set in SGL's system variable area is transferred using the CPU's DMA channel
+1.  This transfer occurs when the SynchCount variable is 0 and _ScrPause is not
+set for the PauseFlag variable.
+
+* Data Transfer Processing (slTransferEntry function)
+
+* Execute User Functions (set with slIntFunction)
+
+* Execute Processing for Peripherals
+
+This is executed 68 counts after the first FRT_Count value read (300
+microseconds).
+
+2. V-blank-Out Interrupts
+
+SGL performs the following during the V-blank-Out interrupt.
+
+* Perform VDP1 Frame Control
+
+Sets the erase write mode when the SynchCount variable is 1.  Sets frame
+change when the variable is 0.
+
+* Transfer Sprite Data
+
+* Read Peripheral Data
+
+* Decrement SynchCount
+
+3-2  Hardware Devices Used by SGL
+
+SGL uses the following hardware devices and places limitations on their use:
+
+1. DMA Controller
+
+There are two types of DMA on the Saturn- SCU and SH2 based.  SGL uses both
+types of DMAs.
+
+a. SCU DMA Controller
+
+There are three DMA channels in the SCU (0 through 2).  The channels are used
+in the following manner:
+
+[Channel 0]
+
+* Unused
+
+[Channel 1]
+
+* Sprite (polygon) data transfers.
+* Used every frame (depends on the slInitSystem function settings).
+
+[Channel 2]
+
+* PCM stream data transfers- used during V-blank data transfers.
+
+In addition, SGL uses the DMA_ function group from SBL.
+
+If an SCU-DMA operation is taking place, a wait occurs after the SGL's
+internal variables are checked.  However, it is not possible to perform this
+check while settings are being made, so always use SGL's DMA library.
+
+For more information regarding SCU DMAs, see
+
+* Hardware Manual Vol. 1, SCU User's Manual
+* ST-TECH-010, SCU Specification Changes
+
+b. Internal CPU DMA Controller
+
+There are also three DMA channels in the SH2 (0, 1, and 2).  SGL uses each
+channel in the following manner:
+
+[Channel 0]
+
+* Sound data transfer
+* slDMACopy
+* slDMAXCopy
+
+[Channel 1]
+
+* Transfer scroll data within V-blank interrupt.
+
+DMA channel 1 is reserved by SGL.  Do not use this channel for your
+application.
+
+If an SCU-DMA operation is taking place, a wait occurs after the SGL's
+internal variables are checked.  However, it is not possible to perform this
+check while settings are being made, so always use SGL's DMA library.
+
+For hardware information regarding CPU DMAs, refer to
+
+* SH7095 Hardware User's Manual, 9. Direct Memory Access Controller (DMAC)
+
+2. Free Running Timer (FRT)
+
+The CPU's internal FRT is used to check the timing of peripheral requests.
+The FRT's counter is read during V-blank interrupt processing.  The timer is
+used by subdividing the clock into 128 divisions.  If you are using the FRT
+within your application, do not change the unit of division.
+
+3. Internal CPU Cache
+
+SGL uses the 4-way cache mode.  In addition, the cache can be cleared by using
+the control register's purge bit.
+
+4. Internal CPU Division, Multiplication Units
+
+SGL uses these on-chip modules outside of interrupt processing periods.
+Applications may use these modules without any problems.
+
+
+3-3 SGL 3D Transforms
+
+In SGL, the camera is positioned at the origin of the Z-axis and normally
+faces the positive Z direction.  Accordingly, an object is displayed by moving
+it in a parallel direction or rotating it relative to the camera's visible
+boundary.
+
+The object is projected onto the projection surface where the line of sight
+"drawn" between the object and the camera intersects the projection surface.
+This line of sight is required to calculate a triangle that is derived from
+the distance from the camera to the object and from the camera to the
+projection surface.
+
+Normally, an object is reduced in size since it is located further away than
+the projection surface.  In comparison, the object is enlarged if it is closer
+than the projection surface.  When the object gets extremely close to the
+camera, it can no longer be projected properly to the projection surface.  In
+SGL, objects are displayed up to the distance halfway between the camera and
+the projection surface (this distance is user-selectable to 1/4 or 1/8).  Any
+object that is closer than that point is not displayed.
+
+
+3-4 SGL Polygon Display Routine Processing Method
+
+SGL displays polygons by passing data necessary for calculations from the
+master to the slave CPU and then issuing a request.  However, depending on the
+processing state of the slave CPU, a portion of the calculation is performed
+by the master CPU.  The slave processes the data it is give in the following
+order:
+
+1.  Executing Vertex Rotation, Translations, and Perspective Transformation
+
+Rotation and translations use normal matrix calculations.  Since, a
+perspective transform is necessary afterwards, calculation is made in
+the Z to Y to X order.
+
+    Z' = M02 * X + M12 * Y + M22 * Z + M32
+
+If Z' is behind the POV or extremely close to the POV, an overflow problem
+occurs during screen projection.  When this occurs, Z' is calculated as DS/4
+(this value is user-definable with the slZdspLevel).
+
+This Z' value is used to calculate the perspective transform coefficients.
+The perspective transform coefficient value k are the following:
+
+      DX = X' * DS / Z'
+      DY = Y' * DS / Z'
+
+Since a divide is necessary for DS / Z', Z' is calculated first.  (39 clocks
+are necessary for the divide)
+
+    Y' = M01 * X + M11 * Y + M21 * Z + M31
+    X' = M00 * X + M10 * Y + M20 * Z + M30
+
+Y' and X' are calculated before the results of the divide are ready.  After
+the perspective transform coefficient k is calculated, it is multiplied by X'
+and Y' to derive the display locations Dx and Dy.
+
+    Dx = X' * k
+    Dy = Y' * k
+
+The resulting values are set in the buffer:
+
+    FIXED  X'
+    FIXED  Y'
+    FIXED  Z'
+    Sint16 Dx
+    Sint16 Dy
+
+The values are grouped, ordered and set for the required number of vertices.
+
+2. Display Enable Processing and Display Data Creation for Each Polygon
+
+a. Multiply the Polygon's Normal and Rotational Matrices to Match the Current
+Direction.
+
+Matrix calculation without the translation portion is performed:
+
+    nX = M00 * NX + M10 * NY + M20 * NZ
+    nY = M01 * NX + M11 * NY + M21 * NZ
+    nZ = M02 * NX + M12 * NY + M22 * NZ
+
+The vector derived by this calculation (nX, nY, nZ) and the vertex used by the
+polygon (PX, PY, PZ) are multiplied and the sign of the resulting value is
+checked to determine the front/back of the polygon.  If a polygon is
+determined to be facing backwards, its surface attributes are checked.  If it
+is a one-sided polygon, processing moves onto the next polygon.  However, if
+the polygon is double-sided, the direction of the normal is reversed (i.e.,
+the sign of each attribute is flipped).
+
+b. Check if the Polygon is Within the Display Boundary
+
+By using the sorting mode, the polygon's Z position is checked to see whether
+the polygon is within the display boundary.  The polygon's Z position is
+determined by the Z positions of the polygon's 4 vertices (upper 16 bits of Z'
+in the buffer) and checked to see whether it is within Zlimit.  If the polygon
+needs to be displayed, it is set in the Z buffer.  If not, the process moves
+on to the next polygon.
+
+c. Check if the Screen Position Used by UseClip is Valid in Hardware Terms
+
+The valid ranges for positional data that the hardware can handle are -2048 to
++2047 for X and -1024 to +1023 for Y.  A check is performed to see if the
+value is within range.
+
+The position of the vanishing point is added as an offset value. The position
+is considered within the valid range when the compared result does not exceed
+the maximum value.
+
+    CX = DX + ClipXAdder
+    CY = DY + ClipYAdder
+
+A value is considered to be out of the valid range if it is either negative or
+exceeds the maximum.
+
+d. Calculate Light Source Brightness for UseLight
+
+A product of the light source vector and the normal is used as the offset
+value for color data.  The offset data is stored in a buffer called CLOfstBuf
+(see MEMORY.DOC) at the time of system initialization.
+
+The RGB values are between 0 to 31 for each color and the brightness range is
+0 to 31. (If the upper 5 bits of the product are negative, it is treated as 0.
+If the value is greater than 1.0, it is treated as 31.)
+
+Each group contains color display data that correspond to color data 0 through
+31.  The values are for 0.5X the source color at brightness level 0 and 1.5X
+the source color at brightness level 31.   The maximum value here is 31.  (See
+section 3-5 for more information on color tables.)
+
+It is not possible to use the method above when using textures.  Use VDP1's
+Gouraud shading function instead to make color offsets to the entire texture.
+
+e. Create Polygon (Sprite) Data
+
+If the data is a texture, its various parameters are set along with the
+display mode and Gouraud shading table as necessary after attributes such as
+the texture number, size, and address are checked.
+
+The display positions of the polygon's 4 vertices are read from the buffer
+created in 1. and set as a parameter.  This concludes the processing for a
+polygon.
+
+f. Check Number of Remaining Polygons and Start from a.
+
+When the number of remaining polygons reach 0, processing is finished.
+
+3-5 Light Source Data Tables
+
+The light source table contents used when UseLight is declared for the display
+of a polygon is explained here.  Although this table is created by SGL with
+the slInitSystem function in the CLOfstBuf area for general-purpose use (see
+MEMORY.DOC), its location may be undesirable depending on your application.
+It is possible to modify the contents of this table to create your own light
+source data.
+
+If textures are used, the VDP1's Gouraud shading table is used.  It is also
+possible to edit this table (see MEMORY.DOC).
+
+As a precaution, the light source calculation for textures is performed only
+when the color mode is set to RGB mode. Light source calculation does not
+occur in paletted mode.  The contents of the color tables are shown below:
+
+
+*<In case of polygons, light source table (CLOfstBuf), brightness 0 to 31>
+
+ ( 0) 0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,A,A,B,B,C,C,D,D,E,E,F,F
+ ( 1) 0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,9,9,A,A,B,B,C,C,D,D,E,E,F,F,10
+ ( 2) 0,0,1,1,2,2,3,3,4,5,5,6,6,7,7,8,9,9,A,A,B,B,C,C,D,E,E,F,F,10,10,11
+ ( 3) 0,0,1,1,2,2,3,4,4,5,5,6,7,7,8,8,9,A,A,B,B,C,D,D,E,E,F,10,10,11,11,12
+ ( 4) 0,0,1,1,2,3,3,4,5,5,6,6,7,8,8,9,A,A,B,B,C,D,D,E,F,F,10,10,11,12,12,13
+ ( 5) 0,0,1,1,2,3,3,4,5,5,6,7,7,8,9,9,A,B,B,C,D,D,E,F,F,10,11,11,12,13,13,14
+ ( 6) 0,0,1,2,2,3,4,4,5,6,6,7,8,8,9,A,B,B,C,D,D,E,F,F,10,11,11,12,13,13,14,15
+ ( 7) 0,0,1,2,2,3,4,5,5,6,7,7,8,9,A,A,B,C,C,D,E,F,F,10,11,11,12,13,14,14,15,16
+ ( 8) 0,0,1,2,3,3,4,5,6,6,7,8,9,9,A,B,C,C,D,E,F,F,10,11,12,12,13,14,15,15,16,
+   17
+ ( 9) 0,0,1,2,3,3,4,5,6,7,7,8,9,A,A,B,C,D,E,E,F,10,11,11,12,13,14,15,15,16,17,
+   18
+ (10) 0,0,1,2,3,4,4,5,6,7,8,8,9,A,B,C,D,D,E,F,10,11,11,12,13,14,15,15,16,17,
+   18,19
+ (11) 0,0,1,2,3,4,5,5,6,7,8,9,A,A,B,C,D,E,F,10,10,11,12,13,14,15,15,16,17,18,
+   19,1A
+ (12) 0,0,1,2,3,4,5,6,7,7,8,9,A,B,C,D,E,E,F,10,11,12,13,14,15,15,16,17,18,19,
+   1A,1B
+ (13) 0,0,1,2,3,4,5,6,7,8,9,9,A,B,C,D,E,F,10,11,12,13,13,14,15,16,17,18,19,1A,
+   1B,1C
+ (14) 0,0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,F,10,11,12,13,14,15,16,17,18,19,1A,1B,
+   1C,1D
+ (15) 0,0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,10,11,12,13,14,15,16,17,18,19,1A,1B,
+   1C,1D,1E
+ (16) 0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,10,11,12,13,14,15,16,17,18,19,1A,1B,1C,
+   1D,1E,1F
+ (17) 0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,10,11,12,13,14,15,16,17,18,19,1A,1B,1C,
+   1D,1E,1F
+ (18) 0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,11,12,13,14,15,16,17,18,19,1A,1B,1C,1D,
+   1E,1F,1F
+ (19) 0,1,2,3,4,5,6,7,8,9,A,C,D,E,F,10,11,12,13,14,15,16,18,19,1A,1B,1C,1D,1E,
+   1F,1F,1F
+ (20) 0,1,2,3,4,5,6,7,9,A,B,C,D,E,F,10,12,13,14,15,16,17,18,19,1B,1C,1D,1E,1F,
+   1F,1F,1F
+ (21) 0,1,2,3,4,5,6,8,9,A,B,C,D,F,10,11,12,13,14,15,17,18,19,1A,1B,1C,1E,1F,
+   1F,1F,1F,1F
+ (22) 0,1,2,3,4,5,7,8,9,A,B,D,E,F,10,11,13,14,15,16,17,18,1A,1B,1C,1D,1E,1F,
+   1F,1F,1F,1F
+ (23) 0,1,2,3,4,6,7,8,9,A,C,D,E,F,11,12,13,14,15,17,18,19,1A,1C,1D,1E,1F,1F,
+   1F,1F,1F,1F
+ (24) 0,1,2,3,5,6,7,8,A,B,C,D,F,10,11,12,14,15,16,17,19,1A,1B,1C,1E,1F,1F,1F,
+   1F,1F,1F,1F
+ (25) 0,1,2,3,5,6,7,8,A,B,C,E,F,10,11,13,14,15,17,18,19,1A,1C,1D,1E,1F,1F,1F,
+   1F,1F,1F,1F
+ (26) 0,1,2,3,5,6,7,9,A,B,D,E,F,11,12,13,15,16,17,18,1A,1B,1C,1E,1F,1F,1F,1F,
+   1F,1F,1F,1F
+ (27) 0,1,2,4,5,6,8,9,A,C,D,E,10,11,12,14,15,16,18,19,1A,1C,1D,1E,1F,1F,1F,1F,
+   1F,1F,1F,1F
+ (28) 0,1,2,4,5,6,8,9,B,C,D,F,10,11,13,14,16,17,18,1A,1B,1C,1E,1F,1F,1F,1F,1F,
+   1F,1F,1F,1F
+ (29) 0,1,2,4,5,7,8,9,B,C,E,F,10,12,13,15,16,17,19,1A,1C,1D,1E,1F,1F,1F,1F,1F,
+   1F,1F,1F,1F
+ (30) 0,1,2,4,5,7,8,A,B,C,E,F,11,12,14,15,17,18,19,1B,1C,1E,1F,1F,1F,1F,1F,1F,
+   1F,1F,1F,1F
+ (31) 0,1,2,4,5,7,8,A,B,D,E,10,11,13,14,16,17,18,1A,1B,1D,1E,1F,1F,1F,1F,1F,
+   1F,1F,1F,1F,1F
+
+* <In case of textures, VDP1 Gouraud shading table, brightness 0 to 31>
+
+ ( 0) 0000  0000  0000  0000  ( 1) 0421  0421  0421  0421
+ ( 2) 0842  0842  0842  0842  ( 3) 0C63  0C63  0C63  0C63
+ ( 4) 1084  1084  1084  1084  ( 5) 14A5  14A5  14A5  14A5
+ ( 6) 18C6  18C6  18C6  18C6  ( 7) 1CE7  1CE7  1CE7  1CE7
+ ( 8) 2108  2108  2108  2108  ( 9) 2529  2529  2529  2529
+ (10) 294A  294A  294A  294A  (11) 2D6B  2D6B  2D6B  2D6B
+ (12) 318C  318C  318C  318C  (13) 35AD  35AD  35AD  35AD
+ (14) 39CE  39CE  39CE  39CE  (15) 3DEF  3DEF  3DEF  3DEF
+ (16) 4210  4210  4210  4210  (17) 4631  4631  4631  4631
+ (18) 4A52  4A52  4A52  4A52  (19) 4E73  4E73  4E73  4E73
+ (20) 5294  5294  5294  5294  (21) 56B5  56B5  56B5  56B5
+ (22) 5AD6  5AD6  5AD6  5AD6  (23) 5EF7  5EF7  5EF7  5EF7
+ (24) 6318  6318  6318  6318  (25) 6739  6739  6739  6739
+ (26) 6B5A  6B5A  6B5A  6B5A  (27) 6F7B  6F7B  6F7B  6F7B
+ (28) 739C  739C  739C  739C  (29) 77BD  77BD  77BD  77BD
+ (30) 7BDE  7BDE  7BDE  7BDE  (31) 7FFF  7FFF  7FFF  7FFF
+
+**************************** Changes **********************************
+3-6. SGL Z-sort processing and the Z-data buffer
+
+This section explains the Z-sort processing performed by the SGL, and the organization
+of the Z buffer data.  This explanation covers the perspective conversion and front/back
+determination tasks that are performed before performing Z-sort processing, and also
+discusses the Z-sort processing method, the organization of the Z-data buffer and the
+polygon data, and the method used to transfer the data to the hardware.
+
+(1) Perspective conversion equations
+
+Rotation and parallel move operations are executed by expanding normal matrix
+operations.
+
+      X' = M00 * X + M10 * Y + M20 * Z + M30
+      Y' = M01 * X + M11 * Y + M21 * Z + M31
+      Z' = M02 * X + M12 * Y + M22 * Z + M32
+
+Conversion processing is then performed using the X', Y', and Z' values derived from
+these equations.
+
+The following equations are used in perspective conversion:
+
+DX = X' * (DS/Z')
+DY = Y' * (DS/Z')  : DS is the screen position
+
+When executed exactly in this fashion, two division operations are required; therefore,
+for efficiency's sake, "(DS/Z')" is calculated first, and then the result is multiplied by X'
+and Y' in order to determine the display positions DX and DY.  In addition, because
+projection cannot be performed properly when Z' is negative or near zero, a value
+smaller than (DS/4) is treated as (DS/4).
+
+(2) Polygon front/back determination equations
+
+The polygon front/back determination is made by taking the inner product of the normal
+line vector of the surface and the viewpoint vector, and then looking at the sign of the
+result.
+
+In the case of positive projection, the viewpoint vector is the Z axis, but because this is
+perspective conversion processing, the viewpoint vector is a vector pointing at the
+surface, and the position vector of one vertex of the polygon can be used as a substitute
+for the viewpoint vector.
+
+Therefore, in order to make the front/back determination:
+
+(a) Align the normal line vector of the surface with the surface to be displayed by
+performing the rotation operation described above.  No parallel movement is made.
+
+        nX = M00 * NX + M10 * NY + M20 * NZ
+        nY = M01 * NX + M11 * NY + M21 * NZ
+        nZ = M02 * NX + M12 * NY + M22 * NZ
+
+(b)	Take the inner product of the position vector of one vertex and (1) above.
+
+P = nX * PX + nY * PY + nZ * PZ
+
+If P is a negative value, the surface is facing the viewpoint, so it is displayed.
+
+(3) Z-sort processing
+
+The sorting that determines priority uses a method that registers the address of display
+data in the buffer corresponding to the Z position and then selects the data in sequence,
+starting from that which is farthest away along the Z axis.  While this method does
+promise to be faster since there is less comparison processing, it does consume memory
+and there is some wasted processing due to reading empty buffers where no data is
+registered.  In order to reduce these inefficiencies, the Z position (15 bits) is divided
+into an upper byte and a lower byte.  Sort processing is then performed first on the
+upper byte, followed by a secondary sort of those Z positions where entries were made.
+This technique reduces memory consumption and reduces the number of times an
+empty buffer is read.
+
+(4) Z buffer and polygon data organization
+
+SGL polygon data consists of 30 bytes of sprite data used by the hardware, the Z position
+needed for sorting, and the data pointer.  The address for the polygon data is registered
+in the Z buffer; if NULL, there is not polygon data.
+
+              Z buffer                         Polygon data
+            ------------           ----------          ----------
+     Z = 0  |         -|-----------|->      |     /----|->      |
+            ------------           |        |    /     |        |
+     Z = 1  |   NULL   |           |        |   /      |        |
+            ------------           |        |  /       |        |
+     Z = 2  |   NULL   |           |  next -|-/        |  NULL  |
+            ------------           ----------          ----------
+            |          |
+            |   ....   |          Organization of polygon data
+            |          |               -------------
+            ------------            00 |  CMDCTRL  |
+     Z =255 |   NULL   |            02 |  CMDLINK  |
+            ------------            04 |  CMDPMOD  |
+                                    06 |  CMDCOLR  |
+                                    08 |  CMDSRCA  |
+                                    0A |  CMDSIZE  |
+                                    0C |  CMDXA    |
+                                    0E |  CMDYA    |
+                                    10 |  CMDXB    |
+                                    12 |  CMDYB    |
+ Table for hardware transfers       14 |  CMDXC    |
+------------------------------      16 |  CMDYC    |
+|        Transfer size       |      18 |  CMDXD    |
+------------------------------      1A |  CMDYD    |
+|Transfer destination adderss|      1C |  CMDGRDA  |
+ -----------------------------      1E |  CMDZPOS  |
+|   Transfer source address  |      20 |  CMDNEXT  |
+------------------------------         -------------
+
+No polygon exists in positions where the pointer is NULL.
+
+
+(5) Method for transfers to hardware (VDP1)
+
+Transfers to the hardware (VDP1) use SCU-DMA indirect mode.  The Z sort buffer
+described above is read in sequence starting from the back, and the appropriate data
+address is set in the transfer table.
+
+3-7  Data passing between the master CPU and the slave CPU
+
+From the time the power for the Sega Saturn is turned on until the application program
+begins running, only the master CPU operates; the slave CPU does not run.  Because
+the master CPU and the slave CPU are connected to memory and other devices through
+the same bus, they can perform the same operations, but if they are not managed
+properly, either the master CPU or the slave CPU may end up in the waiting state, so
+that in some cases the improved efficiency expected from two CPUs will not be realized.
+
+In the SGL, executing slInitSystem causes the slave CPU to operate internally, so that
+the SGL's unique slave management functions are executed and the two CPU's can be
+used efficiently.
+
+The SGL's control method for the slave CPU is described below.
+
+In the SGL, the SMPC reset is released by the InitSlaveSh function within the
+slInitSystem function, and the system enters the FRT input capture waiting state.  At
+this point, the SGL slave CPU control function called "SlaveControl" is set in the
+SlaveCommand pointer variable. If the FRT input capture signal is input (by writing a
+"-1" to address 0x21000000), the slave CPU executes the SlaveControl function.
+
+The SlaveControl function is the SGL's slave CPU control function, and is designed to
+pass requests from the master CPU through a shared buffer so that neither the master
+CPU nor the slave CPU enter the waiting state with a corresponding decrease in
+efficiency.  Whether or not a request was output can be recognized when the master
+CPU's write pointer differs from the slave CPU's read pointer.  Because this method
+allows the master CPU to proceed to the next process as soon as it adds its request to the
+buffer, there is no need for the master CPU to wait for the slave CPU to complete a task.
+
+When the user uses the slave CPU in the SGL, operation is conducted under the control
+of the SlaveControl function once the function to be executed is set in the slSlaveFunc
+function.  The user function to be executed is set in the first argument, and the first
+argument of the user function is set in the second argument of the slSlaveFunc function.
+
+
+In addition, the slave CPU is subject to many more restrictions than the master CPU in
+regards to interrupts; therefore, in the SGL the master CPU handles interrupt-related
+processing.
+
+3-8.	Sound control
+
+The SGL sound control basically permits sequence playback and PCM stream playback.
+
+Up to eight channels of sequence playback and PCM stream playback each can be
+supported simultaneously.  When using these channels, it is difficult for the user to
+manage them because sound driver control is switched using the "sound control
+numbers" as IDs.  Therefore, in the SGL, the background music is assigned to channel
+0 and sound effects are assigned to channels 1 through 7; when a function that outputs a
+sound effect is called, the system finds an unused sound control number and outputs the
+sound on that channel, thus reducing the load on the user.
+
+In addition, in PCM stream playback, in response to an SCSP from the master CPU, the
+playback data must be transferred at fixed times, but because PCM stream playback is
+limited to one-shot playback (in which the data is output at one time from start to finish,
+with no special processing such as loops, etc.), control by the user is not necessary;
+control is performed within the SGL's interrupt processing routine.
+
+In addition, because the effective ranges for the volume and pan values differ according
+to the type of device (sequence, PCM stream, or CDDA) to which output is being directed,
+these values are converted internally by the SGL before they are passed to the sound
+driver so that the user can use consistent values for these settings.
+
+Volume: 0 to 127 (maximum)
+Pan: -128, -127 to +127 (no pan control when -128)
+		Left: -127 << 0 >> +127 :Right
+
+Sound control functions are passed tot he sound driver while handshaking is performed,
+but in order to reduce the number of times handshaking is performed, a command buffer
+is set up within the SGL, and handshaking is not performed until either the command
+buffer becomes full or the slSynch function is executed.  (For certain specific functions,
+however, handshaking is performed immediately.)
+
+Therefore, it is important to realize that data is not output to the sound driver
+immediately when a sound output function is executed.
+
+To make full use of the capabilities of the sound driver functions, use the sound
+interface library provided in the SBL library.  (When using the Cinepak library in the
+SGL, the sound interface library must be used.)
+
+In addition, the sound driver corresponds to the sound driver provided by Sega; use the
+SDDRVS.TSK in the SGL/LIB directory.
+
+************************ End of Changes *********************************:
+4.SGL Troubleshooting
+
+4-1  Dealing with Sprite/Polygon Afterimages
+
+There are occasions when sprite (also polygons) afterimages remain on-screen
+when SGL goes to read large amounts of data from the CD-ROM.
+
+When slSynch() is executed, a request table creation function is sent to the
+slave CPU for sprite transfers.  A check is performed within the V-Blank
+interrupt processing to determine if the table was created.  If the table has
+been created, a SCU-DMA Is used to transfer commands to VDP1 VRAM.
+
+VDP1's display commands are only transferred during this time, so display
+commands normally remain in VDP1 VRAM.
+
+For example, if slSynch has not been executed or if interrupts are disabled
+for any prolonged amount of time, the sprite ends up being displayed since the
+display command remains in VRAM.
+
+If these afterimages appear, check to see whether the two conditions described
+above are in effect.
+
+Normally, a polygon (sprite) can be erased by calling slSynch more often.  Use
+the following coding example as a fix for the problem:
+
+    void sample(){
+        while(-1){
+	    slDispSprite(...) ;
+	    slPushMatrix() ;
+	    {
+	        slTranslate(...) ;
+	        slRotY(...) ;
+	        slPutPolygon(...) ;
+	    }
+	    slPopMatrix() ;
+	    slSynch() ;		/* Transferred to VDP1 here */
+	    slSynch() ;		/* Only the end command is transferred here */
+        }
+    }

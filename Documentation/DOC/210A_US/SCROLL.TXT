@@ -1,0 +1,1143 @@
+******************************************************************************
+Scroll (VDP2) Related Functions
+******************************************************************************
+
+******************************************************************************
+void slTVOn(void)
+******************************************************************************
+
+Function:
+Starts output to video monitor.
+
+******************************************************************************
+void slTVOff(void)
+******************************************************************************
+
+Function:
+Stops output to video monitor. Nothing is displayed.
+
+Note:
+The VDP2 register is set immediately when this function is executed.
+
+******************************************************************************
+Uint16 slGetHCount(void)
+******************************************************************************
+*************************Changes *****************************
+Function:
+Reads the VDP2 H counter.
+
+******************************************************************************
+Uint16 slGetVCount(void)
+******************************************************************************
+
+Function:
+Reads the VDP2 V counter.
+
+********************* End of Changes **********************
+******************************************************************************
+void slExtSignal(Uint16 signal, Uint16 mask)
+******************************************************************************
+
+Function:
+Controls the external signal enable register. Specify the signal name to be 
+set in signal, and the signal name to control in mask.
+
+The four signal names are listed below.
+
+    EXLTEN : Used match the latch timing for the HV counter value with an
+             external signal.
+    EXSYEN : Used to match video output with an external sync signal.
+    DASEL  : Used to access the entire valid image display area.
+    EXBGEN : Used when external screen data is input.
+
+******************************************************************************
+void slColRAMMode(Uint16 mode)
+******************************************************************************
+
+Function:
+Sets the color RAM mode. Be sure to choose the color RAM mode before storing 
+color data to color RAM.
+
+mode : Select the color RAM mode from the following:
+       CRM16_1024 : Color RAM mode 0 (16 bit color 1024 colors x 2 banks)
+       CRM16_2048 : Color RAM mode 1 (16 bit color 2048 colors)
+       CRM32_1024 : Color RAM mode 2 (24 bit color 1024 colors)
+
+******************************************************************************
+void slScrCycleSet(Uint32 a0, Uint32 a1, Uint32 b0, Uint32 b1)
+******************************************************************************
+
+Function:
+Sets the cycle pattern for each bank. When each bank is divided, cycle 
+patterns can be set in banks a0, a1, b0, and b1. When the banks are not 
+divided, cycle patterns can be set in banks a0 and b0.
+
+    a0 : Bank a0 cycle pattern
+    a1 : Bank a1 cycle pattern
+    b0 : Bank b0 cycle pattern
+    b1 : Bank b1 cycle pattern
+
+Note:
+Each value is set immediately in the VDP2 register when this function is 
+executed.
+
+******************************************************************************
+void slScrDisp(Uint32 mode)
+******************************************************************************
+
+Function:
+Sets the scroll screen mode.
+
+mode : NBG0ON | NBG0OFF
+       NBG1ON | NBG1OFF
+       NBG2ON | NBG2OFF
+       NBG3ON | NBG3OFF
+       RBG0ON | RBG0OFF
+
+To set multiple scroll screens, specify the screens by using a OR (|). 
+Settings for unspecified scroll screens will not change.
+
+******************************************************************************
+Bool slScrAutoDisp(Uint32 ptr)
+******************************************************************************
+
+Function:
+Registers scroll screens with the system after completing the setup of the 
+screens. This function automatically assigns VRAM access (cycle pattern 
+register) for a scroll screen specified by the parameter and enables the 
+display settings for the registered screen.
+
+NG is returned for settings that cannot generate a cycle pattern.
+
+flag : NBG0ON, NBG1ON, NBG2ON, NBG3ON, RBG0ON
+
+To set multiple scroll screens at once, specify the screens by combining them 
+with a bitwise OR (|).
+
+******************************************************************************
+void slScrTransparent(Uint16 flag)
+******************************************************************************
+
+Function:
+Sets up transparent colors for each scroll screen.
+
+flag : NBG0ON, NBG1ON, NBG2ON, NBG3ON, RBG0ON
+
+For multiple scroll screen settings, combine parameters with a bitwise OR (|).  
+Scroll screens set as ON will display the color of palette 0.
+
+******************************************************************************
+void slZrotR(ANGLE angz)
+******************************************************************************
+
+Function:
+Rotates scroll screen around the Z axis. Normal direction of rotation is to 
+the right from the axis (clockwise).  The coordinate set with slDispCenterR 
+becomes the center of rotation.
+
+angz : Rotation angle around the Z axis.
+
+******************************************************************************
+void slScrMatSet(void)
+******************************************************************************
+
+Function:
+Sets the RBG0 rotation parameters using the current matrix.
+
+******************************************************************************
+void slBack1ColSet(void *colptr, Uint16 rgb)
+******************************************************************************
+
+Function:
+Sets the background color. The background screen is the rear-most screen that 
+appears through other screens.
+
+colptr : Base VRAM address of background color.
+rgb    : RGB color data (5 bits per color)
+
+******************************************************************************
+void slLineColTable(void *adr)
+******************************************************************************
+
+Function:
+Sets the line color table address in the register.
+
+adr : Line color table address in VRAM
+
+******************************************************************************
+void slLine1ColSet(void *adr, Uint16 col)
+******************************************************************************
+
+Function:
+Sets a single color for the line color screen.
+
+adr : Line color table address in VRAM
+col : Color number
+
+******************************************************************************
+void slLineColDisp(Uint16 flag)
+******************************************************************************
+
+Function:
+Sets the screen affected by line color when it is on top.
+
+flag : NBG0ON, NBG1ON, NBG2ON, NBG3ON, RBG0ON
+
+To set multiple scroll screens, combine parameters by using a bitwise OR (|).  
+Use LNCLON to set sprites (this is due to the difference in bit position with 
+other registers).
+
+******************************************************************************
+void slColorCalc(Uint16 flag)
+******************************************************************************
+
+Function:
+Sets a parameter for color calculation.
+
+flag :  CC_RATE | CC_ADD     : Calculation method
+        CC_TOP | CC_2ND      : Screen for calculation
+        CC_EXT               : Extended color calculation
+        NBG0 | NBG1 | NBG2 | NBG3 | RBG0 | LNCLON | SPRON: register screen
+
+Combine the flag values with a bitwise OR (|) according to the function used.
+
+******************************************************************************
+void slColorCalcOn(Uint16 flag)
+******************************************************************************
+
+Function:
+Sets the screen affected by color calculation control.
+
+flag : NBG0ON, NBG1ON, NBG2ON, NBG3ON, RBG0ON, LNCLON, SPRON
+
+To set multiple scroll screens, combine parameters with a bitwise OR (|).
+
+******************************************************************************
+void slColOffsetOn(Uint16 flag)
+******************************************************************************
+
+Function:
+Sets the screen affected by the color offset value.
+
+flag : NBG0ON, NBG1ON, NBG2ON, NBG3ON, RBG0ON, LNCLON, SPRON
+
+To set multiple scroll screens, combine parameters with a bitwise OR (|).
+
+******************************************************************************
+void slColOffsetOff(Uint16 flag)
+******************************************************************************
+**************** Changes **************************
+Function:
+Sets the screen so that it is not affected by the color offset value.
+***************** End of Changes ***************************************
+
+flag : NBG0ON , NBG1ON , NBG2ON , NBG3ON , RBG0ON , LNCLON , SPRON
+
+To set multiple scroll screens, combine parameters with a bitwise OR (|).
+
+**************** Changes **************************
+Note:
+To disable for all screens, execute "slColOffsetOn(OFF)".
+
+****************** End of Changes *******************
+
+******************************************************************************
+void slColOffsetAUse(Uint16 flag)
+******************************************************************************
+
+Function:
+Sets the screen affected by the color offset value assigned by slColOffsetA.
+
+flag : NBG0ON, NBG1ON, NBG2ON, NBG3ON, RBG0ON, LNCLON, SPRON
+
+To set multiple scroll screens, combine parameters with a bitwise OR (|).
+
+******************************************************************************
+void slColOffsetBUse(Uint16 flag)
+******************************************************************************
+
+Function:
+Sets the screen affected by the color offset value assigned by slColOffsetB.
+
+flag : NBG0ON, NBG1ON, NBG2ON, NBG3ON, RBG0ON, LNCLON, SPRON
+
+To set multiple scroll screens, combine parameters with a bitwise OR (|).
+
+********************** Changes *****************************:
+Note:
+ Because the "slColOffsetOn" function is executed simultaneously if the 
+"slColOffsetAUse" and "slColOffsetAUse" functions are executed, it is not 
+necessary for the user to execute the "slColOffsetOn" function.
+
+************************ End of Changes ***********************
+
+******************************************************************************
+void slColOffsetA(Sint16 r, Sint16 g, Sint16 b)
+void slColOffsetB(Sint16 r, Sint16 g, Sint16 b)
+******************************************************************************
+
+Function:
+Sets the values for color offset A and B.
+r : red offset value
+g : green offset value
+b : blue offset value
+
+******************************************************************************
+void slCharNbg0(Uint16 type, Uint16 size)
+void slCharNbg1(Uint16 type, Uint16 size)
+void slCharNbg2(Uint16 type, Uint16 size)
+void slCharNbg3(Uint16 type, Uint16 size)
+void slCharRbg0(Uint16 type, Uint16 size)
+******************************************************************************
+
+Function:
+Sets character size and number of colors used for a scroll screen.
+
+type : Character colors
+       COL_TYPE_16    : 16 colors, palette format
+       COL_TYPE_256   : 256 colors, palette format
+       COL_TYPE_2048  : 2048 colors, palette format
+       COL_TYPE_32768 : 32768 colors, RGB format
+       COL_TYPE_1M    : 16,770,000 colors, RGB format
+
+size : Character size
+       CHAR_SIZE_1x1: 1 x 1
+       CHAR_SIZE_2x2: 2 x 2
+
+******************************************************************************
+void slPageNbg0(void *celadr, void *coladr, type)
+void slPageNbg1(void *celadr, void *coladr, type)
+void slPageNbg2(void *celadr, void *coladr, type)
+void slPageNbg3(void *celadr, void *coladr, type)
+void slPageRbg0(void *celadr, void *coladr, type)
+******************************************************************************
+
+Function:
+Sets page settings for each scroll screen.
+
+celadr : Base VRAM address for cell data
+coladr : Base VRAM address for color data
+type   : Pattern name data
+         PNB_1WORD:           1 word, lower 10 bits
+         PNB_1WORD | CN12BIT: 1 word, lower 12 bits
+         PNB_2WORD:           2 words, lower 16 bits
+
+******************************************************************************
+void slPlaneNbg0(Uint16 type)
+void slPlaneNbg1(Uint16 type)
+void slPlaneNbg2(Uint16 type)
+void slPlaneNbg3(Uint16 type)
+void slPlaneRA(Uint16 type)
+void slPlaneRB(Uint16 type)
+******************************************************************************
+
+Function:
+Sets plane size for each scroll screen.
+
+type : Plane size
+       PL_SIZE_1x1: 1 wide x 1 high
+       PL_SIZE_2x1: 2 wide x 1 high
+       PL_SIZE_2x2: 2 wide x 2 high
+
+******************************************************************************
+void slOverRA(Uint16 mode)
+void slOverRB(Uint16 mode)
+******************************************************************************
+
+Function:
+Sets screen-out mode for each rotation scroll screen.
+
+mode : Screen-out mode
+       0 : Area outside repeats image set in display area.
+       1 : Area outside repeats assigned character pattern.
+       2 : Area outside is transparent.
+       3 : Area outside 512 x 512 area is all transparent.
+
+******************************************************************************
+void slMapNbg0(void *a, void *b, void *c, void *d)
+void slMapNbg1(void *a, void *b, void *c, void *d)
+void slMapNbg2(void *a, void *b, void *c, void *d)
+void slMapNbg3(void *a, void *b, void *c, void *d)
+******************************************************************************
+
+Function:
+Sets map for each normal scroll screen.
+
+a : Base VRAM address of plane A pattern name data table
+b : Base VRAM address of plane B pattern name data table
+c : Base VRAM address of plane C pattern name data table
+d : Base VRAM address of plane D pattern name data table
+
+(0,0)
+  +---+---+
+  | A | B |
+  +---+---+
+  | C | D |
+  +---+---+
+
+******************************************************************************
+void sl1MapRA(void *adr)
+void sl1MapRB(void *adr)
+******************************************************************************
+
+Function:Sets rotation scroll map that uses rotation parameters.
+
+adr : Base VRAM address of rotation parameter pattern name data table.
+
+******************************************************************************
+void slRparaInitSet(ROTSCROLL *ptr)
+******************************************************************************
+
+Function:
+Stores rotation parameter tables (size: 60 H) in VRAM. Parameter B stores 
+parameter A + 20H, so E0H bytes are necessary for parameters A and B.  If this 
+function is not called, the default storage address is 25E3FF00H.
+
+ptr : Base VRAM address for rotation parameter table.
+
+******************************************************************************
+void slCurRpara(Uint16 flag)
+******************************************************************************
+
+Function:
+Enables use of rotation parameter A or B.
+
+flag : Rotation parameter
+       RA : Rotation parameter A
+       RB : Rotation parameter B
+
+******************************************************************************
+void slRparaMode(Uint16 mode)
+******************************************************************************
+
+Function:
+Sets mode for rotation parameters A and B.
+
+mode : Rotation parameter mode
+       RA       : Use only rotation parameter A
+       RB       : Use only rotation parameter B
+       K_CHANGE : Switch image according to rotation parameter A coefficient
+                  data
+       W_CHANGE : Switch image according to rotation parameter window
+
+******************************************************************************
+void slMakeKtable(void *adr)
+******************************************************************************
+
+Function:
+Creates a coefficient table used for 3D rotation.
+
+Creates one bank of 2 WORD size data. Use this function together with the 
+slKtableRA/B(K_2WORD | K_ON | K_DOT | K_FIX).
+
+adr : Address on function table VRAM
+
+******************************************************************************
+void slKtableRA(void *adr, Uint16 mode)
+void slKtableRB(void *adr, Uint16 mode)
+******************************************************************************
+
+Function:
+Sets coefficient table address to register, coefficient table mode, and 
+coefficient table structure.
+
+adr  : Address on function table VRAM
+
+mode : Function table control mode
+       K_OFF | K_ON                          : Use table
+       K_2WORD | K_1WORD                     : Coefficient data size
+       K_MODE0 | K_MODE1 | K_MODE2 | K_MODE3 : Coefficient mode
+       K_LINECOL                             : Line color
+       K_DOT | K_LINE                        : Transformation unit
+       K_FIX                                 : Fix coefficient
+       
+For multiple settings, combine parameters with a bitwise OR (|).
+
+******************************************************************************
+void slScrPosNbg0(FIXED x, FIXED y)
+void slScrPosNbg1(FIXED x, FIXED y)
+void slScrPosNbg2(FIXED x, FIXED y)
+void slScrPosNbg3(FIXED x, FIXED y)
+******************************************************************************
+
+Function:
+Sets placement coordinates for each normal scroll screen.
+
+x : X component of normal scroll placement coordinates (scroll coordinate)
+y : Y component of normal scroll placement coordinates (scroll coordinate)
+
+******************************************************************************
+void slLookR(FIXED x, FIXED y)
+******************************************************************************
+
+Function:
+Sets placement coordinates of rotation scroll screen.
+
+x : X component of rotation scroll placement coordinates (scroll coordinate)
+y : Y component of rotation scroll placement coordinates (scroll coordinate)
+
+******************************************************************************
+void slDispCenterR(FIXED x, FIXED y)
+******************************************************************************
+
+Function:
+Sets rotation center coordinates of rotation scroll screen.
+
+x : X component of rotation scroll center coordinates (screen coordinate)
+y : Y component of rotation scroll center coordinates (screen coordinate)
+
+******************************************************************************
+void slZoomNbg0(FIXED x, FIXED y)
+void slZoomNbg1(FIXED x, FIXED y)
+******************************************************************************
+
+Function:
+Specifies scaling amount of NBG0 or 1.
+
+x : Inverse of scaling amount for normal scroll X axis (if 2x, then 1/2)
+y : Inverse of scaling amount for normal scroll Y axis (if 2x, then 1/2)
+
+******************************************************************************
+void slZoomR(FIXED x, FIXED y)
+******************************************************************************
+
+Function:
+Sets scaling amount for the rotation scroll screen and sets current state in 
+current rotation parameters.
+
+x : Inverse of scaling amount for rotation scroll X axis (if 2x, then 1/2)
+y : Inverse of scaling amount for rotation scroll Y axis (if 2x, then 1/2)
+
+******************************************************************************
+void slScrScaleNbg0(FIXED x, FIXED y)
+void slScrScaleNbg1(FIXED x, FIXED y)
+******************************************************************************
+
+Function:
+Specifies scaling amount of NBG0 or 1 for which scaling is possible among 
+normal scroll screens.
+
+x : Scaling amount for normal scroll X axis (if 2x, then 2)
+y : Scaling amount for normal scroll Y axis (if 2x, then 2)
+
+******************************************************************************
+void slScrScaleR(FIXED x, FIXED y)
+******************************************************************************
+
+Function:
+Sets scaling amount of rotation scroll screen, maintains current state in 
+current rotation parameters.
+
+x : Scaling amount for rotation scroll X axis (if 2x, then 2)
+y : scaling amount for rotation scroll Y axis (if 2x, then 2)
+
+******************************************************************************
+void slScrAscSet(void *adr)
+******************************************************************************
+
+Function:
+Sets default ASCII characters (256 color, 128 cells) at specified address.
+
+adr : VRAM address where ASCII characters are placed.
+
+******************************************************************************
+void slScrMatConv(void)
+******************************************************************************
+
+Function:
+Changes current matrix to scroll type matrix. The current matrix is rewritten 
+when this function is used. After this function is executed, the matrix is 
+used for the rotation scroll parameters when slScrMatSet() is executed.
+
+******************************************************************************
+void slSpriteWinMode(Uint16 flag)
+******************************************************************************
+
+Function:
+Enables/disables sprite window mode.
+
+flag : ON  : Sprite window is enabled
+       OFF : Sprite window is disabled
+
+******************************************************************************
+void slSpriteCCalcCond((Uint16)Condition)
+******************************************************************************
+
+Function:
+Sets up the sprite color calculation condition.  Set a condition out of 
+CC_pr_CN, CC_PR_CN, CC_PR_cn, or CC_MSB.
+
+CC_pr_CN : Execute color calculation when Priority <= ConditionNumber.
+CC_PR_CN : Execute color calculation when Priority == ConditionNumber.
+CC_PR_cn : Execute color calculation when Priority >= ConditionNumber.
+CC_MSB   : Execute color calculation when the MSB of the color data is 1.
+
+******************************************************************************
+void slSpriteCCalcNum((Uint16)num)
+******************************************************************************
+
+Function:
+Sets the sprite color calculation condition number. num= 0 to 7.
+
+******************************************************************************
+void slSpriteColMode((Uint16)mode)
+******************************************************************************
+
+Function:
+Sets the sprite color mode. Specify mode as either SPR_PAL or SPR_PAL_RGB.
+
+mode:
+SPR_PAL     : Sprite data only uses palette data format.
+SPR_PAL_RGB : Sprite data uses a mixture of palette format and RGB format.
+
+******************************************************************************
+void slSpriteType((Uint16)type)
+******************************************************************************
+
+Function:
+Sets a sprite data type from 0 to 15.
+ 
+type:
+0 to 7 is low resolution (320 or 352), and 8 to 15 is high resolution (640 or 
+704)
+
+******************************************************************************
+void slScrMosaicOn((Uint16)screen)
+******************************************************************************
+
+Function:
+Sets scroll screen for mosaic processing. Settings are the same as for 
+slScrDisp.
+
+******************************************************************************
+void slScrMosSize((Uint16)Hsize, (Uint16)Vsize)
+******************************************************************************
+
+Function:
+Sets mosaic processing size.
+Size which can be specified are from 1 to 16 pixels in both horizontal (Hsize) 
+and vertical (Vsize) directions.
+
+******************************************************************************
+void slScrWindow0((Uint16)Left, (Uint16)Top, (Uint16)Right, (Uint16)Bottom)
+******************************************************************************
+
+Function:
+Sets rectangular scroll window 0 area. If the line window is specified, it is 
+disabled.
+
+******************************************************************************
+void slScrWindow1((Uint16)Left, (Uint16)Top, (Uint16)Right, (Uint16)Bottom)
+******************************************************************************
+
+Function:
+Sets rectangular scroll window 1 area. If the line window is specified, the it 
+is disabled.
+
+******************************************************************************
+void slScrLineWindow0((void *)addr)
+******************************************************************************
+
+Function:
+Sets address of line window data table 0. When using the line window, make the 
+most significant bit 1. When not using the line window, specify NULL (0).
+
+Example: 
+
+When using the line window,
+
+Address = 0 x 25E3F000
+
+  slScrLineWindow0((void *)(0x25E3F000 | 0x80000000)) ;
+
+When the address is held as a pointer variable,
+
+  Sint16 *lnptr ;
+  lnptr = (Sint16 *)0x25e3f000 ;
+  slScrLineWindow((void *)(lnptr + 0x40000000)) ;
+    (because the added is 2x <sizeof(Sint16)>)
+
+When the line window is no longer used
+
+  slScrLineWindow0((void *)NULL) ;
+
+Note: 
+Even when the line window is set, the rectangular window data is still valid 
+(per hardware specs). Both regions refer to the window 0 space.
+
+To make the rectangular window data invalid, set data that contradicts the 
+window's up/down and left/right positions.
+
+Example:
+	
+slScrWindow0(10,0,0,10) ; /* Left/right relationship conflicts */
+              | | |  |__ Bottom
+              | | |_____ Right
+              | |_______ Top
+              |_________ Left
+slScrWindow0(10,10,0,0) ; /* Up/down, left/right relationships contradict */
+
+
+******************************************************************************
+void slScrLineWindow1((void *)addr)
+******************************************************************************
+
+Function:
+Sets address of line window data table 1.
+
+******************************************************************************
+void slScrWindowMode((Uint16)screen, (Uint16)mode)
+******************************************************************************
+
+Function:
+Sets mode for using each scroll screen window.
+
+screen : Set one of scnNBG0, scnNBG1, scnNBG2, scnNBG3, scnRBG0, scnSPR,
+         scnROT, or scnCCAL.
+
+mode : Set a mode from the following:
+       [win_OR  | win_AND]  for multiple windows
+       [win0_IN | win0_OUT]
+       [win1_IN | win1_OUT] ..._IN displays the inside of the window
+       [spw_IN  | spw_OUT]  ..._OUT displays the outside of the window
+
+Example:
+
+  NBG0 = Inside window 0 only
+  NBG1 = Outside window 1 only
+  NBG2 = Inside window 0 and window 1
+  NBG3 = Inside of window 0 and window 1 overlap
+
+    slScrWindowMode(scnNBG0, win0_IN) ;
+    slScrWindowMode(scnNBG1, win1_OUT) ;
+    slScrWindowMode(scnNBG2, win_OR | win0_IN | win1_IN) ;
+    slScrWindowMode(scnNBG3, win_AND | win0_IN | win1_IN) ;
+
+******************************************************************************
+void slBackColTable(void *tbl)
+******************************************************************************
+
+Function:
+Sets the color table for the background screen.  Sets the mode for color 
+switching by raster units.
+
+******************************************************************************
+void slColRate(Uint16 scrn, Uint16 rate)
+******************************************************************************
+
+Function:
+Specifies the color calculation ration for each screen.
+
+scrn : Specify one of scnNBG0, scnNBG1, scnNBG2, scnNBG3, scnRBG0, scnLNCL,
+       or scnBACK.
+rate : Specify with CLRate31_1 through CLRate0_32
+
+       rate            Top Screen : Second Screen
+
+       CLRate31_1               31:1
+       CLRate30_2               30:2
+       ...
+       CLRate1_31                1:31
+       CLRate0_32                0:32
+
+******************************************************************************
+void slColorCalcMode(Uint16 mode)
+******************************************************************************
+
+Function:
+Sets only the slColorCalc mode.  Use along with slColorCalcOn.
+
+******************************************************************************
+void slPriority(Sint16 scrn, Uint16 num)
+******************************************************************************
+
+Function:
+Sets the priority number for each screen.
+
+scrn : scnNBG0, scbNBG1, scnNBG2, scnNBG3, scnRBG0, scnSPR0, scnSPR1,
+       scnSPR2, scnSPR3, scbSPR4, scnSPR5, scnSPR6, scnSPR7
+
+num  : 0 to 7 (however, nothing is displayed when 0 is specified).
+
+******************************************************************************
+void slZoomMode(Uint16 scrn, Uint16 mode)
+******************************************************************************
+
+Function:
+Sets NBG0 and NBG1 zoom factor.
+
+scrn : Set scnNBG0 or scnNBG1 
+
+mode : Set one of ZOOM_1, ZOOM_HALF, or ZOOM_QUARTER.
+
+******************************************************************************
+void slShadowOn(Uint16 scrn)
+******************************************************************************
+
+Function:
+Sets the shadow function for a scroll screen.
+
+scrn : NBG0ON, NBG1ON, NBG2ON, NBG3ON, RBG0ON, BACKON
+
+******************************************************************************
+void slTpShadowMode(Uint16 mode)
+******************************************************************************
+
+Function:
+Enables/disables the transparent shadow sprite mode.
+
+mode : ON or OFF
+
+******************************************************************************
+void slOverPatRA(Uint16 pname)
+void slOverPatRB(Uint16 pname)
+******************************************************************************
+
+Function:
+Sets pattern name of characters outside of the rotation scroll map.
+
+******************************************************************************
+void sl16MapRA(Uint8 map[16])
+void sl16MapRB(Uint8 map[16])
+******************************************************************************
+
+Function:
+Sets 16 rotation scroll map pages. Map numbers for 16 pages are set in the 
+array passed on as the argument. (Enter numbers counted in units of 0x800 from 
+the start of VRAM as the page numbers.)
+
+	ABCD
+	EFGH
+	IJKL
+	MNOP
+
+Sets the aforementioned 4 x 4 page in an array in the order of ABC...NOP.
+
+******************************************************************************
+void slGradationOn(Uint16 scrn)
+******************************************************************************
+
+Function:
+Enables the blur function for a scroll screen.
+
+scrn : Specify only one of grdNBG0, grdNBG1, grdNBG2, grdNBG3, grdRBG0, 
+       or grdSPR.
+
+Note: 
+The blur function can be used only when the color RAM mode is 0. Also note 
+that the blur mode does not function unless used together with color 
+calculation.
+
+******************************************************************************
+void slGradationOff(void)
+******************************************************************************
+
+Function:
+Disable blur function.
+
+******************************************************************************
+void slColRAMOffsetNbg0(Uint16 offset)
+******************************************************************************
+
+Function:
+Sets an offset for the base color RAM address used for each screen in 256 
+color increments. Specify the offset as a value from 0 to 7 (however, the 
+value can only be up to 3 if the color RAM mode is 0 or 2).
+
+******************************************************************************
+void slColRAMOffsetNbg1(Uint16 offset)
+void slColRAMOffsetNbg2(Uint16 offset)
+void slColRAMOffsetNbg3(Uint16 offset)
+void slColRAMOffsetRbg0(Uint16 offset)
+void slColRAMOffsetSpr(Uint16 offset)
+******************************************************************************
+
+Function:
+Same as above
+
+******************************************************************************
+void slBitMapNbg0(Uint16 col_type, Uint16 bmsize, void *bmadr)
+******************************************************************************
+
+Function:
+Sets the NBG0 screen in the bit map mode and specifies bit map size.
+
+col_type : One of COL_TYPE_16, COL_TYPE_256, COL_TYPE_2048, COL_TYPE_32768,
+           or COL_TYPE_1M
+
+bmsize : One of BM_512x256, BM_512x512, BM_1024x256, or BM_1024x512
+
+bmadr : Sets the VRAM address for the bit map data. This must be a 0x20000
+        boundary address.
+
+******************************************************************************
+void slBitMapNbg1(Uint16 col_type, Uint16 bmsize, void *bmadr)
+******************************************************************************
+
+col_type : Specify one of COL_TYPE_16, COL_TYPE_256, COL_TYPE_2048, or
+           COL_TYPE_32768
+
+bmsize : Specify one of BM_512x256, BM_512x512, BM_1024x256, or BM_1024x512 
+
+bmadr : Sets the VRAM address for the bit map data. This must be a 0x20000
+        boundary address.
+
+******************************************************************************
+void slBitMapRbg0(Uint16 col_type, Uint16 bmsize, void *bmadr)
+******************************************************************************
+
+Function:
+Sets the RBG0 screen in bit map mode and specifies bit map size.
+
+col_type : Specify one of COL_TYPE_16, COL_TYPE_256, COL_TYPE_2048,
+           COL_TYPE_32768, or COL_TYPE_1M
+bmsize : Specify one of BM_512x256 or BM_512x512
+bmadr : Sets the VRAM address for the bit map data. This must be a 0x20000
+        boundary address.
+
+******************************************************************************
+void slBMPaletteNbg0(Uint16 pal)
+void slBMPaletteNbg1(Uint16 pal)
+void slBMPaletteRbg0(Uint16 pal)
+******************************************************************************
+
+Function:
+Sets palette number for bit map display. See VDP2 Manual, P.112
+
+******************************************************************************
+void slSpecialPrioModeNbg0(Uint16 mode)
+void slSpecialPrioModeNbg1(Uint16 mode)
+void slSpecialPrioModeNbg2(Uint16 mode)
+void slSpecialPrioModeNbg3(Uint16 mode)
+void slSpecialPrioModeRbg0(Uint16 mode)
+******************************************************************************
+
+Function:
+Sets priority mode when using special priorities.
+
+mode : Specify one of spPRI_Scrn, spPRI_Char, or spPRI_Dot 
+
+******************************************************************************
+void slSpecialCCalcModeNbg0(Uint16 mode)
+void slSpecialCCalcModeNbg1(Uint16 mode)
+void slSpecialCCalcModeNbg2(Uint16 mode)
+void slSpecialCCalcModeNbg3(Uint16 mode)
+void slSpecialCCalcModeRbg0(Uint16 mode)
+******************************************************************************
+
+Function:
+Sets condition that triggers calculation when using special color calculation 
+mode.
+
+mode : Specify one of spCCAL_Scrn, spCCAL_Char, spCCAL_Dot, or spCCAL_MSB
+
+******************************************************************************
+void slSpecialFuncCodeA(Uint16 flag)
+void slSpecialFuncCodeB(Uint16 flag)
+******************************************************************************
+
+Function:
+Sets color code (lower 4 bits) used in the special function.
+
+code : These parameters can be combined with a bitwise OR (|): 
+       sfCOL_01, sfCOL_23, sfCOL_45, sfCOL_67, sfCOL_89, sfCOL_ab, sfCOL_cd,
+       and sfCOL_ef.
+
+******************************************************************************
+void slSpecialFuncSelectB(Uint16 scrn)
+******************************************************************************
+
+Function:
+Sets scroll screen that uses special function code B.
+
+scrn : NBGON, NBG1ON, NBG2ON, NBG3ON, RBG0ON
+
+******************************************************************************
+void slRparaReadCtrlRA(Uint16 flag)
+void slRparaReadCtrlRB(Uint16 flag)
+******************************************************************************
+
+Function:
+Specifies whether Xst, Yst, and KAst of the rotation parameters will be reread 
+per line.
+
+flag : Combine LnRd_Xst, LnRd_Yst, and LnRd_KAst by using a bitwise OR (|).
+
+******************************************************************************
+void slSpecialPrioBitN01(Uint16 scrn, Uint16 flag)
+******************************************************************************
+
+Function:
+Sets special priority bits for each screen.
+Sets registers for both the cell mode and bit map mode.
+
+scrn : scrnNBG0 or scrnNBG1
+
+flag : 0 or 1
+
+******************************************************************************
+void slSpecialPrioBitScr(Uint16 scrn, Uint16 flag)
+******************************************************************************
+
+Function:
+Sets special priority bits for each screen.
+
+scrn : scrnNBG2 or scrnNBG3 
+
+flag : 0 or 1
+
+******************************************************************************
+void slSpecialPrioBitRbg0(Uint16 flag)
+******************************************************************************
+
+Function:
+Sets special priority bits for each screen.
+Sets registers for both the cell mode and bit map mode.
+
+flag : 0 or 1
+
+******************************************************************************
+void slSpecialCCalcBitN01(Uint16 scrn, Uint16 flag)
+******************************************************************************
+
+Function:
+Sets special color calculation bits for each screen.
+
+scrn : scrnNBG0 or scrnNBG1
+
+flag : 0 or 1
+
+******************************************************************************
+void slSpecialCCalcBitScr(Uint16 scrn, Uint16 flag)
+******************************************************************************
+
+Function:
+Sets special color calculation bits for each area.
+
+scrn : scrnNBG2 or scrnNBG3
+
+flag : 0 or 1
+
+******************************************************************************
+void slSpecialCCalcBitRbg0(Uint16 flag)
+******************************************************************************
+
+Function:
+Sets the special color calculation bit for each area.
+Sets registers for both the cell and bit map modes.
+
+flag : 0 or 1
+
+******************************************************************************
+void slLineScrollMode(Uint16 scrn, Uint16 mode)
+******************************************************************************
+
+Function:
+Sets scroll screen line scroll mode.
+
+scrn : scrnNBG0 or scrnNBG1
+mode : Combine the following modes as necessary with a bitwise OR (|).
+       lineSZ1 | lineSZ2 | lineSZ4 | lineSZ8     : Line width
+       lineZoom                                  : Horizontal scaling
+       lineVScroll                               : Vertical scroll
+       lineHScroll                               : Horizontal scroll
+       VCellScroll                               : Vertical cell scroll
+
+******************************************************************************
+void slLineScrollTable0(void *addr)
+******************************************************************************
+
+Function:
+Sets line scroll data table address.
+
+addr : VRAM address for the line scroll data.
+
+******************************************************************************
+void slLineScrollTable1(void *addr)
+******************************************************************************
+
+Function:
+Same as above
+
+******************************************************************************
+void slVCellTable(void *addr)
+******************************************************************************
+
+Function:
+Sets vertical cell scroll data table.
+
+addr : VRAM address for the vertical cell scroll data.
+
+When using vertical cell scrolling, it is necessary to set the VRAM access 
+cycle. Set the cycle using the slScrCycleSet and slScrAutoDisp functions.
+Vertical cell scrolling cannot be used in high resolution mode.
+Data (coefficient, graphics, etc.) used by vertical cell scroll and rotation 
+scroll screens cannot be placed together in the same bank.
+
+******************************************************************************
+void slVRAMMode(Uint16 mode)
+******************************************************************************
+
+Function:
+Sets the VRAM division method.
+
+mode : Only Div_A and Div_B can be specified.
+       To cancel division, specify NULL.
+
+******************************************************************************
+void slColOffsetScrn(Uint16 Ascrn, Uint16 Bscrn)
+******************************************************************************
+
+Function:
+Sets color offset screens separately for parameters Ascrn and Bscrn.
+(This function is a combination of slColOffsetOn() and slColOffsetBUse())
+
+Ascrn, Bscrn : Specify in the same manner as for slScrDisp.
+
+******************************************************************************
+void slScrMoveNbg0(FIXED mvx, FIXED mvy)
+******************************************************************************
+
+Function:
+Moves scroll screen display position using an offset from its previous 
+position. (This function adds to the display position specified by 
+slScrPosNbg0()) See system variables Nbg0_PosX, and Nbg0_PosY for the current 
+display position.
+
+slScrMoveNbg1, slScrMoveNbg2, and slScrMoveNbg3 are used in the same manner.
+
+******************************************************************************
+void setASC_1to8(Uint8 *src, void *dst, Uint32 cell, Uint8 pal)
+void setASC_4to8(Uint8 *src, void *dst, Uint32 cell, uint8 pal)
+******************************************************************************
+
+Function:
+Expands a 4 bit compressed ASCII character data that represents 1 pixel into a 
+scroll screen's 256 color mode character data. Each pixel is assigned to 
+either palette number 0 or 1.
+
+Set the number of characters expanded in the parameter cell.
+Set the base palette number of the characters expanded in the parameter  pal.
+
+******************************************************************************
+void setASC_1to4(Uint8 *src, void *dst, Uint32 cell, Uint8 pal, Sint32 skip)
+******************************************************************************
+
+Expands a 1 bit compressed ASCII character data that represents 1 pixel into a 
+scroll screen's 16 color mode character data. Each pixel is assigned to either 
+palette number 0 or 1.
+
+Set number of characters expanded in the parameter cell.
+Set the base palette number of the characters expanded in the parameter  pal.
+Set the number of bytes skipped after expanding 1 cell in the parameter skip.
+
+(When using 256 color mode specific functions such as slPrint with 16-color 
+mode, specify CG_Size/2.)
+
+******************************************************************************
+Uint8 SGL_ASCII_CG[]
+******************************************************************************
+
+Expand ASCII character data using the default SGL character data with the 
+setASC_1to8() function above. There are a total of 128 characters.
+

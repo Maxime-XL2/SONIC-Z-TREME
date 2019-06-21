@@ -1,0 +1,80 @@
+******************************************************************************
+Interrupt Library Functions
+******************************************************************************
+
+******************************************************************************
+void slSynch(void)
+******************************************************************************
+
+Function:
+Waits for the next video display to start (the first frame when there are 2 
+frames). Terminates immediately when processing overhead occurs in the prior 
+process.
+
+******************************************************************************
+void slInitSynch(void)
+******************************************************************************
+
+Function:
+Initializes the interrupt wait counter, waits, and then ends when the next 
+video display starts.
+
+******************************************************************************
+void slIntFunction(void *func())
+******************************************************************************
+
+Function: 
+Sets the user-defined function to be executed during V-blank-in interrupt 
+processing. The user function is executed after scroll data is transferred.
+Set NULL to delete already registered functions.****************************************** Changes ********
+
+Note:
+Since the user-defined function is executed during interrupt processing, the 
+SH2's divide unit may not be used within the function.
+
+******************************************************************************
+void slSynchFunction(void *func())
+******************************************************************************
+Function:
+A function has been registered that is executed while waiting for a blanking************** Changes ********
+interrupt by the slSynch function.******************************************************** Changes ********
+Set NULL to delete already registered functions.****************************************** Changes ********
+
+******************************************************************************
+Bool slTransferEntry(void *src,void *dst,Uint16 cnt)
+******************************************************************************
+
+Function: 
+Adds an entry to the DMA transfer list that is executed during the next V-
+blank.
+
+Note:
+Since the SCU's indirect DMA mode is used, the transfer source and transfer 
+destination buses must be different. There are 3 buses connected via the SCU:
+  CPUBus: IPLROM, WORK RAM, BACKUP RAM, SMPC
+  A-Bus:  CD, Cartridge
+  B-Bus:  VDP1, VDP2, SCSP
+
+******************************************************************************
+V-Blank Interrupt Processing
+******************************************************************************
+
+Scroll data transfer, execution of DMA transfer tables created with 
+slTransferEntry, and execution of user functions set with slIntFunction are 
+performed at V-Blank-in. Out of these processes, it is possible to prohibit 
+scroll data transfer with the PauseFlag variable.
+
+PauseFlag is a Uint8 type flag variable.  It prohibits the scroll data 
+transfer whenever its value is other than 0.
+
+The following processes are performed at V-blank-out:
+
+    - Erase/write of the sprite frame buffer.
+    - Frame change mode switch.
+    - Sprite data DMA transfer.
+    - Peripheral data reads.
+    - Interrupt wait counter decrement.
+
+Out of these, the sprite-related processes can be suppressed with PauseFlag.
+
+

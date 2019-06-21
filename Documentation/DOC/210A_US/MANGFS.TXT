@@ -1,0 +1,632 @@
+******************************************************************
+* Document type: Library reference
+* Readme file name: mangfs.txt
+* Library prefix: GFS
+* Library name: File System
+* Version: 2.11
+* Creator: H.T.
+* Created: 3/21/96
+* Comments: None
+******************************************************************
+
+1. Description of Changes From Ver.1.01 to Ver.1.10
+
+1.1 Changes Regarding CD Preread Processing
+
+(1) Change of GFS_NwCdRead
+
+After GFS_NwCdRead is called, prereads from a CD are valid even if
+GFS_NwFread is called before GFS_NwExecOne is completed.
+
+When CD preread is used, the preread is not completed until all of
+the specified number of sectors are transferred to the host or
+access is stopped.  (TRUE is not returned for GFS_NwIsComplete.)
+
+(2) Access Complete Check (Important)
+
+When GFS_NwCdRead is called, the completed status is not returned
+for GFS_NwExecOne until data transfer is completed or access is
+stopped.  Do not wait for a completed status to be returned for
+GFS_NwExecOne without calling GFS_NwFread.  As in the example on
+P.18 of the Rel.2 library manual, if a user waits for a completed
+status to be returned for GFS_NwExecOne immediately after
+GFS_NwCdRead, an infinite loop will occur.
+
+As long as GFS_NwCdRead is not called, a check for GFS_NwExecOne
+completion can be performed with the same procedure as the
+previous version of the library.
+
+When prereading from a CD or when in memory resident mode, check
+for completion while monitoring transferred bytes at the same time
+using GFS_NwGetStat.  Following is an example:
+
+************************** Changes ************************************
+#define    FILE_SIZE       ??????  /* File size (number of bytes) */
+#define    SCT_SIZE        2048    /* Sector size (either 2048 or 2324) */
+#define    BUF_SCTNUM      ?       /* Number of sectors to be read (FILE_SIZE or less) */
+************************** End of Changes ************************************
+
+
+
+    GfsHn  gfs;
+    Sint32 fid, stat, nbyte, rest, rdsct;
+    Uint32 buf[BUF_SCTNUM * SCT_SIZE/sizeof(Uint32)];
+
+    gfs = GFS_Open(fid);
+    rest = (FILE_SIZE + SCT_SIZE - 1) / SCT_SIZE;
+    GFS_NwCdRead(gfs, rest);
+    while (rest > 0) {
+        rdsct = MIN(rest, BUF_SCTNUM);
+        GFS_NwFread(gfs, rdsct, buf, rdsct * SCT_SIZE);
+        while (TRUE) {
+            user();                 /* Application processing */
+            stat = GFS_NwExecOne(gfs);
+            if (stat == GFS_SVR_COMPLETED) {
+                break;
+            }
+            GFS_NwGetStat(gfs, &stat, &nbyte);
+            /* Checks of the byte count specified by */
+            /* GFS_NwFread has been read */
+            if (nbyte >= rdsct * SCT_SIZE) {
+                break;
+            }
+        }
+        rest -= rdsct;
+    }
+
+1.2 Addition of a CD-DA File Processing Function
+
+A CD-DA file processing function was added.  The CD-DA file read
+becomes the playback of the music track as specified by that file.
+However, it is necessary to set the SCSP from the application side
+to output sound.
+
+(1) File Control
+
+The control performed by the file system on CD-DA files is limited
+to only playback and playback range.  A default playback mode is
+used (no repeats, the pickup is moved).
+
+(2) Playback Method
+
+To playback CD-DA files, use one of the following methods.
+
+    (a) GFS_Load
+    (b) GFS_Fread
+    (c) GFS_NwFread
+    (d) GFS_NwCdRead
+
+- Control is not returned until playback is complete with methods
+  (a) and (b).
+
+- It is necessary to call the server function with methods (c) and
+  (d).  When CD-DA playback is completed, the server function
+  returns GFS_SVR_COMPLETED.
+
+- To playback from the middle of a file, use GFS_Seek.
+
+- CD-DA files and CD-ROM files cannot be accessed simultaneously.
+
+(3) File Operation Parameters
+
+For CD-DA files, the fetch mode, transfer mode, read parameters,
+and fetch parameters cannot be changed.  An error occurs if the
+following functions are called for CD-DA files.
+
+  GFS_SetGmode
+  GFS_SetTmode
+  GFS_SetReadPara
+  GFS_SetTransPara
+
+1.3 File Attributes
+
+The following changes were made to make the file attribute values
+output by GFS_GetFileInfo comply with CD-ROM XA standards.
+
+  GFS_ATR_DIR     0x80
+  GFS_ATR_CDDA    0x40
+  GFS_ATR_INTLV   0x20
+  GFS_ATR_FORM2   0x10
+  GFS_ATR_FORM1   0x80
+  GFS_ATR_END_TBL 0x01
+
+GFS_ATR_CDDA was added as a CD-DA file processing function.  That
+bit becomes 1 for CD-DA files.
+
+Other constant names or their meanings have not changed.
+
+1.4 GFS_Init and GFS_LoadDir Function Values
+
+By specifying NULL as the pointer for the argument's directory
+information control structure, the directory information count
+stored by the CD block file system is returned as the function
+value.
+
+1.5 Addition of an Error Code
+
+(1) GFS_ERR_BFUL
+
+This error code is generated if the CD buffer becomes full while
+reading a resident mode (GFS_GMODE_RESIDENT) file.
+
+Adjust the access sequence and method so that the buffer does not
+become full during access of a resident mode file.
+
+(2) GFS_ERR_FATAL
+
+This error code gives notification that the CD drive has reached
+FATAL status.
+
+When the file system detects this condition, it stops CD playback
+(seeks the home position), and tries to recover from the error
+condition.  If this error code is detected, retry the process.
+
+1.6 Confirming CD Tray Open Status
+
+The tray is now regarded as being open when the DCHG (bit5) of the
+CD block interrupt source register (HIRQREQ) is 1.
+
+During application development, check to see that the CD status
+does not indicate the tray open status and clear the DCHG bit
+before calling GFS_Init.
+
+The application does not need to perform this on a production
+Saturn since the boot ROM clears the DCHG flag.
+
+1.7 Transfer Mode Changes by the Transfer Destination Address
+
+When the transfer destination address are the following areas, a
+forced CPU software transfer will be executed even if the transfer
+mode is set to GFS_TMODE_SCU.
+
+        WORKRAM-L area   00200000H to 002FFFFFH
+        A-Bus area       02000000H to 058FFFFFH
+
+1.8 Debug File Related
+
+(1) GFMC_base
+
+The variable GFMC_base, which sets the SIMM file starting address,
+has been defined in both sega_gfs.lib and segadgfs.lib.
+
+GFMC_base in sega_gfs.lib only exists for compatibility with
+segadgfs.lib.  It has no effect on File System operation.
+
+(2) File Identifier
+
+The function which automatically appends "." and ".." (current and
+parent directory) when no CD files are used was deleted.  This
+makes the file identifier the same as at startup.
+
+2. Description of Changes After Ver.1.11 (Ver.1.11 to Ver.1.20)
+
+2.1 Description of Changes from Ver.1.10 to Ver.1.11
+
+(1) GFS_Init Function
+
+This function was changed so that a SCU level 0-DMA completion
+interrupt is enabled with INT_ChgMsk.  (This change was made
+because specifications were changed so that DMA transfer
+completion is determined by interrupt.)
+
+2.2 Bug Fix from Ver.1.11 to Ver.1.13
+
+(a) Corrected the read error (GFS_ERR_CDRD) problem that occurred
+    when the CD buffer became full during playback.
+
+2.3 Bug Fix from Ver.1.13 to Ver.1.15
+
+(a) Corrected a unnecessary time out bug (GFS_ERR_TMOUT).
+
+2.4 Description of Changes from Ver.1.15 to Ver.1.16
+
+(1) Initial CD Block Settings for the GFS_Init Function
+
+The following settings are performed with the CDC_CdInit function.
+(The ECC count and retry count are set to maximum, and other
+values stay as default.)
+
+  * CD block software reset:     No
+  * Subcode decode:              No
+  * Recognize Mode 2 subheader:  Yes
+  * Form 2 read retry:           No
+  * CD-ROM data read:            Maximum speed (currently 2X)
+  * Standby time:                180 seconds
+  * ECC count:                   5 times
+  * Retry count:                 15 times
+
+(2) Addition of Read Error Recovery Processing
+
+When a read error occurs on GFS_NwExecOne and GFS_NwExecServer,
+GFS_ERR_CDRD is returned as with versions prior to 1.15, but if
+the server function is called in that state, recovery processing
+is performed.  With end return type access, GFS_ERR_CDRD is
+returned as in versions prior to 1.15.
+
+(3) Increase in GFS_Fread Time Out Time
+
+Time out time has been extended from after the call to GFS_Fread
+until the start of data reads.
+
+(4) Changes to Error Codes
+
+  * Invalid GFS_Load seek position: GFS_ERR_OFS
+  * Out of GFS_Seek file seek range: GFS_ERR_SEEK
+  * Specification of negative playback sector count for
+    GFS_NwFread and GFS_Fread: GFS_ERR_PARA
+
+(5) Bug Fixes
+
+(a) Corrected a bug that caused every other word to be skipped
+    when transferring data to the B-Bus using GFS_TMODE_SCU.
+
+(b) Corrected a bug that resulted in missing data when data was
+    transferred in non-long word units using GFS_TMODE_SDMA0 and
+    GFS_TMODE_SDMA1.
+
+(c) Corrected a bug that caused reduced read speeds when a read is
+    not done to the end of a file using GFS_Load.
+
+2.5 Bug Fixes from Ver.1.16 to Ver.1.20
+
+(a) Corrected a bug that showed the read byte count in 2048 byte
+    units when files are read from SIMM memory using GFS_Fread and
+    GFS_Load.
+
+(b) Corrected a bug that caused prevented data from being read for
+    either of the cases below:
+
+    * When preread was performed for multiple files by executing
+      GFS_NwCdRead and GFS_Fread simultaneously.
+
+    * When the maximum read sector count specified by
+      GFS_SetReadPara is smaller than the file size.
+
+(c) The library was modified so that discs with directory file
+    sizes that are not in sector units can be played back.
+
+3. Description of Changes from Ver.1.20 to Ver.1.21
+
+3.1 Function Additions
+
++----------------+--------------------+-------------------+-----+
+| Title          |Function            | Function Name     | No. |
+|                |                    |                   |     |
+| Function Specs |Get directory info. | GFS_GetDirInfo    | 1.6 |
++----------------+----------------+-----------------------+-----+
+
+Format:         Sint32  GFS_GetDirInfo(Sint32 fid, GfsDirId
+                *dirrec)
+Input:     fid: File identifier
+Output: dirrec: Directory information
+Function Value: Error code
+Function:       Gets directory information from a file identifier.
+
++----------------+--------------------+-------------------+-----+
+| Title          | Function           | Function Name     | No. |
+|                |                    |                   |     |
+| Function Specs | Reset file system  | GFS_Reset         | 1.7 |
++----------------+--------------------+-------------------+-----+
+
+Format:         void  GFS_Reset(void)
+Input:          None
+Output:         None
+Function Value: None
+Function:       Closes all open files and resets the file system.
+                (Initializes data other than directory data)
+
+Comments:
+
+Execute this function after closing the stream when using the
+Stream System.
+
++----------------+--------------------+-------------------+-----+
+| Title          | Function           | Function Name     | No. |
+|                |                    |                   |     |
+| Function Specs | Get CD buffer      | GFS_GetNumCdbuf   | 2.9 |
+|                | partition sector   |                   |     |
+|                | count              |                   |     |
++----------------+--------------------+-------------------+-----+
+
+Format:         Sint32 GFS_GetNumCdbuf(GfsHn gfs)
+Input      gfs: File handle
+Output:         None
+Function Value: CD buffer partition sector count
+Function:       Gets the sector count that exists in the CD buffer
+                partition.
+
++----------------+-------------------+-------------------+-----+
+| Title          | Function          | Function Name     | No. |
+|                |                   |                   |     |
+| Function Specs | Set transfer      | GFS_SetTrFunc     | 5.5 |
+|                | function          |                   |     |
++----------------+-------------------+-------------------+-----+
+
+Format:         void  GFS_SetTrFunc(GfsHn gfs, GfsTrFunc func)
+Input:     gfs: File handle
+          func: Transfer function
+Output:         None
+Function Value: None
+Function:       Sets the transfer function for a specified file.
+                Set functions are called during file transfer
+                processing.
+Comments:
+
+(a) Set functions are in the following format.
+
+    Sint32 (*GfsTrFunc)(GfsHn gfs, Sint32 nsct)
+    gfs: File handle
+    nsct: Number of transferable sectors
+
+The transfer function can fetch a maximum of nsct sector data.
+The actual fetched sector count is returned as the function value.
+However, a (-1) is returned during a DMA transfer at the transfer
+function end point
+
+(b) Transfer Function Example
+
+        Uint32  read_buf[BUFSIZE];
+        Sint32  transFunc(GfsHn gfs, Sint32 nsct)
+        {
+            Uint32  *ptr;
+            Sint32  dadr;
+            Sint32  i;
+
+            ptr = GFS_StartTrans(gfs, &dadr);
+            for (i = 0; i < 2048 * nsct; i++) {
+                read_buf[i] = *ptr;
+                ptr += dadr;
+            }
+            return (nsct);
+        }
+
++----------------+----------------+-------------------+-----+
+| Title          | Function       | Function Name     | No. |
+|                |                |                   |     |
+| Function Specs | Start transfer | GFS_StartTrans    | 5.6 |
+|                | for transfer   |                   |     |
+|                | functions      |                   |     |
++----------------+----------------+-------------------+-----+
+
+Format:         Uint32  *GFS_StartTrans(GfsHn gfs, Sint32 *dadr)
+Input      gfs: File handle
+          dadr: Amount of change in transfer source address for
+                each longword fetched.
+Output:         None
+Function Value: Transfer source address
+Function:       Data transfer processing starts for transfer
+                functions.
+
+3.2 Other Changes
+
+(a) The necessary low-level functions have been set up so that the
+    A-Bus is not accessed (see caution items below) when they
+    are executed during SCU-DMA transfers.
+
+(b) Made compatible with the CDC Library Ver.1.20.
+
+4. Description of Changes After Ver.1.22 (Ver.1.22 to Ver.2.11)
+
+4.1 Description Of Changes from Ver.1.21 to Ver.1.22
+
+A function for the Demo-Demo system has been added.  The GFS
+library which has this function is called the Multi-GFS library.
+By using Multi-GFS, an application can be developed without
+concern for whether it is a version for the Demo-Demo system or an
+actual product.  With Multi-GFS, programs created as product
+versions can be used as Demo-Demo versions without modifications.
+
+4.2 Changes from Ver.1.22 to Ver.2.00
+
+(1) GFS_Fread Function
+
+Unnecessary wait time for the GFS_Fread function was eliminated
+and processing speed was increased.  (A-Bus access during SCU-DMA
+is also avoided.)
+
+(2) Bug Fixes
+
+(a) Corrected the inability to transfer access to a subdirectory
+    when the CD block file system is used.
+
+(b) Corrected a bug that caused a software transfer to occur
+    instead of a CPU-DMA to WORKRAM-L.
+
+(c) Corrected a read error that occurred when a file was divided
+    and read in the resident mode.
+
+4.3 Changes from Ver.2.00 to Ver.2.01
+
+(1) Bug Fixes
+
+(a) Corrected a bug in the resident mode that caused a read to
+    occur beyond the file end position.  This problem occurred
+    when a seek took place two-thirds of the way or more into the
+    file and then GFS_Fread was executed.
+
+(b) Corrected the problem of incomplete reads that occurred when
+    the maximum number of transferred sectors was set to 2 or more
+    in the resident mode.
+
+4.4 Changes from Ver. 2.01 to Ver.2.02
+
+(1) Integration with the SGL CD-ROM Library.
+
+(a) Source code can now be shared with the SGL CD-ROM Library.
+    For further information, refer to section 5.3, "Precautions
+    When Creating the SGL CD-ROM Library."
+
+(2) Bug Fixes
+
+(a) Corrected the problem of bad transfers that occurred when 2
+    files larger than 200 sectors were first accessed with
+    GFS_NwCdRead and then divided and transferred by GFS_NwFread.
+
+(b) Corrected the crash bug that occurred when files that have
+    final sectors containing less than 3 bytes are read by
+    CPU-DMA.
+
+(c) Corrected the bug that caused the playback of a CD-DA file
+    read into memory to stop when the CD-DA track is played with
+    CDC_CdPlay and GFS_Close is executed.
+
+4.5 Changes from Ver.2.02 to Ver.2.10
+
+(1) Changes in the Demo-Demo Reference Area
+
+The starting reference address during the execution of the Demo-
+Demo system has been changed from 0x60020cc to 0x6000ccc.
+
+(2) Improvements to Fatal Error Detection
+
+The error detection function for a FATAL CD block and CD Tray Open
+status was improved.
+
+(3) SGL-related changes
+
+(a) SCU-DMAs can now be used even when USE_SGL has been defined as
+    a compile option.
+
+(b) DEBUG_LIB must be defined in the compile option in order to
+    use SIMM and SCSI-based files.
+
+(4) Bug Fixes
+
+(a) Corrected a bug that caused data to remain in the CD buffer
+    when GFS_NwStop or GFS_Close is executed during reads.
+    Because of this problem, a wait takes place until the drive
+    goes into the pause state when GFS_Close is executed during a
+    read.  To avoid this, execute GFS_NwStop beforehand, and then
+    execute GFS_Close after the drive stops.
+
+    Previously, CD access did not take place during the initial
+    read of a file that was originally read in the resident mode
+    and later switched to cancel mode.  This has now been changed
+    so that CD access occurs from the first time.
+
+(b) Corrected the incorrect interrupt handling problem that
+    occurs when GFS_NwStop and GFS_Close interrupts a read to a
+    DMA transfer-specified file.
+
+*********************** Changes ***********************
+
+(5) Miscellaneous
+
+(a) A correction was made in order to avoid a problem in GCC optimization.
+
+4.6 Changes between Ver. 2.10 and Ver. 2.11
+
+(1) Document corrections
+
+(a) The program example in section 1.1 (2) of this document was corrected.
+
+(2) Bug corrections
+
+(a) The error in the playback range setting for interleaved files was corrected.
+
+(b) The problem where executing GFS_GetFileSize with the "sctsz = NULL"
+    specification on a file that contains both Form1 and Form2 sectors
+    results in address 0 being accessed was corrected.
+
+(3) Miscellaneous
+
+(a) Unused variables were deleted.
+
+5.	Manual corrections
+
+Page Item No. |               Before                            After
+11   |3.4   |OpenByName(Uint8 *fname)         |OpenByName(Sint8 *fname)
+23   |Table7.1   |GFS_TRANS_~                    |GFS_TMODE_~
+27   |No2.6 |GFS_TRANS_~                     |GFS_TMODE_~
+27   |No2.6 |DMA transfer by SCU               | DMA transfer by SCU (level 0)* When he transfer destination is WORKRAM-L, a software transfer results.
+30   |No3.4 |GFS_DIR_FNAME(dir)  Uint8[]      |GFS_DIR_FNAME(dir)  Sint8[]
+34   |No1.4 |GFS_NameToId(Uint8 *fname)        |GFS_NameToId(Sint8 *fname)  |
+34   |No1.5 |const Uint8 *GFS_IdToName          |Sint8 *GFS_IdToName
+35   |No2.3 |Position beyond the end of the file   | the access pointer cannot specify a location outside of the range of the file.
+36   |No2.7 |nsct: Number of sectors (not including the last sector)  Remarks: In a form 2 sector file.                                           |..nsct: Number of sectors (including the last sector)  Remarks: In a file containing both form 1 and form 2, both sctsize and lastsize are "0".
+
+
+38   |No3.2 |Remarks: The access pointer... performs read processing. |Deleted
+     |No4.1 |
+39   |No4.2 |With the GFS_NwlsCompleted function |With the GFS_NwlsComplete function
+44   |      |When not using a CD-ROM             |Deleted due to change in file identifier specifications in section C.2 (8) on page 50.
+48   |C.2(1)|GFS_SVR_COMPLETE                 |GFS_SVR_COMPLETED           |
+49   |C.2(3)|GFS_ATR_FORM1  0x80               |GFS_ATR_FORM1  0x08         |
+
+*********************** End of Changes ***********************
+
+6.1 Cautions When Using DOS Files
+
+Only 1 sector can be transferred at a time due to the processing
+nature of the DOS file fetch parameter.  Even if the fetch
+parameter is set to a value other than 1, it is ignored.
+
+6.2 Cautions When Using SCU-DMA
+
+(1) Enabling Interrupts
+
+When the transfer mode is GFS_TMODE_SCU, the File System Library
+activates the SCU-DMA using the Dma Library. The interrupt
+priority level used is 0.
+
+Therefore, SCU level 0-DMA completion interrupt by the INT_ChgMsk
+function is allowed for GFS_Init.  (For detailed information, see
+DMA/interrupt related documents.)
+
+  /* Enable SCU-DMA0 completion interrupt */
+  INT_ChgMsk(INT_MSK_DMA0, INT_MSK_NULL);
+
+(2) Restrictions on Usable Functions
+
+When the transfer mode is GFS_TMODE_SCU or SCU-DMA is activated
+for the transfer function, only the following functions can be
+used until transfer is complete.
+
+Use of functions other than these is prohibited because A-Bus
+access is prohibited during SCU-DMA transfers.
+
+* GFS_Reset        * GFS_Close       * GFS_NwIsComplete
+* GFS_NwGetStat    * GFS_NwExecOne   * GFS_NwExecServer
+* GFS_GetErrStat
+
+****************** Changes *************************
+6.3 Notes on Demo-Demo Execution
+******************* End of Changes **************************
+To run a program under the Demo-Demo system, the application code
+must take the following restrictions into consideration:
+
+(a) For CD-DA playback, track numbers are converted using the
+    GFS_ConvTno function, and the track number specified by the CD
+    Communication Interface is used by the CDC_CdPlay function.
+    Immediate track numbers and CD-DA files values must not be
+    used.
+(b) Immediate FAD must not be used during CD access.
+(c) The maximum of directory levels is 7 levels, including the
+    root directory.
+
++----------------+----------------+-------------------+-----+
+| Title          | Function       | Function Name     | No. |
+|                |                |                   |     |
+| Function Specs | Convert track  | GFS_ConvTno       | 6.4 |
+|                | number         |                   |     |
++----------------+----------------+-------------------+-----+
+
+Format:         Sint32 GFS_ConvTno(Sint32 logtno)
+Input   logtno: Logical track number (game disc track number)
+Function Value: Physical track number (Demo-Demo track number)
+Function:       The logical track number is converted to a
+                physical track number.  When the Demo-Demo system
+                is not used, the logical track number equals the
+                physical track number.
+
+6.4 Precautions When Creating the SGL CD-ROM Library
+
+Define USE_SGL before compiling code to use this library as an SGL
+CD-ROM Library module.
+
+Define DEBUG_LIB in the compile options for the SBL to support
+SIMM and SCSI-based files.  Refer to gfs.lbr, gfsd1.lbr, gfsd2.lbr
+for the object files that are necessary for each library.
+
+****************************end of file***************************
+

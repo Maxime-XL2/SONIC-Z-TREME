@@ -1,0 +1,641 @@
+******************************************************************************
+System Memory Mapping
+******************************************************************************
+
+The SGL system uses 0x40000 bytes of the WORK-HI area for sprite and scroll
+control. It also uses 264 bytes of VDP1 VRAM as data for Gouraud shading to
+apply light source effects to textures. The breakdown of the system memory
+mapping and their default settings are as follows:
+
+    MAX_POLYGONS: 1786 polygons
+    MAX_VERTICES: 2500 vertices
+    MAX_TRANSFER:   20 transfer requests (during V-blanks)
+    MAX_NEST:       20 matrix nesting levels
+
+slPutPolygon() does not process a model if the number of polygons and vertices
+used in that specified model is exceeds the maximum for each parameter.
+
+In addition, whenever slPutSprite(), slDispSprite(), and slSetSprite() are
+executed, polygons count is increased one at a time. When the maximum number
+is exceeded, the processing of data is halted. (Note: When the specified Z
+position is outside the display area, the polygon count is not increased.)
+
+* Work RAM:
+
+    060C0000: (SortList)
+      DMA transfer table buffer for sprite control data.
+      (MAX_POLYGONS+6)*3*4 bytes = 0x5400
+
+    060C5400: (CLOfstBuf)
+      Data table for light source color generation.
+      32*32 = 0x400
+
+    060C5800: (Zbuffer)
+      Primary buffer for polygon sorting (for window 0).
+      128*4 = 0x200
+
+    060C5A00: (Zbuffer2)
+      Primary buffer 2 for polygon sorting (for window 1).
+      128*4 = 0x200
+
+    060C5C00: (Zbuf_nest)
+      Secondary buffer for polygon sorting.
+      256*4 = 0x400
+
+    060C6000: (Spritebuf)
+      Sprite control data buffer.
+      (MAX_POLYGONS+5)*36 = 0xFBDC
+
+    060D5BDC: (Spritebuf2)
+      Sprite control data buffer 2.
+      (MAX_POLYGONS+5)*36 = 0xFBDC
+
+    060E57B8: (Pbuffer)
+      Vertex position buffer for polygon calculations.
+      MAX_VERTICES*16 = 0x9C40
+
+    060EF3F8: (CommandBuf)
+      Master-to-slave command buffer.
+      MAX_POLYGONS*32 = 0xDF40
+
+    060fb800: (TransList)
+      DMA control table for transfer requests during V-blanks.
+      MAX_TRANSFER*3*4 bytes = 0xF0
+
+    060FB8F0:
+      Stack area (0x4310)
+
+    060FFC00:
+      System variable area (GBR register always points to here)
+      0x400 bytes
+      System variables are as follows. They can be read from a C program
+      with the same names (identifiers).
+
+* System Variables:
+
+000: (EventTop)       (EVENT *) ; event registered at top
+004: (EventLast)      (EVENT *) ; event registered last
+008: (EventNow)       (EVENT *) ; event executing now
+00C: (EventCount)     (Uint16) ; event remaining
+00E: (WorkCount)      (Uint16) ; work remaining
+010: (MainMode)       (Uint8) ; main sequence mode
+011: (SubMode)        (Uint8) ; subsequence mode
+012: (SynchConst)     (Sint8) ; video sync count
+013: (SynchCount)     (Sint8) ; video sync count
+014: (UserFunction)   (void (*)()) ; user function executed during V-blank
+018: (TransCount)     (Uint16) ; transfer count during V-blank
+01A: (TransRequest)   (Uint8) ; transfer request during V-blank
+01B: (PauseFlag)      (Uint8) ; pause flag for sprites and scroll
+01C: (mtptr)          (MATRIX *) ; current matrix pointer
+020: (MatrixCount)    (Uint8) ; matrix nest count
+021: (PrintColor)     (Uint8) ; color palette for text display
+022: (IntCount)       (Uint16) ; interrupt count
+024: (MsPbufPtr)      (Uint32 *) ; vertex coordinate calculation buffer
+                                   pointer (Master)
+028: (SlPbufPtr)      (Uint32 *) ; vertex coordinate calculation buffer
+                                   pointer (Slave)
+02C: (SpritePtr)      (Uint16 *) ; sprite data transfer pointer
+030: (MsSdataPtr)     (Uint16 *) ; sprite data set pointer (Master)
+034: (SlSdataPtr)     (Uint16 *) ; sprite data set pointer (Slave)
+038: (ZbufPtr)        (void **) ; Z buffer pointer
+03C: (FormTbl)        (TEXTURE *) ; texture data table
+040: (SprbufBias)     (Uint32) ; sprite data buffer switch
+044: (ComRdPtr)       (Uint32 *) ; command read pointer
+048: (ComWrPtr)       (Uint32 *) ; command set pointer
+04C: (MsLightVector)  (VECTOR) ; light source vector (Master)
+058: (SlLightVector)  (VECTOR) ; light source vector (Slave)
+064: (ColorOffset)    (Uint8 *) ; color offset table pointer
+068: (MsScreenDist)   (FIXED)  ; screen position (Master)
+06C: (SlScreenDist)   (FIXED)  ; screen position (Slave)
+070: (MsZlimit)       (Sint16) ; display limit Z position (Master)
+072: (WindowNumber)   (Uint8)  ; number of windows used
+073: (WinUseFlag)     (Uint8)  ; window use flag
+074: (TotalPolygons)  (Uint16) ; total polygons calculated
+076: (TotalVertices)  (Uint16) ; total vertices calculated
+078: (MsScreenLeft)   (Sint16) ; screen left position (Master)
+07A: (MsScreenTop)    (Sint16) ; screen top position (Master)
+07C: (MsScreenRight)  (Sint16) ; screen right position (Master)
+07E: (MsScreenBottom) (Sint16) ; screen bottom position (Master)
+080: (MsScreenSizeX)  (Uint16) ; screen size X (Master)
+082: (MsScreenSizeY)  (Uint16) ; screen size Y (Master)
+084: (MsWindowSizeX)  (Uint16) ; window size (Master)
+086: (MsWindowSizeY)  (Uint16) ; window size (Master)
+088: (MXPolygons)     (Uint16) ; maximum polygons
+08A: (MXVertices)     (Uint16) ; maximum vertices
+08C: (FrameSizeX)     (Uint16) ; frame buffer size
+08E: (FrameSizeY)     (Uint16) ; frame buffer size
+090: (MsWinXAdder)    (Uint16) ; window check adder data (Master)
+092: (MsWinYAdder)    (Uint16) ; window check adder data (Master)
+094: (SlWinXAdder)    (Uint16) ; window check adder data (Slave)
+096: (SlWinYAdder)    (Uint16) ; window check adder data (Slave)
+098: (MsClipXAdder)   (Sint16) ; clipping adder data (Master)
+09A: (MsClipYAdder)   (Sint16) ; clipping adder data (Master)
+09C: (SlClipXAdder)   (Sint16) ; clipping adder data (Slave)
+09E: (SlClipYAdder)   (Sint16) ; clipping adder data (Slave)
+0A0: (SlZlimit)       (Sint16) ; display limit Z position (Slave)
+0A2: (WinPtr)         (Uint16) ; window data set offset
+0A4: (DispPolygons)   (Uint16) ; number of displayed polygons
+0A6: (DMAEndFlag)     (Uint8)  ; DMA end flag (not used)
+0A8: (DMASetFlag)     (Uint8)  ; DMA table set flag
+0AA: (PutCount)       (Uint16) ; slPutPolygon(),sl...Sprite() call count
+0AC: (MsZdpsftcnt)    (Uint8)  ; screen display limit shift counter (Master)
+0AD: (SlZdpsftcnt)    (Uint8)  ; screen display limit shift counter (Slave)
+0B0: (Resolution)     (Uint8)  ; screen mode
+0B1: (NbPCMBf)        (Uint8)  ; number of PCM buffers (2000H units)
+0B2: (PCMBufFlag)     (Sint16) ; PCM buffer empty status flag
+0B4: (SoundRdCount)   (Uint8)  ; sound buffer read counter
+0B5: (SoundWrCount)   (Uint8)  ; sound buffer entry counter
+0B6: (FRT_Count)      (Sint16) ; FRT counter
+0B7: (SCUMC_ID)       (Uint8)  ; SCU memory copy channel number
+0B8: (DMASt_CPU0)     (Uint8)  ; CPU DMA status (CH0)
+0BA: (DMASt_CPU1)     (Uint8)  ; CPU DMA status (CH1)
+0BB: (DMASt_SCU0)     (Uint8)  ; SCU DMA status (CH0)
+0BC: (DMASt_SCU1)     (Uint8)  ; SCU DMA status (CH1)
+0BD: (DMASt_SCU2)     (Uint8)  ; SCU DMA status (CH2)
+0BE: (--------)       (Uint16) ; system reserved
+0C0: (VDP2_TVMD)      (Uint16) ; TV screen mode
+0C2: (VDP2_EXTEN)     (Uint16) ; external signal enable
+0C4: (VDP2_TVSTAT)    (Uint16) ; screen status
+0C6: (VDP2_VRSIZE)    (Uint16) ; VRAM size
+0C8: (VDP2_HCNT)      (Uint16) ; H counter
+0CA: (VDP2_VCNT)      (Uint16) ; V counter
+0CE: (VDP2_RAMCTL)    (Uint16) ; RAM control
+0D0: (VDP2_CYCA0L)    (Uint16) ; VRAM cycle pattern (bank A0, T0_3)
+0D2: (VDP2_CYCA0U)    (Uint16) ; VRAM cycle pattern (bank A0, T4_7)
+0D4: (VDP2_CYCA1L)    (Uint16) ; VRAM cycle pattern (bank A1, T0_3)
+0D6: (VDP2_CYCA1U)    (Uint16) ; VRAM cycle pattern (bank A1, T4_7)
+0D8: (VDP2_CYCB0L)    (Uint16) ; VRAM cycle pattern (bank B0, T0_3)
+0DA: (VDP2_CYCB0U)    (Uint16) ; VRAM cycle pattern (bank B0, T4_7)
+0DC: (VDP2_CYCB1L)    (Uint16) ; VRAM cycle pattern (bank B1, T0_3)
+0DE: (VDP2_CYCB1U)    (Uint16) ; VRAM cycle pattern (bank B1, T4_7)
+0E0: (VDP2_BGON)      (Uint16) ; enable screen display
+0E2: (VDP2_MZCTL)     (Uint16) ; mosaic control
+0E4: (VDP2_SFSEL)     (Uint16) ; select special function code
+0E6: (VDP2_SFCODE)    (Uint16) ; special function code
+0E8: (VDP2_CHCTLA)    (Uint16) ; character control (NBG0, NBG1)
+0EA: (VDP2_CHCTLB)    (Uint16) ; character control (NBG2, NBG3, RBG0)
+0EC: (VDP2_BMPNA)     (Uint16) ; bit map palette number (NBG0, 1)
+0EE: (VDP2_BMPNB)     (Uint16) ; bit map palette number (RBG0)
+0F0: (VDP2_PNCN0)     (Uint16) ; pattern name control (NBG0)
+0F2: (VDP2_PNCN1)     (Uint16) ; pattern name control (NBG1)
+0F4: (VDP2_PNCN2)     (Uint16) ; pattern name control (NBG2)
+0F6: (VDP2_PNCN3)     (Uint16) ; pattern name control (NBG3)
+0F8: (VDP2_PNCR)      (Uint16) ; pattern name control (RBG0)
+0FA: (VDP2_PLSZ)      (Uint16) ; plane size
+0FC: (VDP2_MPOFN)     (Uint16) ; map offset (NBG0_3)
+0FE: (VDP2_MPOFR)     (Uint16) ; map offset (rotation parameters A, B)
+100: (VDP2_MPABN0)    (Uint16) ; map (NBG0 plane A, B)
+102: (VDP2_MPCDN0)    (Uint16) ; map (NBGO plane C, D)
+104: (VDP2_MPABN1)    (Uint16) ; map (NBG1 plane A, B)
+106: (VDP2_MPCDN1)    (Uint16) ; map (NBG1 plane C, D)
+108: (VDP2_MPABN2)    (Uint16) ; map (NBG2 plane A, B)
+10A: (VDP2_MPCDN2)    (Uint16) ; map (NBG2 plane C, D)
+10C: (VDP2_MPABN3)    (Uint16) ; map (NBG3 plane A, B)
+10E: (VDP2_MPCDN3)    (Uint16) ; map (NBG3 plane C, D)
+110: (VDP2_MPABRA)    (Uint16) ; map (rotation parameter A plane A, B)
+112: (VDP2_MPCDRA)    (Uint16) ; map (rotation parameter A plane C, D)
+114: (VDP2_MPEFRA)    (Uint16) ; map (rotation parameter A plane E, F)
+116: (VDP2_MPGHRA)    (Uint16) ; map (rotation parameter A plane G, H)
+118: (VDP2_MPIJRA)    (Uint16) ; map (rotation parameter A plane I, J)
+11A: (VDP2_MPKLRA)    (Uint16) ; map (rotation parameter A plane K, L)
+11C: (VDP2_MPMNRA)    (Uint16) ; map (rotation parameter A plane M, N)
+11E: (VDP2_MPOPRA)    (Uint16) ; map (rotation parameter A plane O, P)
+120: (VDP2_MPABRB)    (Uint16) ; map (rotation parameter B plane A, B)
+122: (VDP2_MPCDRB)    (Uint16) ; map (rotation parameter B plane C, D)
+124: (VDP2_MPEFRB)    (Uint16) ; map (rotation parameter B plane E, F)
+126: (VDP2_MPGHRB)    (Uint16) ; map (rotation parameter B plane G, H)
+128: (VDP2_MPIJRB)    (Uint16) ; map (rotation parameter B plane I, J)
+12A: (VDP2_MPKLRB)    (Uint16) ; map (rotation parameter B plane K, L)
+12C: (VDP2_MPMNRB)    (Uint16) ; map (rotation parameter B plane M, N)
+12E: (VDP2_MPOPRB)    (Uint16) ; map (rotation parameter B plane O, P)
+130: (VDP2_SCXN0)     (FIXED)  ; screen scroll value (NBG0, horiz fixed point)
+130: (VDP2_SCXIN0)    (Sint16) ; screen scroll value (NBG0, horiz integer
+                               ; component)
+132: (VDP2_SCXDN0)    (Uint16) ; screen scroll value (NBG0, horiz fractional
+                               ; component)
+134: (VDP2_SCYN0)     (FIXED)  ; screen scroll value (NBG0, vert fixed point)
+134: (VDP2_SCYIN0)    (Uint16) ; screen scroll value (NBG0, vert integer
+                               ; component)
+136: (VDP2_SCYDN0)    (Uint16) ; screen scroll value (NBG0, vert fractional
+                               ; component)
+138: (VDP2_ZMXN0)     (FIXED)  ; coord increment (NBG0, horiz fixed point)
+138: (VDP2_ZMXIN0)    (Uint16) ; coord increment (NBG0, horiz integer
+                               ; component)
+13A: (VDP2_ZMXDN0)    (Uint16) ; coord increment (NBG0, horiz fractional
+                               ; component)
+13C: (VDP2_ZMYN0)     (FIXED)  ; coord increment (NBG0, vert fixed point)
+13C: (VDP2_ZMYIN0)    (Uint16) ; coord increment (NBG0, vert integer
+                               ; component)
+13E: (VDP2_ZMYDN0)    (Uint16) ; coord increment (NBG0, vert fractional
+                               ; component)
+140: (VDP2_SCXN1)     (FIXED)  ; screen scroll value (NBG1, horiz fixed point)
+140: (VDP2_SCXIN1)    (Uint16) ; screen scroll value (NBG1, horiz integer
+                               ; component)
+142: (VDP2_SCXDN1)    (Uint16) ; screen scroll value (NBG1, horiz fractional
+                               ; component)
+144: (VDP2_SCYN1)     (FIXED)  ; screen scroll value (NBG1, vert fixed point)
+144: (VDP2_SCYIN1)    (Uint16) ; screen scroll value (NBG1, vert integer
+                               ; component)
+146: (VDP2_SCYDN1)    (Uint16) ; screen scroll value (NBG1, vert fractional
+                               ; component)
+148: (VDP2_ZMXN1)     (FIXED)  ; coord increment (NBG1, horiz fixed point)
+148: (VDP2_ZMXIN1)    (Uint16) ; coord increment (NBG1, horiz integer
+                               ; component)
+14A: (VDP2_ZMXDN1)    (Uint16) ; coord increment (NBG1, horiz fractional
+                               ; component)
+14C: (VDP2_ZMYN1)     (FIXED)  ; coord increment (NBG1, vert fixed point)
+14C: (VDP2_ZMYIN1)    (Uint16) ; coord increment (NBG1, vert integer
+                               ; component)
+14E: (VDP2_ZMYDN1)    (Uint16) ; coord increment (NBG1, vert fractional
+                               ; component)
+150: (VDP2_SCXN2)     (Uint16) ; screen scroll value (NBG2, horizontal)
+152: (VDP2_SCYN2)     (Uint16) ; screen scroll value (NBG2, vertical)
+154: (VDP2_SCXN3)     (Uint16) ; screen scroll value (NBG3, horizontal)
+156: (VDP2_SCYN3)     (Uint16) ; screen scroll value (NBG3, vertical)
+158: (VDP2_ZMCTL)     (Uint16) ; scale enable
+15A: (VDP2_SCRCTL)    (Uint16) ; line & vertical cell scroll control
+15C: (VDP2_VCSTA)     (Uint16 *) ; vertical cell scroll table address
+160: (VDP2_LSTA0)     (Sint16 *) ; NBG0 line scroll table address
+164: (VDP2_LSTA1)     (Sint16 *) ; NBG1 line scroll table address
+168: (VDP2_LCTA)      (Uint16 *) ; line color screen table address
+16C: (VDP2_BKTA)      (Uint16 *) ; background table address
+170: (VDP2_RPMD)      (Uint16) ; rotation parameter mode
+172: (VDP2_RPRCTL)    (Uint16) ; rotation parameter read control
+174: (VDP2_KTCTL)     (Uint16) ; coefficient table control
+176: (VDP2_KTAOF)     (Uint16) ; coefficient table address offset
+178: (VDP2_OVPNRA)    (Uint16) ; screen over pattern name
+17A: (VDP2_OVPNRB)    (Uint16) ; screen over pattern name
+17C: (VDP2_RPTA)      (Sint32 *) ; rotation parameter table address
+180: (VDP2_WPSX0)     (Uint16) ; window position (H start)
+182: (VDP2_WPSY0)     (Uint16) ; window position (V start)
+184: (VDP2_WPEX0)     (Uint16) ; window position (H stop)
+186: (VDP2_WPEY0)     (Uint16) ; window position (V stop)
+188: (VDP2_WPSX1)     (Uint16) ; window position (H start)
+18A: (VDP2_WPSY1)     (Uint16) ; window position (V start)
+18C: (VDP2_WPEX1)     (Uint16) ; window position (H stop)
+18E: (VDP2_WPEY1)     (Uint16) ; window position (V stop)
+190: (VDP2_WCTLA)     (Uint16) ; window control
+192: (VDP2_WCTLB)     (Uint16) ; window control
+194: (VDP2_WCTLC)     (Uint16) ; window control
+196: (VDP2_WCTLD)     (Uint16) ; window control
+198: (VDP2_LWTA0)     (Uint16 *) ; line window table address
+19C: (VDP2_LWTA1)     (Uint16 *) ; line window table address
+1A0: (VDP2_SPCTL)     (Uint16) ; sprite control
+1A2: (VDP2_SDCTL)     (Uint16) ; shadow control
+1A4: (VDP2_CRAOFA)    (Uint16) ; color RAM address offset (NBG0 - 3)
+1A6: (VDP2_CRAOFB)    (Uint16) ; color RAM address offset (RBG0, sprite)
+1A8: (VDP2_LNCLEN)    (Uint16) ; enable line color screen
+1AA: (VDP2_SFPRMD)    (Uint16) ; special priority mode
+1AC: (VDP2_CCCTL)     (Uint16) ; color calculation control
+1AE: (VDP2_SFCCMD)    (Uint16) ; special color calculation mode
+1B0: (VDP2_PRISA)     (Uint16) ; priority number
+1B2: (VDP2_PRISB)     (Uint16) ; priority number
+1B4: (VDP2_PRISC)     (Uint16) ; priority number
+1B6: (VDP2_PRISD)     (Uint16) ; priority number
+1B8: (VDP2_PRINA)     (Uint16) ; priority number
+1BA: (VDP2_PRINB)     (Uint16) ; priority number
+1BC: (VDP2_PRIR)      (Uint16) ; priority number
+1BE: (--------)       (Uint16) ; system reserved
+1C0: (VDP2_CCRSA)     (Uint16) ; color calculation ratio (sprite 0, 1)
+1C2: (VDP2_CCRSB)     (Uint16) ; color calculation ratio (sprite 2, 3)
+1C4: (VDP2_CCRSC)     (Uint16) ; color calculation ratio (sprite 4, 5)
+1C6: (VDP2_CCRSD)     (Uint16) ; color calculation ratio (sprite 6, 7)
+1C8: (VDP2_CCRNA)     (Uint16) ; color calculation ratio (NBG0, 1)
+1CA: (VDP2_CCRNB)     (Uint16) ; color calculation ratio (NBG2, 3)
+1CC: (VDP2_CCRR)      (Uint16) ; color calculation ratio (RGB0)
+1CE: (VDP2_CCRLB)     (Uint16) ; color calculation ratio (line color screen,
+                               ; background)
+1D0: (VDP2_CLOFEN)    (Uint16) ; enable color offset
+1D2: (VDP2_CLOFSL)    (Uint16) ; select color offset
+1D4: (VDP2_COAR)      (Uint16) ; color offset A (RED)
+1D6: (VDP2_COAG)      (Uint16) ; color offset A (GREEN)
+1D8: (VDP2_COAB)      (Uint16) ; color offset A (BLUE)
+1DA: (VDP2_COBR)      (Uint16) ; color offset B (RED)
+1DC: (VDP2_COBG)      (Uint16) ; color offset B (GREEN)
+1DE: (VDP2_COBB)      (Uint16) ; color offset B (BLUE)
+1E0: (ScrRotPtr)      (ROTSCROLL *) ; Rotation parameter address
+1E4: (nbg0_char_adr)  (void *) ; NBG0 graphics address
+1E8: (nbg1_char_adr)  (void *) ; NBG1 graphics address
+1EC: (nbg2_char_adr)  (void *) ; NBG2 graphics address
+1F0: (nbg3_char_adr)  (void *) ; NBG3 graphics address
+1F4: (ra_char_adr)    (void *) ; RBG0 (parameter A) graphics address
+1F8: (rb_char_adr)    (void *) ; RBG0 (parameter B) graphics address
+1FC: (nbg0_page_adr)  (void *) ; NBG0 pattern name address
+200: (nbg1_page_adr)  (void *) ; NBG1 pattern name address
+204: (nbg2_page_adr)  (void *) ; NBG2 pattern name address
+208: (nbg3_page_adr)  (void *) ; NBG3 pattern name address
+20C: (ra_page_adr)    (void *) ; RBG0 (parameter A) pattern name address
+210: (rb_page_adr)    (void *) ; RBG0 (parameter B) pattern name address
+214: (rpara_vram_adr) (void *) ; rotation parameter set address
+218: (k_table_adr)    (void *) ; coefficient table set address
+21C: (RotScrParA)     (ROTSCROLL) ; rotation parameter A
+284: (RotScrParB)     (ROTSCROLL) ; rotation parameter B
+2EC: (Nbg2_PosX)      (FIXED) ; NBG2 display position (X)
+2F0: (Nbg2_PosY)      (FIXED) ; NBG2 display position (Y)
+2F4: (Nbg3_PosX)      (FIXED) ; NBG3 display position (X)
+2F8: (Nbg3_PosY)      (FIXED) ; NBG3 display position (Y)
+2FC: (Window_data)    (Uint16[22]); window control data buffer (x2)
+328: (Center_data)    (Uint16[10]); window center data buffer (x2)
+33C: (RandWork)       (Uint32) ; random number generator work
+340: (CDReadExec)     (void*()) ; CD read server function
+344: (DMA_TRANS)      (Uint32[10]); CPU DMA parameter
+36C: (SOUND)          (void*[3]) ; sound buffer pointer
+378: (PERIPHERAL)     (Uint32[12]); peripheral control data
+
+* VDP1_VRAM
+
+The start and end areas of VDP1 VRAM starting at 0x25C00000 is used by the
+system.  This area is not available for use by the user.
+
+    25C00000: Sprite control command.
+      (MAX_POLYGON + 6) * 32 = 0xE1C0
+
+    25C7FF00: Gouraud shading table.
+      2*4*33 = 0x108(264)
+
+* VDP2_VRAM
+
+When the system is initialized, VDP2 VRAM is partitioned starting from
+0x25E00000 as follows:
+
+    25E00000: VDP2_VRAM_A0
+      Rotation scroll graphics data.
+
+    25E20000: VDP2_VRAM_A1
+      Rotation scroll coefficient data and rotation parameter.
+
+    25E40000: VDP2_VRAM_B0
+      Rotation scroll pattern name data.
+
+    25E60000: VDP2_VRAM_B1
+      Normal scroll data.
+
+ This area is shared by graphics data and the pattern name
+
+    25E60000~25E67FFF (NBG0 and NBG1 graphics data)
+    25E68000~25E75FFF (NBG1 graphics data)
+    25E76000~25E77FFF (NBG0 pattern name data 1 page)
+    25E78000~25E7FFFF (NBG1 pattern name data 4 pages)
+
+All scrolls are in 256 color mode and the pattern name is 1 word/cell. NBG0 is
+in 10-bit mode with a flip flag for every cell; other screens are in 12-bit
+mode that uses a flip attribute for every surface. The color RAM is set to 16
+bit, 2048 color mode. No offsets are used.  The background uses a single
+color; color data (0000) is set at 25E3FFFE.
+
+06000000 : +---------------------------+
+           | Boot ROM BIOS functions   |
+06000800 : +---------------------------+
+           | Slave CPU Stack Area      |
+06001000 : +---------------------------+
+           | Master CPU default Stack  |
+06002000 : +---------------------------+
+           |           ???             |
+06004000 : +---------------------------+
+           |                           |
+           | User Program & Data       |
+           |                           |
+060C0000 : +---------------------------+
+           |                           |
+           | SortList (5400)           |
+           |                           |
+060C5400 : +---------------------------+
+           | TransList (F0)            |
+060C54F0 : +---------------------------+
+           | Zbuffer (200)             |
+060C56F0 : +---------------------------+
+           | Zbuffer2 (200)            |
+060C58F0 : +---------------------------+
+           | Zbuf-nest (400)           |
+060C5CF0 : +---------------------------+
+           |                           |
+           | Spritebuf (FBDC)          |
+           |                           |
+060D58CC : +---------------------------+
+           |                           |
+           | Spritebuf2(FBDC)          |
+           |                           |
+060E54A8 : +---------------------------+
+           |                           |
+           | Pbuffer (9C40)            |
+           |                           |
+060EF0E8 : +---------------------------+
+           | CLOfstBuf (400)           |
+060EF4E8 : +---------------------------+
+           |                           |
+           | CommandBuf(DF40)          |
+           |                           |
+060FD428 : +---------------------------+
+           |                           |
+           | Stack Area(27D8)          |
+           |                           |
+060FFC00 : +---------------------------+
+           | SystemWork(400)           |
+06100000 : +---------------------------+
+
+
+25C00000 : +---------------------------+
+           |                           |
+           | SpriteCommand(E1C0)       |
+           |                           |
+25C0E1C0 : +---------------------------+
+           |                           |
+           | Free (for User)           |
+           |                           |
+25C7FEF8 : +---------------------------+
+           | Gouraud table(108)        |
+25C80000 : +---------------------------+
+
+25E00000 : +---------------------------+
+           |                           |
+           | RBG0 CG (2048chars)       |
+           |                           |
+25E20000 : +---------------------------+
+           |                           |
+           | RBG0 K table              |
+           |                           |
+25E40000 : +---------------------------+
+           |                           |
+           | RBG0 Map (16pages)        |
+           |                           |
+25E60000 : +---------------------------+
+           | NBG0, NBG1 (512 chars)    |
+25E68000 : +---------------------------+
+           | NBG1 CG (+896 chars)      |
+25E76000 : +---------------------------+
+           | NBG0 Map (1 page)         |
+25E78000 : +---------------------------+
+           | NBG1 Map (4 pages)        |
+25E80000 : +---------------------------+
+
+;---------------------------------------------------------------------------
+
+* System Work RAM Area Customization
+
+Although the system variable area starting from 060FFC00 is reserved by the
+system, the work RAM area (default mode: 060C0000~) can be customized by
+defining the following variables. (Please note that even if there is a partial
+change, all the variables must be set.)
+
+void*   MasterStack = (void*)0x60ffc00 ;    /* Master Stack area End */
+void*   SlaveStack  = (void*)0x6001e00 ;    /* Slave Stack area End */
+Uint16  MaxVertices = 2500 ;             /* Calculable number of vertices */
+Uint16  MaxPolygons = 1786 ;             /* Calculable number of polygons */
+Uint16  EventSize = 0x80 ;               /* sizeof(EVENT) */
+Uint16  WorkSize = 0x40 ;                /* sizeof(WORK) */
+Uint16  MaxEvents = 64 ;                 /* Usable number of Events */
+Uint16  MaxWorks = 256 ;                 /* Usable number of Work */
+void*   SortList = (void*)0x60c0000 ;    /* SCU DMA Table */
+Uint32  SortListSize = 0x5400 ;             /* Sprite transfer request table size */
+void*   TransList = (void*)0x60fb800 ;      /* SCU D.M.A. Table */
+void*   Zbuffer = (void*)0x60c5800 ;        /* (128 + 128 + 256) * 4 Bytes fix */
+void*   SpriteBuf (void*)0x60c6000 ;        /* Sprite control data buffer */
+Uint32  SpriteBufSize = 0x1f7b8 ;           /* Sprite control data buffer size */
+void*   Pbuffer = (void*)0x60e57b8 ;        /* Point calculate buffer */
+void*   CLOfstBuf = (void*)0x60c5400 ;      /* 32 * 32 Bytes fix */
+void*   CommandBuf = (void*)0x60ef3f8 ;     /* Command for slave CPU buffer */
+void*   PCM_Work = (void*)0x25a78000 ;      /* PCM data buffer */
+Uint32  PCM_WkSize = 0x8000 ;            /* PCM data buffer size */
+
+EVENT   EventBuf[MAX_EVENTS] ;           /* buffer for Event use */
+WORK    WorkBuf[MAX_WORKS] ;             /* buffer for Work use */
+EVENT*  RemainEvent[MAX_EVENTS] ;        /* Remaining Event address buffer */
+WORK*   RemainWork[MAX_WORKS] ;          /* Remaining Work address buffer */
+
+Please observe the following precautions for the setup of each area:
+
+(1) SortList and TransList use indirect SCU DMA.  Adjust the area in powers of
+    2 so that it exceeds the table size. SortList is used in transfers of
+    sprite (polygon) data and for data such as window data; make sure to
+    allocate entries for the maximum number of displayed sprites + 6 entries.
+
+    Use a 12-byte table for each entry.
+    For example, to display 1000 sprites,
+
+      (1000+6) * 12 = 12072 (2F28H)
+
+    Therefore, set at a 4000H boundary address.
+
+    Also, TransList is used during V-blank transfer requests and extends to 20
+    entries. Therefore,
+
+      20 * 12 = 240(F0H) bytes required.
+
+    Therefore, set at a 100H boundary address.
+
+(2) Zbuffer and CLOfstBuf have fixed sizes; therefore, set them to 4-byte
+    boundary addresses.
+
+(3) Allocate a size that is approximately equal to
+
+        the display control function (such as slPutPolygon and slDispSprite)
+        execution count * 80 bytes + 100H
+
+    for the CommandBuf. When the execution function can be determined
+    specifically, set the buffer size according to the following list:
+
+        slPutPolygon   72 bytes
+        slDispPolygon  16 bytes
+        slPutSprite    36 bytes
+        slDispSprite   36 bytes
+        slSetSprite    16 bytes
+        slPerspective   8 bytes
+        slWindow       20 bytes
+        slLight        16 bytes
+        slZdspLevel     4 bytes
+
+    The system sends functions other than these per each frame, so take this
+    overhead into account.
+
+(4) SpriteBuf is a buffer for setting sprite control data. The buffer is used
+    by alternating between the first half of the buffer and the second half
+    for each frame.  Accordingly, a buffer equivalent to
+
+        (displayed number of sprites [polygons] + 5) * 36 bytes * 2 banks
+
+    in size is required.
+
+(5) Since Pbuffer is used as a coordinate and perspective transform
+    calculation buffer for displaying polygon models, it does not need to be
+    used by applications that do not use slPutPolygon and slDispPolygon.
+    Therefore, another buffer may overlap Pbuffer.
+
+(6) MaxPolygons and MaxVertices are used to check buffer overflow when
+    executing display control functions. However, the check is performed
+    on the polygon and vertex entries and not the displayed image. Therefore,
+    MaxPolygons does not necessarily need to match SortListSize and
+    SpriteBufSize.
+
+(7) PCM-Work is in the sound CPU area with the size in 2000H units. Please
+    make sure it is set after consulting with the sound designer.
+
+The following is a sample (workarea.c) to set the work RAM:
+
+
+/*                                        */
+/* Workarea assignment customization file */
+/* for SGL ver. 1.30                      */
+
+/*------------------------------------------------------------------------*/
+
+#include "sl-def.h"
+
+/*------------------------------------------------------------------------*/
+
+#define       SystemWork           0x060ffc00          /* fixed by system */
+
+#define       _Byte_               sizeof(Uint8)
+#define       _Word_               sizeof(Uint16)
+#define       _LongWord_           sizeof(Uint32)
+#define       _Sprite_             (sizeof(Uint16) * 18)
+
+#define       AdjWork(pt,sz,ct)    (pt + (sz) * (ct))
+
+/*------------------------------------------------------------------------*/
+
+#define       MAX-VERTICES         500
+#define       MAX-POLYGONS         100
+
+#define       WORK-AREA            0x060f0000
+
+    enum workarea{
+        sort_list  = WORK_AREA,
+        zbuffer    = AdjWork(sort_list, _LongWord_ * 3, MAX_POLYGONS + 6),
+        spritebuf  = AdjWork(zbuffer, _LongWord_, 512),
+        pbuffer    = AdjWork(spritebuf, _Sprite_, (MAX_POLYGONS + 6) * 2),
+        clofstbuf  = AdjWork(pbuffer, _LongWord_ * 4, MAX_VERTICES),
+        commandbuf = AdjWork(clofstbuf, _Byte_ * 32, 32),
+        NextEntry  = AdjWork(commandbuf, _LongWord_ * 8, MAX_POLYGONS)
+    } ;
+
+#define       PCM-Buffer           SoundRAM+0x78000
+
+/*------------------------------------------------------------------------*/
+
+    const void*   MasterStack   = (void*)(WORK_AREA - 0x800) ;
+    const void*   SlaveStack    = (void*)(WORK_AREA) ;
+    const Uint16  MaxVertices   = MAX_VERTICES ;
+    const Uint16  MaxPolygons   = MAX_POLYGONS ;
+    const Uint16  EventSize     = sizeof(EVENT) ;
+    const Uint16  WorkSize      = sizeof(WORK) ;
+    const Uint16  MaxEvents     = MAX_EVENTS ;
+    const Uint16  MaxWorks      = MAX_WORKS ;
+    const void*   SortList      = (void*)(sort_list) ;
+    const Uint32  SortListSize  = (MAX_POLYGONS + 6) * _LongWord_ * 3 ;
+    const void*   Zbuffer       = (void*)(zbuffer) ;
+    const void*   SpriteBuf     = (void*)(spritebuf) ;
+    const Uint32  SpriteBufSize = _Sprite_ * (MAX_POLYGONS + 6) * 2 ;
+    const void*   Pbuffer       = (void*)(pbuffer) ;
+    const void*   CLOfstBuf     = (void*)(clofstbuf) ;
+    const void*   CommandBuf    = (void*)(commandbuf) ;
+    const void*   PCM_Work      = (void*)(PCM_Buffer) ;
+    const Uint32  PCM_WkSize    = 0x8000 ;
+    const void*   TransList     = (void*)(SystemWork - 0x0100) ;
+
+    EVENT  EventBuf[MAX_EVENTS] ;
+    WORK   WorkBuf[MAX_WORKS] ;
+    EVENT* RemainEvent[MAX_EVENTS] ;
+    WORK*  RemainWork[MAX_WORKS] ;
+
+/*------------------------------------------------------------------------*/
+

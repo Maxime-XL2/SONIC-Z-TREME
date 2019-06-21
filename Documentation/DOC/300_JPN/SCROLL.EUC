@@ -1,0 +1,663 @@
+
+スクロール(ＶＤＰ２)関係の関数について
+
+void slTVOn(void)
+  機能 : モニターへの出力を開始します。
+
+void slTVOff(void)
+  機能 : モニターへの出力を中止します。
+	モニターには何も表示されなくなります。
+  注意 : 本関数を実行すると、直ちにＶＤＰ２のレジスタにセットされます。
+
+Uint16 slGetHCount(void)
+  機能 : ＶＤＰ２のＨカウンタを読み出します。
+
+Uint16 slGetVCount(void)
+  機能 : ＶＤＰ２のＶカウンタを読み出します。
+
+void slExtSignal(Uint16 signal , Uint16 mask)
+  機能 : 外部信号イネーブルレジスタを操作します。
+	 signal にはセットしたい信号名を、mask には操作したい信号名を指定します。
+	 信号名は以下の４つです。
+	 EXLTEN : ＨＶカウンタの値をラッチするタイミングを外部信号に合わせる場合に指定します。
+	 EXSYEN : 外部同期信号に合わせてＴＶ画面の表示を行なう場合に指定します。
+	 DASEL  : 画像表示エリアを規格領域いっぱいに使用する場合に指定します。
+	 EXBGEN : 外部画面データを入力する場合に指定します。
+
+void slColRAMMode(Uint16 mode)
+  機能 : カラーＲＡＭモードを決定します。
+	カラーＲＡＭへのカラーデータの格納は、必ずカラーＲＡＭモードを決定してから
+	行なって下さい。
+	mode : カラーＲＡＭモードに対応した次の値を代入して下さい。
+		CRM16_1024 : カラーＲＡＭモード０（１６ビットカラー１０２４色×２バンク）
+		CRM16_2048 : カラーＲＡＭモード１（１６ビットカラー２０４８色）
+		CRM32_1024 : カラーＲＡＭモード２（２４ビットカラー１０２４色）
+
+void slScrCycleSet(Uint32 a0 , Uint32 a1 , Uint32 b0 , Uint32 b1)
+  機能 : 各バンクのサイクルパターンを設定します。各バンクが分割されている場合には
+	a0,a1,b0,b1 にサイクルパターンを設定することができます。バンクが分割されて
+	いない時には、a0,b0 にサイクルパターンを設定することができます。
+	a0 : バンク a0 のサイクルパターン
+	a1 : バンク a1 のサイクルパターン
+	b0 : バンク b0 のサイクルパターン
+	b1 : バンク b1 のサイクルパターン
+  注意 : 本関数を実行すると、各設定値は直ちにＶＤＰ２のレジスタにセットされます。
+
+void slScrDisp(Uint32 mode)
+  機能 : パラメータとして指定されたスクロール面の描画設定を行ないます。
+	mode :	NBG0ON | NBG0OFF
+		NBG1ON | NBG1OFF
+		NBG2ON | NBG2OFF
+		NBG3ON | NBG3OFF
+		RBG0ON | RBG0OFF
+	    複数のスクロール面の描画設定を同時に行なう場合は、各面のモードを "|"
+	    でつないで指定して下さい。
+	    指定されなかったスクロール面の設定は変わりません。
+
+Bool slScrAutoDisp(Uint32 ptr)
+  機能 : 機能設定を終了したスクロール面のシステム登録を行ないます。
+	関数は、パラメータとして指定されたスクロール画面の、ＶＲＡＭへのアクセス指定
+	（サイクルパターンレジスタ）を自動的に設定し、同時に、登録されたスクロールの
+	描画設定をオンにします。
+	サイクルパターンが作成できない設定の場合はＮＧが返ります。
+	flag : NBG0ON , NBG1ON , NBG2ON , NBG3ON , RBG0ON
+	    複数のスクロール面の描画設定を同時に行なう場合は、各面のモードを "|"
+	    でつないで指定して下さい。
+
+void slScrTransparent(Uint16 flag)
+  機能 : 各スクロール面の透明色の扱いを指定します。
+	flag : NBG0ON , NBG1ON , NBG2ON , NBG3ON , RBG0ON
+	    複数のスクロール面の描画設定を同時に行なう場合は、各面のモードを "|"
+	    でつないで指定して下さい。
+	    ＯＮに指定されたスクロール面のスペースがパレット０のカラーで表示されます。
+
+void slZrotR(ANGLE angz)
+  機能 : 回転スクロールのＺ軸回転を行ないます。回転の正方向は軸に対して右向き
+	（時計回り）になります。
+	関数 "slDispCenterR" で指定した座標が、回転中心になります。
+	angz : Ｚ軸に対する回転スクロールの回転角値
+
+void slScrMatSet(void)
+  機能 : カレントマトリクスを利用して RBG0 の回転パラメータをセットします。
+
+void slBack1ColSet(void *colptr , Uint16 rgb)
+  機能 : バック画面の設定を行ないます。バック画面とは、他の画面が全く描画されて
+	いない部分に表示される、最背面の描画面のことです。
+	colptr : バックカラーを格納するＶＲＡＭの先頭アドレス
+	rgb    : カラーデータをＲＧＢ各５ビットで指定
+
+void slLineColTable(void *adr)
+  機能 : ラインカラーテーブルアドレスをレジスタにセットします。
+	adr : ＶＲＡＭ上のラインカラーテーブルアドレス
+
+void slLine1ColSet(void *adr , Uint16 col)
+  機能 : ラインカラー画面を単一色にし、その色を設定します。
+	adr : ＶＲＡＭ上のラインカラーテーブルアドレス
+	col : カラー番号
+
+void slLineColDisp(Uint16 flag)
+  機能 : トップ画像になった時にラインカラーの影響を受ける画面を設定します。
+	flag : NBG0ON , NBG1ON , NBG2ON , NBG3ON , RBG0ON 、LNCLON
+	    複数のスクロール面の描画設定を同時に行なう場合は、各面のモードを "|"
+	    でつないで指定して下さい。
+	    スプライトを設定したい場合には LNCLON を使用して下さい。
+	    (これは他のレジスタとビット位置が異なっているためです)
+
+void slColorCalc(Uint16 flag)
+  機能 : カラー演算のためのパラメータを設定します。
+	flag :  CC_RATE | CC_ADD				: 演算方法
+		CC_TOP | CC_2ND					: 演算指定画面
+		CC_EXT						: 拡張カラー演算
+		NBG0 | NBG1 | NBG2 | NBG3 | RBG0 | LNCLON | SPRON	: 登録面
+	    使用する機能に応じて上記の値を "|" でつないで指定して下さい。
+
+void slColorCalcOn(Uint16 flag)
+  機能 : カラー演算コントロールの影響を受ける画面を設定します。
+	flag : NBG0ON , NBG1ON , NBG2ON , NBG3ON , RBG0ON , LNCLON , SPRON
+	    複数のスクロール面の描画設定を同時に行なう場合は、各面のモードを "|"
+	    でつないで指定して下さい。
+
+void slColOffsetOn(Uint16 flag)
+  機能 : カラーオフセット値の影響を受ける画面を設定します。
+	flag : NBG0ON , NBG1ON , NBG2ON , NBG3ON , RBG0ON , LNCLON , SPRON
+	    複数のスクロール面の描画設定を同時に行なう場合は、各面のモードを "|"
+	    でつないで指定して下さい。
+
+void slColOffsetOff(Uint16 flag)
+  機能 : カラーオフセット値の影響を受けなくする画面を設定します。
+	flag : NBG0ON , NBG1ON , NBG2ON , NBG3ON , RBG0ON , LNCLON , SPRON
+	    複数のスクロール面の描画設定を同時に行なう場合は、各面のモードを "|"
+	    でつないで指定して下さい。
+  注意 : 全ての面について無効にする場合には slColOffsetOn(OFF) を実行して下さい。
+
+void slColOffsetAUse(Uint16 flag)
+  機能 : 関数 "slColOffsetA" によって設定されたカラーオフセット値の影響を受ける
+	画面を設定します。
+	flag : NBG0ON , NBG1ON , NBG2ON , NBG3ON , RBG0ON , LNCLON , SPRON
+	    複数のスクロール面の描画設定を同時に行なう場合は、各面のモードを "|"
+	    でつないで指定して下さい。
+
+void slColOffsetBUse(Uint16 flag)
+  機能 : 関数 "slColOffsetB" によって設定されたカラーオフセット値の影響を受ける
+	画面を設定します。
+	flag : NBG0ON , NBG1ON , NBG2ON , NBG3ON , RBG0ON , LNCLON , SPRON
+	    複数のスクロール面の描画設定を同時に行なう場合は、各面のモードを "|"
+	    でつないで指定して下さい。
+
+  注意 : slColOffsetAUse , slColOffsetBUse 関数を実行すると slColOffsetOn 関数も
+	同時に実行されますので、slColOffsetOn 関数はユーザーが実行する必要はあり
+	ません。
+
+void slColOffsetA(Sint16 r , Sint16 g , Sint16 b)
+void slColOffsetB(Sint16 r , Sint16 g , Sint16 b)
+  機能 : カラーオフセットＡ・Ｂで使用されるオフセット値を設定します。
+	r : red のオフセット値
+	g : green のオフセット値
+	b : blue のオフセット値
+
+void slCharNbg0(Uint16 type , Uint16 size)
+void slCharNbg1(Uint16 type , Uint16 size)
+void slCharNbg2(Uint16 type , Uint16 size)
+void slCharNbg3(Uint16 type , Uint16 size)
+void slCharRbg0(Uint16 type , Uint16 size)
+  機能 : それぞれのスクロール面のキャラクタサイズ及びスクロールに使用される色数の
+	設定を行ないます。
+	type : キャラクタ色数
+		COL_TYPE_16	: パレット形式 １６色
+		COL_TYPE_256	: パレット形式 ２５６色
+		COL_TYPE_2048	: パレット形式 ２０４８色
+		COL_TYPE_32768	: ＲＧＢ形式 ３２７６８色
+		COL_TYPE_1M	: ＲＧＢ形式 １６７７万色
+	size : キャラクタサイズ
+		CHAR_SIZE_1x1	: １×１
+		CHAR_SIZE_2x2	: ２×２
+
+void slPageNbg0(void *celadr , void *coladr , type)
+void slPageNbg1(void *celadr , void *coladr , type)
+void slPageNbg2(void *celadr , void *coladr , type)
+void slPageNbg3(void *celadr , void *coladr , type)
+void slPageRbg0(void *celadr , void *coladr , type)
+  機能 : それぞれのスクロール面のページ設定を行ないます。
+	celadr : セルデータのＶＲＡＭ上先頭アドレス
+	coladr : カラーデータのＶＲＡＭ上先頭アドレス
+	type   : パターンネームデータ
+		PNB_1WORD		: １ワード 下位１０ビット
+		PNB_1WORD | CN_12BIT	: １ワード 下位１２ビット
+		PNB_2WORD		: ２ワード 下位１６ビット
+
+void slPlaneNbg0(Uint16 type)
+void slPlaneNbg1(Uint16 type)
+void slPlaneNbg2(Uint16 type)
+void slPlaneNbg3(Uint16 type)
+void slPlaneRA(Uint16 type)
+void slPlaneRB(Uint16 type)
+  機能 : それぞれのスクロール面のプレーンサイズを設定します。
+	type : プレーンサイズ
+		PL_SIZE_1x1	: 横１×縦１
+		PL_SIZE_2x1	: 横２×縦１
+		PL_SIZE_2x2	: 横２×縦２
+
+void slOverRA(Uint16 mode)
+void slOverRB(Uint16 mode)
+  機能 : それぞれの回転スクロール面の画面オーバー処理モードを設定します。
+	mode : 画面オーバー処理モード
+		0 : エリア外は、表示エリアに設定された画像を繰り返す。
+		1 : エリア外は、指定したキャラクタパターンを繰り返す。
+		2 : エリア外は、すべて透明。
+		3 : 縦５１２×横５１２のエリア外はすべて透明。
+
+void slMapNbg0(void *a , void *b , void *c , void *d)
+void slMapNbg1(void *a , void *b , void *c , void *d)
+void slMapNbg2(void *a , void *b , void *c , void *d)
+void slMapNbg3(void *a , void *b , void *c , void *d)
+  機能 : それぞれのノーマルスクロール面のマップ設定を行ないます。
+	a : プレーンＡのパターンネームデータテーブルのＶＲＡＭ上先頭アドレス
+	b : プレーンＢのパターンネームデータテーブルのＶＲＡＭ上先頭アドレス
+	c : プレーンＣのパターンネームデータテーブルのＶＲＡＭ上先頭アドレス
+	d : プレーンＤのパターンネームデータテーブルのＶＲＡＭ上先頭アドレス
+
+	      (0,0)
+		┌─┬─┐
+		│Ａ│Ｂ│
+		├─┼─┤
+		│Ｃ│Ｄ│
+		└─┴─┘
+
+void sl1MapRA(void *adr)
+void sl1MapRB(void *adr)
+  機能 : それぞれの回転パラメータを使用する回転スクロールのマップを設定します。
+	adr : 回転パラメータのパターンネームデータテーブルのＶＲＡＭ上先頭アドレス
+
+void slRparaInitSet(ROTSCROLL *ptr)
+  機能 : 回転スクロールに使用する回転パラメータテーブル（サイズ：６０Ｈ）をＶＲＡＭ
+	領域中に格納します。パラメータＢは、パラメータＡ＋２０Ｈの位置から格納される
+	ので、パラメータＡ・Ｂで、合わせてＥ０Ｈ必要となります。
+	本関数を使用しない場合のデフォルトの格納アドレスは 25E3FF00H となっています。
+	ptr : 回転パラメータテーブルを格納するＶＲＡＭ先頭アドレス
+
+void slCurRpara(Uint16 flag)
+  機能 : 回転パラメータＡ・Ｂのうち、操作するパラメータを指定します。
+	flag : 回転パラメータ
+		RA : 回転パラメータＡ
+		RB : 回転パラメータＢ
+
+void slRparaMode(Uint16 mode)
+  機能 : 回転パラメータＡ・Ｂの使用モードを指定します。
+	mode : 回転パラメータモード
+		RA	 : 回転パラメータＡのみ使用
+		RB	 : 回転パラメータＢのみ使用
+		K_CHANGE : 回転パラメータＡの係数データによって画像切替え
+		W_CHANGE : 回転パラメータウィンドウで画像切替え
+
+void slMakeKtable(void *adr)
+  機能 : ３次元回転で使用する係数のテーブルを作成します。
+	２ＷＯＲＤサイズのデータを１バンク分作成します。本関数を使用する場合には、
+	関数 "slKtableRA・B(K_2WORD | K_ON | K_DOT | K_FIX)" を併用して下さい。
+	adr : 係数テーブルのＶＲＡＭ上アドレス
+
+void slKtableRA(void *adr , Uint16 mode)
+void slKtableRB(void *adr , Uint16 mode)
+  機能 : 係数テーブルのアドレスをレジスタに設定し、同時に、係数テーブルの使用法、
+	構成を指定します。
+	adr  : 係数テーブルのＶＲＡＭ上アドレス
+	mode : 係数テーブルコントロールモード
+		K_OFF | K_ON				: テーブル使用
+		K_2WORD | K_1WORD			: 係数データサイズ
+		K_MODE0 | K_MODE1 | K_MODE2 | K_MODE3	: 係数モード
+		K_LINECOL				: ラインカラー
+		K_DOT | K_LINE				: 変形単位
+		K_FIX					: 係数固定
+	    使用する機能に応じて上記の値を "|" でつないで指定して下さい。
+
+void slScrPosNbg0(FIXED x , FIXED y)
+void slScrPosNbg1(FIXED x , FIXED y)
+void slScrPosNbg2(FIXED x , FIXED y)
+void slScrPosNbg3(FIXED x , FIXED y)
+  機能 : それぞれのノーマルスクロール面の配置座標を設定します。
+	x : ノーマルスクロール配置座標のＸ成分（スクロール座標系）
+	y : ノーマルスクロール配置座標のＹ成分（スクロール座標系）
+
+void slLookR(FIXED x , FIXED y)
+  機能 : 回転スクロール面の配置座標を設定します。
+	x : 回転スクロール配置座標のＸ成分（スクロール座標系）
+	y : 回転スクロール配置座標のＹ成分（スクロール座標系）
+
+void slDispCenterR(FIXED x , FIXED y)
+  機能 : 回転スクロール面の回転中心座標を設定します。
+	x : 回転スクロール回転中心座標のＸ成分（画面座標系）
+	y : 回転スクロール回転中心座標のＹ成分（画面座標系）
+
+void slZoomNbg0(FIXED x , FIXED y)
+void slZoomNbg1(FIXED x , FIXED y)
+  機能 : ノーマルスクロール面のうち、拡縮可能な "NBG0,1" の拡縮率を指定します。
+	x : ノーマルスクロールのＸ軸方向に対する拡縮率の逆数（２倍なら１／２）
+	y : ノーマルスクロールのＹ軸方向に対する拡縮率の逆数（２倍なら１／２）
+
+void slZoomR(FIXED x , FIXED y)
+  機能 : 回転スクロール面の拡縮率を設定し、カレント回転パラメータに現在の状態を保存
+	します。
+	x : 回転スクロールのＸ軸方向に対する拡縮率の逆数（２倍なら１／２）
+	y : 回転スクロールのＹ軸方向に対する拡縮率の逆数（２倍なら１／２）
+
+void slScrScaleNbg0(FIXED x , FIXED y)
+void slScrScaleNbg1(FIXED x , FIXED y)
+  機能 : ノーマルスクロール面のうち、拡縮可能な "NBG0,1" の拡縮率を指定します。
+	x : ノーマルスクロールのＸ軸方向に対する拡縮率（２倍なら２）
+	y : ノーマルスクロールのＹ軸方向に対する拡縮率（２倍なら２）
+
+void slScrScaleR(FIXED x , FIXED y)
+  機能 : 回転スクロール面の拡縮率を設定し、カレント回転パラメータに現在の状態を保存
+	します。
+	x : 回転スクロールのＸ軸方向に対する拡縮率（２倍なら２）
+	y : 回転スクロールのＹ軸方向に対する拡縮率（２倍なら２）
+
+void slScrAscSet(void *adr)
+  機能 : デフォルトのアスキー文字（２５６色モード用・１２８セル）を指定されたアドレス
+	にセットします。
+	adr : アスキーをセットするＶＲＡＭ上アドレス
+
+void slScrMatConv(void)
+  機能 : カレントマトリクスをスクロール形式のマトリクスに変換します。
+	本関数を使用するとカレントマトリクスが書き換えられます。
+	このあと、slScrMatSet() 関数を実行することにより回転スクロールのパラメータに
+	反映されます。
+
+void slSpriteWinMode(Uint16 flag)
+  機能 : スプライトウィンドウの有効・無効を指定します。
+	flag :  ON  : スプライトウィンドウ有効
+		OFF : スプライトウィンドウ無効
+
+void slSpriteCCalcCond((Uint16)Condition)
+  機能 : スプライトカラー演算条件の指定をします。
+    Condition は CC_pr_CN , CC_PR_CN , CC_PR_cn , CC_MSB のいずれかを指定します。
+	CC_pr_CN : プライオリティがカラー演算条件ナンバーと同じか小さい場合に
+		   カラー演算をします。 (Priority <= ConditionNumber)
+	CC_PR_CN : プライオリティがカラー演算条件ナンバーと同じ場合にカラー演
+		   算をします。 (Priority == ConditionNumber)
+	CC_PR_cn : プライオリティがカラー演算条件ナンバーと同じか大きい場合に
+		   カラー演算をします。 (Priority >= ConditionNumber)
+	CC_MSB :   カラーデータの最上位ビットが１の場合にカラー演算をします。
+
+void slSpriteCCalcNum((Uint16)num)
+  機能 : スプライトカラー演算条件ナンバーの指定をします。
+    num は ０から７の範囲で指定します。
+
+void slSpriteColMode((Uint16)mode)
+  機能 : スプライトのカラーモードの指定をします。
+    mode は SPR_PAL , SPR_PAL_RGB のいずれかを指定します。
+	SPR_PAL : スプライトのデータがパレットデータ形式のみの場合に指定します。
+	SPR_PAL_RGB : スプライトのデータがパレット形式とＲＧＢ形式が混在する場合
+		に指定します。
+
+void slSpriteType((Uint16)type)
+  機能 : スプライトデータのタイプを指定します。
+    type は ０から１５で指定します。
+    ０から７は低解像度(３２０または３５２)、８から１５は高解像度用(６４０または
+    ７０４)になります。
+
+void slScrMosaicOn((Uint16)screen)
+  機能 : モザイク処理の対象となるスクロール面を指定します。
+    指定は slScrDisp と同様です。
+
+void slScrMosSize((Uint16)Hsize , (Uint16)Vsize)
+  機能 : モザイク処理をする場合のサイズを指定します。
+    指定できる大きさは水平、垂直方向とも１から１６ドットです。
+
+void slScrWindow0((Uint16)Left , (Uint16)Top , (Uint16)Right , (Uint16)Bottom)
+  機能 : スクロール用矩形ウィンドウ０の領域を設定します。
+	 ラインウィンドウが指定されている場合、ラインウィンドウは無効になります。
+
+void slScrWindow1((Uint16)Left , (Uint16)Top , (Uint16)Right , (Uint16)Bottom)
+  機能 : スクロール用矩形ウィンドウ１の領域を設定します。
+	 ラインウィンドウが指定されている場合、ラインウィンドウは無効になります。
+
+void slScrLineWindow0((void *)addr)
+  機能 : ラインウィンドウデータテーブル０のアドレスを指定します。
+    ラインウィンドウを使用する場合は最上位ビットを１にして下さい。
+    使用しない場合にはＮＵＬＬ(０)を指定します。
+	例)ラインウィンドウを使用する時
+	    アドレス＝０ｘ２５Ｅ３Ｆ０００
+		slScrLineWindow0((void *)(0x25E3F000 | 0x80000000)) ;
+	    アドレスをポインタ変数で持っている場合
+		Sint16 *lnptr ;
+		lnptr = (Sint16 *)0x25e3f000 ;
+		slScrLineWindow((void *)(lnptr + 0x40000000)) ;
+			(加算する値が ２倍<sizeof(Sint16)>されるため)
+	   ラインウィンドウを使用しなくなった時
+		slScrLineWindow0((void *)NULL) ;
+  注意 : ラインウィンドウを設定した場合でも、矩形ウィンドウのデータは有効のまま
+	 になっています(ハードウエア仕様)ので、両方の領域がウィンドウ０の範囲と
+	 なります。
+	 矩形ウィンドウのデータを無効にしたい場合には、ウィンドウの上下及び、左
+	 右の位置関係に矛盾のあるようなデータをセットしてください。
+	 例)
+		slScrWindow0(10,0,0,10) ; /* 左右の位置関係がおかしい */
+			      | | |  |__ Bottom
+			      | | |_____ Right
+			      | |_______ Top
+			      |_________ Left
+		slScrWindow0(10,10,0,0) ; /* 上下、左右の位置関係がおかしい */
+
+void slScrLineWindow1((void *)addr)
+  機能 : ラインウィンドウデータテーブル１のアドレスを指定します。
+
+void slScrWindowMode((Uint16)screen , (Uint16)mode)
+  機能 : 各スクロール面のウィンドウの使用モードを設定します。
+	screen : scnNBG0 , scnNBG1 , scnNBG2 , scnNBG3 , scnRBG0 ,
+		 scnSPR , scnROT , scnCCAL のいずれかを指定します。
+	mode : 以下の要素から選択して指定します。
+		[win_OR  | win_AND]	複数のウィンドウに対する条件
+		[win0_IN | win0_OUT]
+		[win1_IN | win1_OUT]	..._IN は ウィンドウの内側を表示する
+		[spw_IN  | spw_OUT]	..._OUT は ウィンドウの外側を表示する
+
+  例)
+    ＮＢＧ０がウィンドウ０の内側のみ、
+    ＮＢＧ１がウィンドウ１の外側のみ、
+    ＮＢＧ２がウィンドウ０とウィンドウ１の内側、
+    ＮＢＧ３がウィンドウ０とウィンドウ１の重なった部分の内側のみという場合
+	slScrWindowMode(scnNBG0 , win0_IN) ;
+	slScrWindowMode(scnNBG1 , win1_OUT) ;
+	slScrWindowMode(scnNBG2 , win_OR | win0_IN | win1_IN) ;
+	slScrWindowMode(scnNBG3 , win_AND | win0_IN | win1_IN) ;
+
+void slBackColTable(void *tbl)
+  機能 : バック画面のカラーテーブルをセットし、ラスター単位でカラーを切り替え
+	 るモードに設定します。
+
+void slColRate(Uint16 scrn , Uint16 rate)
+  機能 : 各画面のカラー演算割合を指定します。
+	scrn : scnNBG0 , scnNBG1 , scnNBG2 , scnNBG3 , scnRBG0 , scnLNCL , scnBACK
+	のいずれかを指定します。
+	rate : CLRate31_1 ~ CLRate0_32 で指定します。
+		rate		 Top Screen : Second Screen
+		 CLRate31_1		３１:１
+		 CLRate30_2		３０:２
+			    ・・・
+		 CLRate1_31		  １:３１
+		 CLRate0_32		  ０:３２
+
+void slColorCalcMode(Uint16 mode)
+  機能 : slColorCalc 関数のモード設定部分のみを行う関数、slColorCalcOn 関数と併用する
+
+void slPriority(Sint16 scrn , Uint16 num)
+  機能 : 各画面のプライオリティナンバーを設定します。
+	scrn : scnNBG0 , scbNBG1 , scnNBG2 , scnNBG3 , scnRBG0 , scnSPR0 , scnSPR1 ,
+	scnSPR2 , scnSPR3 , scbSPR4 , scnSPR5 , scnSPR6 , scnSPR7
+	num : ０〜７の値を指定します(ただし、０を指定すると表示されません)。
+
+void slZoomMode(Uint16 scrn , Uint16 mode)
+  機能 : ＮＢＧ０，ＮＢＧ１をどこまで縮小するかを指定します。
+	scrn : scnNBG0 , scnNBG1 のいずれかを指定します。
+	mode : ZOOM_1 , ZOOM_HALF , ZOOM_QUARTER のいずれかを指定します。
+
+void slShadowOn(Uint16 scrn)
+  機能 : シャドウ機能がどのスクロール面に対して機能するかを指定します。
+	scrn : NBG0ON , NBG1ON , NBG2ON , NBG3ON , RBG0ON , BACKON
+
+void slTpShadowMode(Uint16 mode)
+  機能 : 透明シャドウのスプライトを有効にするかどうかを指定します。
+	mode : ON , OFF を指定します。
+
+void slOverPatRA(Uint16 pname)
+void slOverPatRB(Uint16 pname)
+  機能 : 回転スクロールのマップ外キャラクタのパターンネームをセットします。
+
+void sl16MapRA(Uint8 map[16])
+void sl16MapRB(Uint8 map[16])
+  機能 : 回転スクロールのマップ１６ページ分をセットします。
+	 引数として渡す配列に１６ページ分のマップナンバーをセットしておきます。
+	 (ページナンバーにはＶＲＡＭの先頭から ０ｘ８００ 単位で数えたものを入
+	  れてください)
+
+	 ＡＢＣＤ
+	 ＥＦＧＨ
+	 ＩＪＫＬ
+	 ＭＮＯＰ
+
+	 上記の４ｘ４ページ分をＡＢＣ ... ＮＯＰの順に配列にセットしておきます。
+
+void slGradationOn(Uint16 scrn)
+  機能 : ボカシ機能を有効にし、作用する画面を指定します。
+	scrn : grdNBG0 , grdNBG1 , grdNBG2 , grdNBG3 , grdRBG0 , grdSPR の
+	いずれかのみ指定。
+【注意】ボカシ機能は、カラーＲＡＭモードが０の場合にしか使えません。
+	また、ボカシ機能はカラー演算と併用しないと機能しませんので注意してください。
+
+void slGradationOff(void)
+  機能 : ボカシ機能を無効にします。
+
+void slColRAMOffsetNbg0(Uint16 offset)
+  機能 : 各画面で使用するカラーＲＡＭの先頭アドレスを２５６色単位でオフセットを
+	掛けます。
+	オフセットは０から７(ただし、カラーＲＡＭモードが０または２の場合には３
+	まで)で指定します。
+
+void slColRAMOffsetNbg1(Uint16 offset)
+void slColRAMOffsetNbg2(Uint16 offset)
+void slColRAMOffsetNbg3(Uint16 offset)
+void slColRAMOffsetRbg0(Uint16 offset)
+void slColRAMOffsetSpr(Uint16 offset)
+	同上
+
+void slBitMapNbg0(Uint16 col_type , Uint16 bmsize , void *bmadr)
+  機能 : ＮＢＧ０画面をビットマップモードにし、ビットマップのサイズを設定します。
+	col_type : COL_TYPE_16 , COL_TYPE_256 , COL_TYPE_2048 , COL_TYPE_32768
+		 COL_TYPE_1M のいずれか
+	bmsize : BM_512x256 , BM_512x512 , BM_1024x256 , BM_1024x512 のいずれか
+	bmadr  : ビットマップデータをセットするＶ-ＲＡＭアドレスをセットします。
+		 これは０ｘ２００００バウンダリのアドレスでなければなりません。
+
+void slBitMapNbg1(Uint16 col_type , Uint16 bmsize , void *bmadr)
+	col_type : COL_TYPE_16 , COL_TYPE_256 , COL_TYPE_2048 , COL_TYPE_32768
+		 のいずれか
+	bmsize : BM_512x256 , BM_512x512 , BM_1024x256 , BM_1024x512 のいずれか
+	bmadr  : ビットマップデータをセットするＶ-ＲＡＭアドレスをセットします。
+		 これは０ｘ２００００バウンダリのアドレスでなければなりません。
+
+void slBitMapRbg0(Uint16 col_type , Uint16 bmsize , void *bmadr)
+  機能 : ＲＢＧ０画面をビットマップモードにし、ビットマップのサイズを設定します。
+	col_type : COL_TYPE_16 , COL_TYPE_256 , COL_TYPE_2048 , COL_TYPE_32768
+		 COL_TYPE_1M のいずれか
+	bmsize : BM_512x256 , BM_512x512 のいずれかを指定します。
+	bmadr  : ビットマップデータをセットするＶ-ＲＡＭアドレスをセットします。
+		 これは０ｘ２００００バウンダリのアドレスでなければなりません。
+
+void slBMPaletteNbg0(Uint16 pal)
+void slBMPaletteNbg1(Uint16 pal)
+void slBMPaletteRbg0(Uint16 pal)
+  機能 : ビットマップ画面を表示する場合のパレットナンバーをセットします。
+	Manual VDP2 P.112 参照
+
+void slSpecialPrioModeNbg0(Uint16 mode)
+void slSpecialPrioModeNbg1(Uint16 mode)
+void slSpecialPrioModeNbg2(Uint16 mode)
+void slSpecialPrioModeNbg3(Uint16 mode)
+void slSpecialPrioModeRbg0(Uint16 mode)
+  機能 : 特殊プライオリティを使用する場合のプライオリティ決定モードを設定します。
+	mode : spPRI_Scrn , spPRI_Char , spPRI_Dot のいずれかを指定します。
+
+void slSpecialCCalcModeNbg0(Uint16 mode)
+void slSpecialCCalcModeNbg1(Uint16 mode)
+void slSpecialCCalcModeNbg2(Uint16 mode)
+void slSpecialCCalcModeNbg3(Uint16 mode)
+void slSpecialCCalcModeRbg0(Uint16 mode)
+  機能 : 特殊カラー演算を使用する場合の演算を有効にするためのモードを設定します。
+	mode : spCCAL_Scrn , spCCAL_Char , spCCAL_Dot , spCCAL_MSB のいずれかを
+	指定します。
+
+void slSpecialFuncCodeA(Uint16 flag)
+void slSpecialFuncCodeB(Uint16 flag)
+  機能 : 特殊機能を有効にするカラーコード(下位４ビット)を指定します。
+	code : sfCOL_01 , sfCOL_23 , sfCOL_45 , sfCOL_67 , sfCOL_89 , sfCOL_ab ,
+	    sfCOL_cd , sfCOL_ef を '|' でつないで指定します。
+
+void slSpecialFuncSelectB(Uint16 scrn)
+  機能 : 特殊機能コードＢを使用するスクロール画面を指定します。
+	scrn : NBGON , NBG1ON , NBG2ON , NBG3ON , RBG0ON
+
+void slRparaReadCtrlRA(Uint16 flag)
+void slRparaReadCtrlRB(Uint16 flag)
+  機能 : 回転パラメータの内 Ｘｓｔ、Ｙｓｔ、ＫＡｓｔを各ラインごとに読み直すか
+	 どうかを指定します。
+	flag : LnRd_Xst , LnRd_Yst , LnRd_KAst を '|' でつないで指定します。
+
+void slSpecialPrioBitN01(Uint16 scrn , Uint16 flag)
+  機能 : 面ごとに指定する特殊プライオリティビットをセットします。
+	 セルモード、ビットマップモード用の両方のレジスタをセットします。
+	scrn : scrnNBG0 , scrnNBG1 のいずれか
+	flag : ０ または １
+
+void slSpecialPrioBitScr(Uint16 scrn , Uint16 flag)
+  機能 : 面ごとに指定する特殊プライオリティビットをセットします。
+	scrn : scrnNBG2 , scrnNBG3 のいずれか
+	flag : ０ または １
+
+void slSpecialPrioBitRbg0(Uint16 flag)
+  機能 : 面ごとに指定する特殊プライオリティビットをセットします。
+	 セルモード、ビットマップモード用の両方のレジスタをセットします。
+	flag : ０ または １
+
+void slSpecialCCalcBitN01(Uint16 scrn , Uint16 flag)
+  機能 : 面ごとに指定する特殊カラー演算ビットをセットします。
+	 セルモード、ビットマップモード用の両方のレジスタをセットします。
+	scrn : scrnNBG0 , scrnNBG1 のいずれか
+	flag : ０ または １
+
+void slSpecialCCalcBitScr(Uint16 scrn , Uint16 flag)
+  機能 : 面ごとに指定する特殊カラー演算ビットをセットします。
+	scrn : scrnNBG2 , scrnNBG3 のいずれか
+	flag : ０ または １
+
+void slSpecialCCalcBitRbg0(Uint16 flag)
+  機能 : 面ごとに指定する特殊カラー演算ビットをセットします。
+	 セルモード、ビットマップモード用の両方のレジスタをセットします。
+	flag : ０ または １
+
+void slLineScrollMode(Uint16 scrn , Uint16 mode)
+  機能 : スクロール面のラインスクロールモードを設定します。
+	scrn : scrnNBG0 , scrnNBG1 のいずれか
+	mode :
+	    lineSZ1 | lineSZ2 | lineSZ4 | lineSZ8	: ラインの幅
+	    lineZoom					: 水平方向のスケーリング
+	    lineVScroll					: 垂直方向のスクロール
+	    lineHScroll					: 水平方向のスクロール
+	    VCellScroll					: 縦セルスクロール
+	を 使用したいモードを '|' でつないで指定。
+
+void slLineScrollTable0(void *addr)
+  機能 : ラインスクロールデータのテーブルを指定します。
+	addr : ラインスクロールデータをセットしたＶＲＡＭのアドレス
+
+void slLineScrollTable1(void *addr)
+  機能 : 同上
+
+void slVCellTable(void *addr)
+  機能 : 縦セルスクロールデータのテーブルを指定します。
+	addr : 縦セルスクロールデータをセットしたＶＲＡＭのアドレス
+	縦セルスクロールを使用する場合、ＶＲＡＭアクセスサイクルの設定が必要となります。
+	関数 "slScrCycleSet","slScrAutoDisp" によってセットして下さい。
+	縦セルスクロールはハイレゾリューションモードでは使用できません。
+	また、回転スクロールで使用するデータ(係数、ＣＧ等)と同じバンクにすることも
+	許されません。
+
+void slVRAMMode(Uint16 mode)
+  機能 : Ｖ-ＲＡＭの分割方法を設定します。
+	mode : Div_A , Div_B を分割するものだけ指定します。
+	分割をやめたい場合にはＮＵＬＬを指定します。
+
+void slColOffsetScrn(Uint16 Ascrn , Uint16 Bscrn)
+  機能 : カラーオフセットの影響するスクリーンをパラメータＡに対する面と、パラメータ
+	 Ｂに対する面とを別々に指定します。
+	 (この関数は slColOffsetOn() と slColOffsetBUse() とを合わせたものです)
+	Ascrn , Bscrn : slScrDisp と同様に指定します。
+
+void slScrMoveNbg0(FIXED mvx , FIXED mvy)
+  機能 : スクロールの表示位置を前の位置からの移動量で指定します。
+	 (この関数は slScrPosNbg0() で指定された表示位置に加算していきます)
+	 現在の表示位置はシステム変数 Nbg0_PosX , Nbg0_PosY を参照してください。
+	 slScrMoveNbg1 , slScrMoveNbg2 , slScrMoveNbg3 も同様に用意されています。
+
+void setASC_1to8(Uint8 *src, void *dst , Uint32 cell , Uint8 pal)
+void setASC_4to8(Uint8 *src, void *dst , Uint32 cell , uint8 pal)
+  機能 : １ピクセルが１(４)ビットに圧縮されたＡＳＣＩＩキャラクタのデータをスクロー
+	 ルの２５６色モード用のキャラクタデータに展開します。
+	 各ピクセルは パレット番号が０または１になります。
+	 cell には 展開するキャラクタ数を指定します。
+	 pal には 展開するキャラクタのベースパレットナンバーを指定します。
+
+void setASC_1to4(Uint8 *src, void *dst , Uint32 cell , Uint8 pal , Sint32 skip)
+  機能 : １ピクセルが１ビットに圧縮されたＡＳＣＩＩキャラクタのデータをスクロー
+	 ルの１６色モード用のキャラクタデータに展開します。
+	 各ピクセルは パレット番号が０または１になります。
+	 cell には 展開するキャラクタ数を指定します。
+	 pal には 展開するキャラクタのベースパレットナンバーを指定します。
+	 skip には １セル分の展開の後、何バイト分スキップするかを指定します。
+	 (slPrint 等の２５６色モード専用の関数を１６色モードで使用する場合には
+	  CG_Size/2 を指定します)
+
+Uint8 SGL_ASCII_CG[]
+  ＳＧＬ がデフォルトのキャラクタデータとして持っている ＡＳＣＩＩキャラクタの
+  データで、上記の setASC_1to8() 関数により展開しています。
+  キャラクタ数は１２８です。
+

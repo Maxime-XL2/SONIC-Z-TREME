@@ -1,0 +1,142 @@
+20>SatCom debugger Ver.1.5.60 [Build Sep 10 2017, 14:31:39]
+20>Usage: SatLink.exe <ini_file> [<commands>]
+20>
+20>Available command-line parameters are:
+20> -logsettings <file>          Open log settings file.
+20> -dev parlink         Open parallel port based device.
+20> -dev usbdl           Open USB Data Link device.
+20> -dev usbdc           Open USB dev cart device.
+20> -dev ylink           Open Yabause Link.
+20> -s <parameter> <value>       Set parameter to the specified value.
+20> -loginfos                    Log help and commands given to program.
+20>Basic commands:
+20> -l  <file> <addr>            Load file to address
+20> -x  <file> <addr>            Load file and JSR to load address
+20> -xx <file> <addr> <flags>    Load file, soft reset and JSR to load address
+20> -memset <addr> <val> <len>   Set memory area to specified 8-bit value.
+20> -d  <file> <addr> <size>     Dump data to file
+20>Soft reset flags used in -xx function:
+20> Bit 0 : if set, reset High work RAM.
+20> Bit 1 : if set, reset Low work RAM.
+20> Bit16 : if set, reset VDP1 registers.
+20> Bit17 : if set, reset VDP1 RAM.
+20> Bit18 : if set, reset VDP2 registers.
+20> Bit19 : if set, reset VDP2 RAM.
+20> Example : 0xFFFFFFFE : reset everything except High work RAM.
+20>Some shortcuts for the above commands:
+20> -db <file>                   Dump BIOS (assume 512K)
+20> -df <file>                   Dump cheat cartridge firmware (assume 256K)
+20> -bs <file>                   Save battery backed RAM to file
+20> -bl <file>                   Load battery backed RAM from file (must be 32K)
+20> -target_info                 Display target informations.
+20> -vdp1view                    Get VPD1 framebuffer snapshot.
+20> -showlog                     Show Log Window.
+20> -gui_set                     Change Main Form setting (Same keywords as in SatLink.ini).
+20> -exit                        Exit this application.
+20>
+20>Based on Saturn PAR utility by Charles MacDonald (http://cgfm2.emuviews.com)
+20>Based on code by Bart Trzynadlowski, James Forshaw and Charles MacDonald.
+20>[PT]SC->SEND (D:\OneDrive\Max\OneDrive\Documents\SATURN\SDK\Compiler\SBL_601\SEGASMP\SPR\SMPSPR8\smpspr80_elf.bin, [0x06004000], f1)
+20>Loading file `D:\OneDrive\Max\OneDrive\Documents\SATURN\SDK\Compiler\SBL_601\SEGASMP\SPR\SMPSPR8\smpspr80_elf.bin' to address 06004000
+00>No communication device opened !
+20>[PT]SC->SEND ended
+20>
+20>[PT]SC->OPEN (usb_dev_cart.ini)
+20>Set log setting from file: log_settings.ini
+20>SatCom debugger Ver.1.5.60 [Build Sep 10 2017, 14:31:39]
+20>Usage: SatLink.exe <ini_file> [<commands>]
+20>
+20>Available command-line parameters are:
+20> -logsettings <file>          Open log settings file.
+20> -dev parlink         Open parallel port based device.
+20> -dev usbdl           Open USB Data Link device.
+20> -dev usbdc           Open USB dev cart device.
+20> -dev ylink           Open Yabause Link.
+20> -s <parameter> <value>       Set parameter to the specified value.
+20> -loginfos                    Log help and commands given to program.
+20>Basic commands:
+20> -l  <file> <addr>            Load file to address
+20> -x  <file> <addr>            Load file and JSR to load address
+20> -xx <file> <addr> <flags>    Load file, soft reset and JSR to load address
+20> -memset <addr> <val> <len>   Set memory area to specified 8-bit value.
+20> -d  <file> <addr> <size>     Dump data to file
+20>Soft reset flags used in -xx function:
+20> Bit 0 : if set, reset High work RAM.
+20> Bit 1 : if set, reset Low work RAM.
+20> Bit16 : if set, reset VDP1 registers.
+20> Bit17 : if set, reset VDP1 RAM.
+20> Bit18 : if set, reset VDP2 registers.
+20> Bit19 : if set, reset VDP2 RAM.
+20> Example : 0xFFFFFFFE : reset everything except High work RAM.
+20>Some shortcuts for the above commands:
+20> -db <file>                   Dump BIOS (assume 512K)
+20> -df <file>                   Dump cheat cartridge firmware (assume 256K)
+20> -bs <file>                   Save battery backed RAM to file
+20> -bl <file>                   Load battery backed RAM from file (must be 32K)
+20> -target_info                 Display target informations.
+20> -vdp1view                    Get VPD1 framebuffer snapshot.
+20> -showlog                     Show Log Window.
+20> -gui_set                     Change Main Form setting (Same keywords as in SatLink.ini).
+20> -exit                        Exit this application.
+20>
+20>Based on Saturn PAR utility by Charles MacDonald (http://cgfm2.emuviews.com)
+20>Based on code by Bart Trzynadlowski, James Forshaw and Charles MacDonald.
+20>Command line: `SatLink.exe
+20> "-logsettings"
+20> "log_settings.ini"
+20> "-loginfos"
+20> "-dev"
+20> "usbdc"
+20> "-s"
+20> "v"
+20> "0x0403"
+20> "-s"
+20> "p"
+20> "0x6001"
+20> "-s"
+20> "display"
+20> "1"
+20> "-s"
+20> "init"
+20> "1"
+20>'
+20>Open device (usbdc) ...
+20>Start ...
+20>Open device (usbdc) success !
+20>Device version=Saturn USB dev cart (FTDI) interface Ver. 0.3
+20>Init parameter "v" = "0x0403"
+20>Set parameter (v, 0x0403) ...
+20>Init parameter "p" = "0x6001"
+20>Set parameter (p, 0x6001) ...
+20>Init parameter "display" = "1"
+20>Set parameter (display, 1) ...
+01>USB dev cart internal settings
+01>|VID        : 0x0403
+01>|PID        : 0x6001
+20>Init parameter "init" = "1"
+20>Set parameter (init, 1) ...
+01>USB dev cart init ...
+01>USB dev cart init = 1
+20>[PT]SC->OPEN ended
+20>
+20>[PT]SC->SEND (D:\OneDrive\Max\OneDrive\Documents\SATURN\SDK\Compiler\SBL_601\SEGASMP\SPR\SMPSPR8\smpspr80_elf.bin, [0x06004000], f1)
+20>Loading file `D:\OneDrive\Max\OneDrive\Documents\SATURN\SDK\Compiler\SBL_601\SEGASMP\SPR\SMPSPR8\smpspr80_elf.bin' to address 06004000
+00>Firmware Version = 0x31 (1)
+00> -> will use ExecExt function
+21>Transfer Time  = 813 msec(s) (173952 bytes).
+21>Average transmission speed = 213.963100 KB/s
+01>DoExecExt(address=0x06004000, buffer, length=173952, reset=0xFFFFFFFD) = 1
+20>[PT]SC->SEND ended
+20>
+20>[PT]SC->OPEN (usb_dev_cart.ini)
+20>[PT]SC->OPEN ended
+20>
+20>[PT]SC->SEND (C:\SaturnOrbit\SGL_302j\DEMOS\CDDA_SGL\cd\0.bin, [0x06004000], f1)
+20>Loading file `C:\SaturnOrbit\SGL_302j\DEMOS\CDDA_SGL\cd\0.bin' to address 06004000
+00>Firmware Version = 0x31 (1)
+00> -> will use ExecExt function
+21>Transfer Time  = 375 msec(s) (77024 bytes).
+21>Average transmission speed = 205.397333 KB/s
+01>DoExecExt(address=0x06004000, buffer, length=77024, reset=0xFFFFFFFD) = 1
+20>[PT]SC->SEND ended
+20>

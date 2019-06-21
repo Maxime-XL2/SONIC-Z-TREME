@@ -1,0 +1,4 @@
+
+Usage: C:\Users\Maxime\OneDrive\Documents\SATURN\DEV\Emulators\mednafen\mednafen.exe [OPTION]... [FILE]
+	Please refer to the documentation for option parameters and usage.
+
