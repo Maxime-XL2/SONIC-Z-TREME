@@ -27,8 +27,8 @@ SPR_ATTR sprites[]=
     SPR_ATTRIBUTE(18, LUTidx(18), No_Gouraud, CL16Look | ECdis | SPenb | HSSon | MESHoff | Window_In ,  sprNoflip | _ZmCC ),
     SPR_ATTRIBUTE(19, LUTidx(19), No_Gouraud, CL16Look | ECdis | SPenb | HSSon | MESHoff | Window_In ,  sprNoflip | _ZmCC ),
 
-    SPR_ATTRIBUTE(28, LUTidx(28), No_Gouraud, CL16Look | ECdis | SPenb | HSSon | (1<<11) | MESHoff | Window_In ,  sprNoflip | _ZmCC ),
-    SPR_ATTRIBUTE(17, LUTidx(17), No_Gouraud, CL16Look | ECdis | SPenb | HSSon | (1<<11) | MESHoff | Window_In ,  sprNoflip | _ZmCC ),
+    SPR_ATTRIBUTE(28, LUTidx(28), No_Gouraud, CL16Look | ECdis | SPenb | HSSon | (1<<11) | MESHon | Window_In ,  sprNoflip | _ZmCC ),
+    SPR_ATTRIBUTE(17, LUTidx(17), No_Gouraud, CL16Look | ECdis | SPenb | HSSon | (1<<11) | MESHon | Window_In ,  sprNoflip | _ZmCC ),
 };
 
 

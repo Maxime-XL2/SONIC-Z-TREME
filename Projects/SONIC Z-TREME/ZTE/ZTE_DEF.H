@@ -60,14 +60,14 @@ Many things aren't even used anymore.
 /* SPRITES */
 #define     MAX_SPRITES             (1280)
 #define     DEFAULT_FRAMERATE       (2)
-#define     TEXTURE_BASE_ADDRESS    ((MAX_POLYGONS+6)*32)
+#define     TEXTURE_BASE_ADDRESS    ((MAX_POLYGONS+6)*32 + MAX_POLYGONS*8)
 
 /* DISPLAY */
 #define     ZT_RES                  (TV_352x224)
 #define     ZT_TV_WIDTH             (352)
 #define     ZT_TV_HEIGHT            (224)
-#define     FIXEDdrawDist           (1680<<16)
-#define     def_drawDist            (1680)
+#define     FIXEDdrawDist           (1536<<16)
+#define     def_drawDist            (1536)
 #define     def_drawDist2           (1088)
 #define     FISH_EYE                (toFIXED(132.0))
 

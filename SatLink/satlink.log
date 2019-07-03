@@ -96,15 +96,15 @@
 20> "1"
 20> "-gui_set"
 20> "dbg_folder"
-20> "D:\OneDrive\Max\OneDrive\Documents\SATURN\DEV\Projects\SONIC Z-TREME\cd\"
+20> "C:\Users\Max\Documents\SONIC_Z-TREME\SONIC-Z-TREME\Projects\SONIC Z-TREME\cd\"
 20> "-gui_set"
 20> "dbg_binary"
-20> "D:\OneDrive\Max\OneDrive\Documents\SATURN\DEV\Projects\SONIC Z-TREME\cd\0.bin"
+20> "C:\Users\Max\Documents\SONIC_Z-TREME\SONIC-Z-TREME\Projects\SONIC Z-TREME\cd\0.bin"
 20> "-l"
-20> "D:\OneDrive\Max\OneDrive\Documents\SATURN\DEV\SatLink\sclib_4d_stub.bin"
+20> "C:\Users\Max\Documents\SONIC_Z-TREME\SONIC-Z-TREME\Projects\SONIC Z-TREME\..\..\SatLink\sclib_4d_stub.bin"
 20> "0x002E0000"
 20> "-xx"
-20> "D:\OneDrive\Max\OneDrive\Documents\SATURN\DEV\Projects\SONIC Z-TREME\cd\0.bin"
+20> "C:\Users\Max\Documents\SONIC_Z-TREME\SONIC-Z-TREME\Projects\SONIC Z-TREME\cd\0.bin"
 20> "0x06004000"
 20> "0x000F0001"
 20> "-showlog"
@@ -126,23 +126,37 @@
 20>Set parameter (init, 1) ...
 01>USB dev cart init ...
 01>USB dev cart init = 1
-20>Set GUI `dbg_folder' to `D:\OneDrive\Max\OneDrive\Documents\SATURN\DEV\Projects\SONIC Z-TREME\cd\'
-20>Set GUI `dbg_binary' to `D:\OneDrive\Max\OneDrive\Documents\SATURN\DEV\Projects\SONIC Z-TREME\cd\0.bin'
-20>Loading file `D:\OneDrive\Max\OneDrive\Documents\SATURN\DEV\SatLink\sclib_4d_stub.bin' to address 002E0000
-21>Transfer Time  = 375 msec(s) (77300 bytes).
-21>Average transmission speed = 206.133333 KB/s
+20>Set GUI `dbg_folder' to `C:\Users\Max\Documents\SONIC_Z-TREME\SONIC-Z-TREME\Projects\SONIC Z-TREME\cd\'
+20>Set GUI `dbg_binary' to `C:\Users\Max\Documents\SONIC_Z-TREME\SONIC-Z-TREME\Projects\SONIC Z-TREME\cd\0.bin'
+20>Loading file `C:\Users\Max\Documents\SONIC_Z-TREME\SONIC-Z-TREME\Projects\SONIC Z-TREME\..\..\SatLink\sclib_4d_stub.bin' to address 002E0000
+21>Transfer Time  = 391 msec(s) (77300 bytes).
+21>Average transmission speed = 197.698210 KB/s
 01>DoUpload(address=0x002E0000, buffer, length=77300) = 1
-20>Loading file `D:\OneDrive\Max\OneDrive\Documents\SATURN\DEV\Projects\SONIC Z-TREME\cd\0.bin' to address 06004000
+20>Loading file `C:\Users\Max\Documents\SONIC_Z-TREME\SONIC-Z-TREME\Projects\SONIC Z-TREME\cd\0.bin' to address 06004000
 00>Firmware Version = 0x31 (1)
 00> -> will use ExecExt function
-21>Transfer Time  = 3031 msec(s) (659488 bytes).
-21>Average transmission speed = 217.580996 KB/s
-01>DoExecExt(address=0x06004000, buffer, length=659488, reset=0x000F0001) = 1
+21>Transfer Time  = 3047 msec(s) (659504 bytes).
+21>Average transmission speed = 216.443715 KB/s
+01>DoExecExt(address=0x06004000, buffer, length=659504, reset=0x000F0001) = 1
 20>Show Log Window ...
 20>[PT]Parse command line end.
 20>
 00>Read data error: usb bulk read failed
-10>[DBG]Version check failed ! PC(version = 5.5, struct sz=3072)
+00>Send download command error: usb bulk write failed
+00>Send download command error: usb bulk write failed
+00>Send download command error: usb bulk write failed
+00>Send download command error: usb bulk write failed
+00>Send download command error: usb bulk write failed
+00>Send download command error: usb bulk write failed
+00>Send download command error: usb bulk write failed
+00>Send download command error: usb bulk write failed
+00>Send download command error: usb bulk write failed
+00>Send download command error: usb bulk write failed
+00>Send download command error: usb bulk write failed
+00>Send download command error: usb bulk write failed
+00>Send download command error: usb bulk write failed
+00>Send download command error: usb bulk write failed
+00>Send download command error: usb bulk write failed
 00>Send download command error: usb bulk write failed
 00>Send download command error: usb bulk write failed
 00>Send download command error: usb bulk write failed

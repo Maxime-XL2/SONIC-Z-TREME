@@ -6,32 +6,6 @@ GPL license : If you share a binary version of this, you share back the code.
 And please don't be a jerk, just give me some credits somewhere.
 
 Note on this code : it's not pretty, I know!
-I started this project with almost no knowledge of coding, even less for game making.
-So I am not a programmer and I never code in my job, but I learned a great deal thanks to this project.
-Many things are wrong or could be much better.
-I know it, but with little free time, I wanted to just make a fun little game.
-I've seen too many people coding on Saturn and wasting months to have the most efficient functions possible. But then nothing ever truly comes out
-of these projects because it takes way too long to do anything.
-I had a different philosophy, I just want to make a nice little game, so I just try to do it as fast as possible even knowing things are "broken" or not efficient.
-Bad coding practices, yes, but at least a game can come out of it!
-
-I chose to remake Sonic X-Treme for a number of reason, the number one being the simplicity of it.
-The blocky nature of the game made the collision detection easier when I started and it also made generating LOD models easy.
-
-I lost motivation on this project for a number of reason, the number one being the insane amount of people complaining non-stop without even playing the demo.
-
-"I refuse to play this unless you put sprites!"
-"Port Sonic Mania instead! Do I have to do it myself?"
-"Where is the fisheye lens?"
-"Can you make game XYZ instead?"
-"There is a reason Sega cancelled Sonic X-Treme!"
-"It's so blocky! LOL!"
-
-People don't realize how difficult it is to code a whole 3d game engine from scratch (and no, using Unity/UE is not what I consider creating a game engine!) and realize even
-less how hard it is on the Saturn.
-So anyway, it got to a point where entitled people were just and complaining non-stop, so it just fully killed my motivation to work on this.
-Realizing that I was just putting way too much of my free time in something not pleasing anybody (or almost),
-I just killed this project.
 
 Note on this build : it was rushed for SAGE 2018. I had no working build in 2018 and wanted to try a new engine using octrees.
 I also wrote a custom animation system, which I was proud of (done in like 2 weeks part time, I was very pleased with the results even if it's not user friendly).
@@ -134,7 +108,7 @@ void ztInit()
     fadeIn();
 
     ztInitSound();
-    //slInitGouraud(gourRealMax, GOUR_REAL_MAX, GRaddr, vwork);
+    slInitGouraud(gourRealMax, GOUR_REAL_MAX, GRaddr, vwork);
 	slIntFunction(ztVBLANKcustom);
 
     ztLoadPermanentAssets(2);

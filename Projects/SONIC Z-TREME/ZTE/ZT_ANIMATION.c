@@ -34,7 +34,7 @@ void ztUpdateAnimation(animationControl * animCtrl, entity_t * currentModel)
     Sint16 *src=curKeyFrame[0];
     Sint16 *nxt=nextKeyFrame[0];
     for (i = 0; i < currentPDATA->nbPoint*sizeof(POINT); i+= sizeof(int)) {
-		*dst++=(*src+(((*nxt-*src)*interpFctr)>>FPS))<<7;  //Here is a "mistake" : Using <<8 would be faster since the SH2 supports a shift left 8 instruction, but I didn't know it when I made this animation tool. To be changed to 8 instead
+		*dst++=(*src+(((*nxt-*src)*interpFctr)>>FPS))<<8;  //Here is a "mistake" : Using <<8 would be faster since the SH2 supports a shift left 8 instruction, but I didn't know it when I made this animation tool. To be changed to 8 instead
 		*src++; *nxt++;
     }
     *dst=currentPDATA->pltbl[0].norm[0];
