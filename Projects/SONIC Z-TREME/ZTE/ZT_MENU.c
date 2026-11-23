@@ -47,6 +47,9 @@ void setMenu(void)
 Sint32 mainMenu(void)
 {
     setMenu();
+    #if ZT_NET_AUTO
+    return GS_ONLINE; //Unattended online test (SRC/online.h)
+    #endif
     Sint8       fadeEffect = 0;
     Sint8       currentMenu = 0;
     Sint8       currentOption = 0;
@@ -99,19 +102,21 @@ Sint32 mainMenu(void)
                 if (fadeEffect >= 0 || currentOption != 0) ztSetNormalSprite(firstMapTexture + 1, -68, -40, toFIXED(150.0));
                 if (fadeEffect >= 0 || currentOption != 1) ztSetNormalSprite(firstMapTexture + 2, -68, 0, toFIXED(150.0));
                 if (fadeEffect >= 0 || currentOption != 2) ztSetNormalSprite(firstMapTexture + 3, -68, 40, toFIXED(150.0));
+                if (fadeEffect >= 0 || currentOption != 3) slPrint("ONLINE", slLocate(19, 24)); //No picture for it yet
 
                 if ((pad1.push & PER_DGT_ST) == 0 || (pad1.push & PER_DGT_TA) == 0 || (pad1.push & PER_DGT_TC) == 0 || (pad2.push & PER_DGT_ST) == 0 )
                 {
                     if (currentOption == 2) {currentMenu=2; currentOption=0;}
                     else if (currentOption == 0) {returnState=GS_1PLAYER; break;}  //Does nothing for now
                     else if (currentOption == 1) {returnState=GS_2PLAYERS; break;}  //Does nothing for now
+                    else if (currentOption == 3) {returnState=GS_ONLINE; break;}
                 }
 
                 if ((pad1.push & PER_DGT_KU) == 0 || (pad2.push & PER_DGT_KU) == 0 )
-                    {currentOption--; if (currentOption < 0) currentOption=2;}
+                    {currentOption--; if (currentOption < 0) currentOption=3;}
                 else if ((pad1.push & PER_DGT_KD) == 0 || (pad2.push & PER_DGT_KD) == 0 )
-                    {currentOption++; if (currentOption > 2) currentOption=0;}
-                if (currentOption > 2) currentOption=0;
+                    {currentOption++; if (currentOption > 3) currentOption=0;}
+                if (currentOption > 3) currentOption=0;
         }
 
 

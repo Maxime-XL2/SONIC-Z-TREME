@@ -382,9 +382,9 @@ void wireframeDebug(PerDigital * pad)
 
 void controls(player_t * currentPlayer, camera_t * currentCamera)
 {
-    PerDigital pad = Smpc_Peripheral[currentPlayer->PLAYER_ID];
+    PerDigital pad = ztPlayerPad(currentPlayer); //Online, the pad comes from the line (SRC/online.c)
     if (pad.id == PER_ID_NotConnect) return;
-    wireframeDebug(&pad);
+    if (!ztNetOn || currentPlayer == ztNetMe()) wireframeDebug(&pad); //Debug view: this console's player only
 
     FIXED is_moving;
     if(pad.id == 0x16)
