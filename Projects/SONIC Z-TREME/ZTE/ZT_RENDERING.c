@@ -55,6 +55,7 @@ FUNCTION EXECUTED DURING VBLANK
 *******/
 void ztVBLANKcustom()
 {
+    ztNetFields++;  //Online clock (ZT_NETLINK.c)
 
     if(enableRTG == 1)
         slGouraudTblCopy();
@@ -726,7 +727,9 @@ void			ztRender(player_t * currentPlayer, camera_t * currentCamera, Uint32 nbPla
     Uint8 rtg=enableRTG;
     if (BGAnim == 2 || BGAnim == 4) BGAnim=curTimer<< 17;
     else BGAnim=0;
-    if (currentPlayer->PLAYER_ID == 0)
+    //Main view: player 1, or online this console's player
+    int mainView = ztNetOn ? (currentPlayer == ztNetMe()) : (currentPlayer->PLAYER_ID == 0);
+    if (mainView)
     {
         slScrPosNbg1(slMulFX(currentCamera->camAngle[Y], (2048<<16)) + (BGAnim<<1), (slMulFX(slSin(currentCamera->camAngle[Z]), 256<<16))+(nbPlayers* ZT_TV_HEIGHT<<8)+BGAnim);
         animate(); //To be put elsewhere...
@@ -759,7 +762,7 @@ void			ztRender(player_t * currentPlayer, camera_t * currentCamera, Uint32 nbPla
 
 
 
-            if (nbPlayers>1)                //For multiplayer, displays the other player
+            if (nbPlayers>1 || ztNetOn)     //For multiplayer, displays the other player
             {
                 player_t * otherPlayer;
                 entity_t * otherEntity;
@@ -789,7 +792,7 @@ void			ztRender(player_t * currentPlayer, camera_t * currentCamera, Uint32 nbPla
         }
         slPopMatrix() ;
 
-        if (currentPlayer->PLAYER_ID == 0)
+        if (mainView)
             draw_stats(currentPlayer);
 
 }

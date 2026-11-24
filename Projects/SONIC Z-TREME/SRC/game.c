@@ -750,6 +750,20 @@ void main_loop(Uint32 nbPlayers)
 {
     if (PLAYER_1.STATUS & IS_DYING) ztReset(&PLAYER_1);
 
+    if (ztNetOn)    //Online: draw this console's player full screen, move both players in split screen's order
+    {
+        player_t * me = ztNetMe();
+        if (PLAYER_2.STATUS & IS_DYING) ztReset(&PLAYER_2);
+        slCurWindow(winFar);
+        ztSetScaledSprite(-80, -56, 159, 111, ((1<<11) | SPdis | CL_Replace | CL16Bnk | ECenb),
+                          (0xFFE0), 0, ((0x100)| 1), _ZmLT, toFIXED(3000)); //Clear the scaled frame buffer
+        slCurWindow(winNear);
+        ztRender(me, me == &PLAYER_1 ? &cam1 : &cam2, 1);
+        update_physics(&PLAYER_2);
+        update_physics(&PLAYER_1);
+        return;
+    }
+
     if (nbPlayers > 1)
     {
         if (PLAYER_2.STATUS & IS_DYING) ztReset(&PLAYER_2);

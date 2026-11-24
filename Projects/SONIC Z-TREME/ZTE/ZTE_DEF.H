@@ -131,6 +131,7 @@ typedef enum
     GS_BOSS,
     GS_END_CREDITS,
     GS_EXIT,
+    GS_ONLINE,
 } GAME_STATE;
 
 
@@ -383,6 +384,11 @@ void SYS_Exit(bool);
 #include "../SRC/game.h"
 #include "../SRC/physics.h"
 #include "../SRC/audio.h"
+
+/**ONLINE PLAY (NetLink)**/
+#include "ZT_NETLINK.H"
+#include "ZT_NETPLAY.H"
+#include "../SRC/online.h"
 
 
 

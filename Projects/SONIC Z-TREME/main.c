@@ -143,6 +143,7 @@ int main(void)
 	    gameState = mainMenu();
 	    if (gameState == GS_1PLAYER) {gameState = ztGameLoop(1);}
 	    if (gameState == GS_2PLAYERS) {gameState = ztGameLoop(2);}
+	    if (gameState == GS_ONLINE)   {gameState = ztOnlineGame();}
 	    if (gameState == GS_EXIT)    SYS_Exit(0);
 	    if (gameState == GS_DEMO)    {gameState = GS_MAIN_SCREEN;} //Temporary, it's meant to add a demo mode
         if (gameState==  GS_MAIN_SCREEN)       ztLoadLogo();

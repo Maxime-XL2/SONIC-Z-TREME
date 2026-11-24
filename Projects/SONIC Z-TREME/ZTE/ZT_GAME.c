@@ -60,8 +60,9 @@ Sint32 ztGameLoop(Uint32 nbPlayers)
     }
     #endif // SATLINK_DEBUG
 
-    ztInitDisplay(nbPlayers);
-    ztLoadMap(1, nbPlayers);
+    Uint32 nbViews = ztNetOn ? 1 : nbPlayers; //Online: one view per console (SRC/online.c)
+    ztInitDisplay(nbViews);
+    ztLoadMap(1, nbViews);
     DELAYED_CHANGEMAP=0;
     PerDigital pad1;
     PerDigital pad2;
@@ -70,7 +71,7 @@ Sint32 ztGameLoop(Uint32 nbPlayers)
     while (1)
     {
         if (DELAYED_CHANGEMAP==1)        {
-            ztLoadMap(0, nbPlayers);
+            ztLoadMap(0, nbViews);
             DELAYED_CHANGEMAP=0;
         }
 
@@ -78,12 +79,13 @@ Sint32 ztGameLoop(Uint32 nbPlayers)
         pad1 = Smpc_Peripheral[0];
         pad2 = Smpc_Peripheral[15];
         ztUpdateFramerate();
+        if (ztNetOn && !ztNetGameStep()) break; //Online: this step's pads and length
 
         if (PLAYER_1.LIVES<0) {ztClearText(); slPrint("GAME OVER!", slLocate(17,15)); ztWait(60*5); break;}
 
         if (KEY_PRESS(pad1.data, PER_DGT_TA) && KEY_PRESS(pad1.data, PER_DGT_TB) && KEY_PRESS(pad1.data, PER_DGT_TC) && KEY_PRESS(pad1.push, PER_DGT_ST) ) break;
         /**If you press START, you can change maps or reset the current level**/
-        if (KEY_PRESS(pad1.push, PER_DGT_ST))
+        if (KEY_PRESS(pad1.push, PER_DGT_ST) && !ztNetOn) //Debug keys read one console's pad: offline only
         {
             if      (KEY_PRESS(pad1.data, PER_DGT_TL) && KEY_PRESS(pad1.data, PER_DGT_TR))            ztLoadMap(0, nbPlayers);
             else if (KEY_PRESS(pad1.data, PER_DGT_KU))      ztLoadMap(0, nbPlayers);
@@ -94,13 +96,14 @@ Sint32 ztGameLoop(Uint32 nbPlayers)
                                                             else {showDebugStats=false; ztClearText();}}
             else    playerHurt(&PLAYER_1, 1);
         }
-        if (KEY_PRESS(pad2.push, PER_DGT_ST) && nbPlayers > 1)
+        if (KEY_PRESS(pad2.push, PER_DGT_ST) && nbPlayers > 1 && !ztNetOn)
         {
             playerHurt(&PLAYER_2, 1);
         }
         slUnitMatrix(0);
         main_loop(nbPlayers);
         TIMER+=ZT_FRAMERATE;
+        if (ztNetOn) ztNetGameAfter(); //Online: checksums, network page
 
 
         //ztGetDepthBuffer();
