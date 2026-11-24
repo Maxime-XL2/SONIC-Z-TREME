@@ -28,6 +28,7 @@ void setMenu(void)
         ztLoadTexture((Sint8*)"1PLAY.ZTI", ptr);
         ztLoadTexture((Sint8*)"2PLAY.ZTI", ptr);
         ztLoadTexture((Sint8*)"OPTIO.ZTI", ptr);
+        ztLoadTexture((Sint8*)"ONLINE.ZTI", ptr); //The letters of OPTIO.ZTI and 1PLAY.ZTI
         ztLoadVDP2bmp(NULL, "NBG0.ZTI", (Uint16 *)VDP2_VRAM_A0, 1, bmNBG0);
         ztLoadVDP2bmp(NULL, "CLOUD004.ZTI", (Uint16 *)VDP2_VRAM_B0, 2, bmNBG1);
     }
@@ -100,9 +101,9 @@ Sint32 mainMenu(void)
         else if (currentMenu==MM_GAME_SELECT)
         {
                 if (fadeEffect >= 0 || currentOption != 0) ztSetNormalSprite(firstMapTexture + 1, -68, -40, toFIXED(150.0));
-                if (fadeEffect >= 0 || currentOption != 1) ztSetNormalSprite(firstMapTexture + 2, -68, 0, toFIXED(150.0));
-                if (fadeEffect >= 0 || currentOption != 2) ztSetNormalSprite(firstMapTexture + 3, -68, 40, toFIXED(150.0));
-                if (fadeEffect >= 0 || currentOption != 3) slPrint("ONLINE", slLocate(19, 24)); //No picture for it yet
+                if (fadeEffect >= 0 || currentOption != 1) ztSetNormalSprite(firstMapTexture + 2, -68, -4, toFIXED(150.0));
+                if (fadeEffect >= 0 || currentOption != 2) ztSetNormalSprite(firstMapTexture + 3, -68, 32, toFIXED(150.0));
+                if (fadeEffect >= 0 || currentOption != 3) ztSetNormalSprite(firstMapTexture + 4, -68, 68, toFIXED(150.0));
 
                 if ((pad1.push & PER_DGT_ST) == 0 || (pad1.push & PER_DGT_TA) == 0 || (pad1.push & PER_DGT_TC) == 0 || (pad2.push & PER_DGT_ST) == 0 )
                 {

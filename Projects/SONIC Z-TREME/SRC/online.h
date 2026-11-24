@@ -3,7 +3,7 @@
 
 /*
  * Sonic Z-Treme online (online.c). Build switches (make ZT_DEFS="-D..."):
- *   ZT_NET_NUMBER="..."   the number the NetLink dials (default 199410; the emulated modem ignores it)
+ *   ZT_NET_NUMBER="..."   the number the NetLink dials (default 199411; the emulated modem ignores it)
  *   ZT_NET_GAME_ID="..."  the relay only matches consoles with the same id (default SONICZT1)
  *   ZT_NET_AUTO=1         go online at boot, and again after each game (unattended tests)
  *   ZT_NET_TEST_PAD=1     this console's player follows a scripted pad (unattended tests)

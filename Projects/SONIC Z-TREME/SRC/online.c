@@ -14,7 +14,7 @@
  */
 
 #ifndef ZT_NET_NUMBER
-#define ZT_NET_NUMBER "199410"
+#define ZT_NET_NUMBER "199411"         /* the DreamPi code of Sonic Z-Treme's relay (ONLINE.md) */
 #endif
 #ifndef ZT_NET_GAME_ID
 #define ZT_NET_GAME_ID "SONICZT1"      /* the relay only matches identical ids: change it when the game logic changes */
@@ -150,6 +150,19 @@ player_t *ztNetMe(void)
     return netLocal == 1 ? &PLAYER_2 : &PLAYER_1;
 }
 
+/* fadeOut, at the end of the menu and of ztGameLoop, turns the display off with the colour offset at -255: undo both
+ * for the text screens, then put them back for what follows */
+static void ztNetShow(int on)
+{
+    Sint16 o = on ? 0 : -255;
+    ztClearText();
+    slColOffsetB(o, o, o);
+    if (on)
+        slTVOn();
+    else
+        slTVOff();
+}
+
 /* the waiting screen; B cancels while in the hall */
 static int ztNetIdle(int state)
 {
@@ -184,11 +197,11 @@ static int ztNetIdle(int state)
 static void ztNetMessage(const char *m)
 {
     int i;
-    ztClearText();
+    ztNetShow(1);
     ztNetLine(12, m, 1);
     for (i = 0; i < 90; i++)
         slSynch();
-    ztClearText();
+    ztNetShow(0);
 }
 
 /* both consoles start from the same state, whatever was played before */
@@ -215,7 +228,10 @@ static void ztNetPrepare(void)
 Sint32 ztOnlineGame(void)
 {
     Sint32 r;
-    int c = netConnect(ZT_NET_NUMBER, ZT_NET_GAME_ID, 2, 2, ztNetIdle);
+    int c;
+    ztNetShow(1);
+    c = netConnect(ZT_NET_NUMBER, ZT_NET_GAME_ID, 2, 2, ztNetIdle);
+    ztNetShow(0);
     if (c <= 0)
     {
         if (c == 0)

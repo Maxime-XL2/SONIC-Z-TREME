@@ -19,7 +19,7 @@ Status: works in Mednafen with an emulated NetLink. Not tried on a real Saturn y
 |---|---|
 | `ZTE/ZT_NETLINK.c` | NetLink driver: 16550 UART, Hayes AT, its A-bus interrupt (the 16-byte FIFO would overflow while the game draws) |
 | `ZTE/ZT_NETPLAY.c` | Lockstep, game-agnostic: input delay, agreed step length, checksums, relay protocol |
-| `SRC/online.c` | Sonic side: menu entry, hall screen, pad records, checksums, network page |
+| `SRC/online.c` | Sonic side: hall screen, pad records, checksums, network page |
 
 Changes to the engine, all behind `ztNetOn` (offline nothing changes):
 
@@ -29,12 +29,14 @@ Changes to the engine, all behind `ztNetOn` (offline nothing changes):
 - `main_loop()` draws only this console's player, then moves player 2 and player 1 as split screen does. `ztRender()` takes
   that player as its main view.
 - The START debug keys of `ztGameLoop()` are offline only.
+- GAME SELECT gets a fourth picture, `cd/MENU/ONLINE.ZTI`, made of the letters of `OPTIO.ZTI` and `1PLAY.ZTI`. The
+  choices are 36 pixels apart instead of 40 to keep it on screen.
 
 Build switches are listed in `SRC/online.h` (dial number, game id, input delay, unattended test modes).
 
 ## Trying it in an emulator
 
-You need the saturn-online kit: Mednafen 1.32.1 with its NetLink modem cartridge (`-ss.cart nlmodem`: dialing becomes a TCP
+You need the [saturn-online](https://github.com/N0rt0N85/saturn-online) kit: Mednafen 1.32.1 with its NetLink modem cartridge (`-ss.cart nlmodem`: dialing becomes a TCP
 connection to `MDFN_NLMODEM`), and its relay (`relay/relay.py`, Python 3.8+).
 
     python3 relay.py --port 4822
@@ -54,10 +56,12 @@ players, 40 and 100 ms of line, 17 games:
 
 ## On a real Saturn
 
-The NetLink dials a DreamPi, or a PC with a USB voice modem running a NetLink bridge, which connects to the relay. A DreamPi
-entry looks like:
+The NetLink dials a DreamPi, or a PC with a USB voice modem running a NetLink bridge, which connects to the relay. Sonic
+Z-Treme dials 199411 (`ZT_NET_NUMBER`). The DreamPi's codes are handed out in the `netlink_config.ini` of
+[eaudunord/Netlink](https://github.com/eaudunord/Netlink), where 199411 is not registered yet: add this entry at the end of
+the DreamPi's `netlink_config.ini`, then restart it.
 
-    [server:199410]
+    [server:199411]
     name = Sonic Z-Treme
     host = <relay host>
     port = <relay port>
@@ -69,5 +73,4 @@ entry looks like:
 
 - Two players, no joining a game already running.
 - Only player 1's GAME OVER ends the game, as in split screen.
-- The menu entry is text, with no picture yet.
 - The stream has no resync marker: one lost byte breaks the game. The UART interrupt is there to prevent that.
