@@ -21,7 +21,7 @@ The compiler setup is very similar to the Jo Engine setup and it uses Johannes F
 Props to Dany from Jo Engine forums for helping me setup the compiler environment.
 The Sonic X-Treme maps are from Andrew75, the maker of Project AXSX.
 Thanks to JollyRoger for his overall help and tips.
-Thanks to Café Alpha for the Satlink support.
+Thanks to CafÃ© Alpha for the Satlink support.
 Thanks also to the Segaxtreme community (vbt, mrkotfw and many others) who helped me a lot improving the Z-Treme engine 
 (not seen here, the version in Sonic Z-Treme is an old one).
 
@@ -72,6 +72,6 @@ I built a BSP compiler that I used for lighting, which worked well, but killed s
 
 # About the map compiler : 
 It truly sucks. 
-I won't share it for now, I would need to clean it quite a bit, but it really sucks. It started as simple model converter to a collision generator to a "full" map compiler. And I did so many experiments, so many different iterations of the engine that it's a real shitshow of unused code, abandonned experiments, working experiments with terrible code, duplicate functions, etc.
+I won't share it for now, I would need to clean it quite a bit, but it really sucks. It started as simple model converter to a collision generator to a "full" map compiler. And I did so many experiments, so many different iterations of the engine that it's a real shitshow of unused code, abandoned experiments, working experiments with terrible code, duplicate functions, etc.
 In other words, it's terrible even to myself, so I won't share it for now. I would need to update it as well to fix things I broke since SAGE and make sure it works with the current Z-Treme build, but it takes more time than I am willing to spend for now. 
 If there is enough interest, I will try to find time to fix it.
